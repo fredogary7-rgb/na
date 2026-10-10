@@ -1,0 +1,56 @@
+{% extends "auth_base.html" %}
+{% block title %}Inscription{% endblock %}
+{% block auth_content %}
+<div class="auth-title">
+    <h1>Créer un compte</h1>
+    <p>Rejoignez NAMARA en quelques étapes</p>
+</div>
+<form method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        <label for="full_name">Nom complet</label>
+        {{ form.full_name(placeholder="Votre nom complet") }}
+        {% for e in form.full_name.errors %}<span class="error">{{ e }}</span>{% endfor %}
+    </div>
+    <div class="form-group">
+        <label for="country">Pays</label>
+        {{ form.country() }}
+    </div>
+    <div class="form-group">
+        <label for="phone_number">Numéro de téléphone</label>
+        {{ form.phone_number(placeholder="90 00 00 00", inputmode="tel") }}
+        <span class="help-text">Sans l'indicatif pays.</span>
+        {% for e in form.phone_number.errors %}<span class="error">{{ e }}</span>{% endfor %}
+    </div>
+    <div class="form-group">
+        <label for="password">Mot de passe</label>
+        {{ form.password(placeholder="••••••••") }}
+        {% for e in form.password.errors %}<span class="error">{{ e }}</span>{% endfor %}
+    </div>
+    <div class="form-group">
+        <label for="confirm_password">Confirmer le mot de passe</label>
+        {{ form.confirm_password(placeholder="••••••••") }}
+        {% for e in form.confirm_password.errors %}<span class="error">{{ e }}</span>{% endfor %}
+    </div>
+    <div class="form-group">
+        <label for="referral_code">Code de parrainage (facultatif)</label>
+        {{ form.referral_code(placeholder="ABC12345") }}
+        {% for e in form.referral_code.errors %}<span class="error">{{ e }}</span>{% endfor %}
+    </div>
+    <div class="form-group checkbox">
+        {{ form.accept_terms() }}
+        <label for="accept_terms">J'accepte les <a href="{{ url_for('public.terms') }}" target="_blank">conditions d'utilisation</a>.</label>
+    </div>
+    <div class="form-group checkbox">
+        {{ form.accept_privacy() }}
+        <label for="accept_privacy">J'accepte la <a href="{{ url_for('public.privacy') }}" target="_blank">politique de confidentialité</a>.</label>
+    </div>
+    {% for e in form.accept_terms.errors %}<span class="error">{{ e }}</span>{% endfor %}
+    {% for e in form.accept_privacy.errors %}<span class="error">{{ e }}</span>{% endfor %}
+    <button type="submit" class="btn btn-primary btn-block">Créer mon compte</button>
+</form>
+<div class="auth-footer-link">
+    Déjà inscrit ? <a href="{{ url_for('auth.login') }}">Se connecter</a>
+</div>
+{% endblock %}
+

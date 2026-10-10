@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Service client{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Service client</h2>
+    {% include "admin/_nav.html" %}
+
+    <div class="grid grid-cards">
+        <div class="card balance-card"><div class="label">Ouvertes</div><div class="value">{{ stats.open }}</div></div>
+        <div class="card balance-card"><div class="label">En attente</div><div class="value">{{ stats.pending }}</div></div>
+        <div class="card balance-card"><div class="label">Messages non lus</div><div class="value">{{ stats.unread }}</div></div>
+        <div class="card balance-card"><div class="label">Fermées</div><div class="value">{{ stats.closed }}</div></div>
+    </div>
+
+    <form method="get" class="card mb" style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:flex-end">
+        <div class="form-group" style="margin:0">
+            <label>Statut</label>
+            <select name="status">
+                <option value="">Tous</option>
+                <option value="open" {{ 'selected' if status=='open' }}>Ouverte</option>
+                <option value="pending" {{ 'selected' if status=='pending' }}>En attente</option>
+                <option value="answered" {{ 'selected' if status=='answered' }}>Répondue</option>
+                <option value="closed" {{ 'selected' if status=='closed' }}>Fermée</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin:0">
+            <label>Canal</label>
+            <select name="channel">
+                <option value="">Tous</option>
+                <option value="telegram" {{ 'selected' if channel=='telegram' }}>Telegram</option>
+                <option value="web" {{ 'selected' if channel=='web' }}>Web</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin:0;flex:1;min-width:160px">
+            <label>Recherche (référence)</label>
+            <input type="text" name="q" value="{{ q }}" placeholder="SC-...">
+        </div>
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+    </form>
+
+    <div class="card table-wrap">
+        <table>
+            <thead><tr><th>Référence</th><th>Canal</th><th>Catégorie</th><th>Dernier message</th><th>Statut</th></tr></thead>
+            <tbody>
+            {% for c in conversations %}
+                <tr>
+                    <td><a href="{{ url_for('admin.support_detail', conv_id=c.id) }}">{{ c.public_reference }}</a></td>
+                    <td>{{ c.channel }}</td>
+                    <td>{{ c.category or '—' }}</td>
+                    <td>{{ c.last_message_at.strftime('%d/%m/%Y %H:%M') if c.last_message_at else '—' }}</td>
+                    <td><span class="badge badge-{{ badge_class(c.status) }}">{{ c.status }}</span></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5" class="muted">Aucune conversation.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

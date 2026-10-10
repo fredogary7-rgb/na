@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Dépôts{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Dépôts</h2>
+    {% include "admin/_nav.html" %}
+    <div class="card table-wrap">
+        <table>
+            <thead><tr><th>Référence</th><th>Utilisateur</th><th>Montant</th><th>Devise</th><th>Opérateur</th><th>Statut</th><th>Date</th></tr></thead>
+            <tbody>
+            {% for d in deposits %}
+                <tr>
+                    <td>{{ d.reference }}</td>
+                    <td>{{ d.user_id }}</td>
+                    <td>{{ format_amount(d.amount, d.currency) }}</td>
+                    <td>{{ d.currency }}</td>
+                    <td>{{ d.operator }}</td>
+                    <td><span class="badge badge-{{ badge_class(d.status) }}">{{ d.status }}</span></td>
+                    <td>{{ d.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7" class="muted">Aucun dépôt.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

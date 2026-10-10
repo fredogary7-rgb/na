@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Webhooks{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Événements de paiement</h2>
+    {% include "admin/_nav.html" %}
+    <div class="card table-wrap">
+        <table>
+            <thead><tr><th>ID</th><th>Fournisseur</th><th>Type</th><th>Référence externe</th><th>Statut</th><th>Date</th></tr></thead>
+            <tbody>
+            {% for e in events %}
+                <tr>
+                    <td>{{ e.id }}</td>
+                    <td>{{ e.provider }}</td>
+                    <td>{{ e.event_type }}</td>
+                    <td>{{ e.external_reference }}</td>
+                    <td><span class="badge badge-{{ badge_class(e.status) }}">{{ e.status }}</span></td>
+                    <td>{{ e.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="muted">Aucun événement.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Conversation{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="flex-between mb">
+        <h2>Conversation {{ conv.public_reference }}</h2>
+        <a href="{{ url_for('admin.support') }}">← Retour</a>
+    </div>
+    {% include "admin/_nav.html" %}
+
+    <div class="card mb">
+        <p><strong>Canal :</strong> {{ conv.channel }}</p>
+        <p><strong>Catégorie :</strong> {{ conv.category or '—' }}</p>
+        <p><strong>Statut :</strong> <span class="badge badge-{{ badge_class(conv.status) }}">{{ conv.status }}</span></p>
+    </div>
+
+    <div class="card mb">
+        <h3>Messages</h3>
+        <div class="chat-history">
+            {% for m in conv.messages.all() %}
+                {% if not m.internal_note %}
+                    <div class="chat-msg cm-{{ m.sender_type }}">
+                        <div class="cm-meta">{{ m.sender_type }} · {{ m.created_at.strftime('%d/%m %H:%M') }}</div>
+                        <div class="cm-text">{{ m.message_text }}</div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card mb">
+        <h4>Répondre</h4>
+        <form method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="reply">
+            <div class="form-group"><textarea name="message" rows="2" required></textarea></div>
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+        </form>
+    </div>
+
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+        <div class="card">
+            <h4>Note interne</h4>
+            <form method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="note">
+                <div class="form-group"><textarea name="note" rows="2" required></textarea></div>
+                <button type="submit" class="btn btn-outline btn-sm">Ajouter la note</button>
+            </form>
+        </div>
+        <div class="card">
+            <h4>Affecter</h4>
+            <form method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="assign">
+                <div class="form-group">
+                    <select name="admin_id">
+                        <option value="">— Non affecté —</option>
+                        {% for a in admins %}
+                            <option value="{{ a.id }}" {{ 'selected' if conv.assigned_admin_id == a.id }}>{{ a.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-outline btn-sm">Affecter</button>
+            </form>
+        </div>
+        <div class="card">
+            <h4>Statut</h4>
+            <form method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="status">
+                <div class="form-group">
+                    <select name="status">
+                        <option value="open" {{ 'selected' if conv.status=='open' }}>Ouverte</option>
+                        <option value="pending" {{ 'selected' if conv.status=='pending' }}>En attente</option>
+                        <option value="answered" {{ 'selected' if conv.status=='answered' }}>Répondue</option>
+                        <option value="closed" {{ 'selected' if conv.status=='closed' }}>Fermée</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-outline btn-sm">Mettre à jour</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mt">
+        <h4>Notes internes</h4>
+        {% set notes = conv.messages.all() | selectattr('internal_note') | list %}
+        {% if notes %}
+            {% for m in notes %}
+                <div class="chat-msg cm-admin"><div class="cm-text">🔒 {{ m.message_text }}</div></div>
+            {% endfor %}
+        {% else %}
+            <p class="muted">Aucune note interne.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "app_base.html" %}
+{% block title %}Confirmer le retrait{% endblock %}
+{% block app_content %}
+
+<div class="page-head">
+    <h1>Confirmer le retrait</h1>
+    <p class="muted">Vérifiez les détails avant de valider.</p>
+</div>
+
+<div class="card">
+    <div class="confirm-dest">
+        <img class="card-logo" src="{{ url_for('static', filename='images/' ~ card.operator|lower ~ '.jpeg') }}" alt="{{ card.operator }}">
+        <div>
+            <div class="t">{{ card.operator }}</div>
+            <div class="s">{{ card.masked }}</div>
+        </div>
+    </div>
+
+    <div class="fee-box">
+        <div class="fee-row"><span>Montant demandé</span><span>{{ format_amount(amount, current_user.currency) }}</span></div>
+        <div class="fee-row"><span>Frais (8 %)</span><span>− {{ format_amount(fee, current_user.currency) }}</span></div>
+        <div class="fee-row total"><span>Vous recevrez</span><span>{{ format_amount(net, current_user.currency) }}</span></div>
+    </div>
+
+    <form method="post" action="{{ url_for('dashboard.withdrawals_confirm') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="card_id" value="{{ card.id }}">
+        <input type="hidden" name="amount" value="{{ amount }}">
+        <button type="submit" class="btn btn-primary btn-block">Confirmer le retrait</button>
+    </form>
+    <a class="btn btn-outline btn-block mt" href="{{ url_for('dashboard.withdrawals') }}">Modifier</a>
+</div>
+
+<p class="help-text mt">Une fois validé, votre demande sera envoyée à un administrateur pour approbation.</p>
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Journal d'audit{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Journal d'audit</h2>
+    {% include "admin/_nav.html" %}
+    <div class="card table-wrap">
+        <table>
+            <thead><tr><th>ID</th><th>Admin</th><th>Action</th><th>Cible</th><th>IP</th><th>Date</th></tr></thead>
+            <tbody>
+            {% for l in logs %}
+                <tr>
+                    <td>{{ l.id }}</td>
+                    <td>{{ l.admin_id }}</td>
+                    <td>{{ l.action }}</td>
+                    <td>{{ l.target_type }} {{ l.target_id }}</td>
+                    <td>{{ l.ip_address }}</td>
+                    <td>{{ l.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="muted">Aucune entrée.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

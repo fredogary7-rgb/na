@@ -1,0 +1,42 @@
+{% extends "app_base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block app_content %}
+
+<div class="page-head">
+    <h1>Notifications</h1>
+</div>
+
+{% if notifications %}
+    <div class="flex-between mb">
+        <span class="muted">{{ notifications|length }} notification(s)</span>
+        <form method="post" action="{{ url_for('dashboard.notifications_read') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline btn-sm">Tout marquer comme lu</button>
+        </form>
+    </div>
+{% endif %}
+
+<div class="list-card">
+    {% for n in notifications %}
+        <div class="list-item {{ 'notif-unread' if not n.is_read }}">
+            <div class="ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <div class="grow">
+                <div class="t">
+                    {{ n.title }}
+                    {% if not n.is_read %}<span class="notif-dot"></span>{% endif %}
+                </div>
+                <div class="s">{{ n.message }}</div>
+                <div class="s" style="font-size:0.72rem;margin-top:0.25rem;opacity:0.7">{{ n.created_at.strftime('%d/%m/%Y à %H:%M') }}</div>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+            <p>Aucune notification pour le moment.</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

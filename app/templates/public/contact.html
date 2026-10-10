@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Contact{% endblock %}
+{% block content %}
+<div class="container narrow">
+    <div class="card">
+        <h2>Contact et assistance</h2>
+        <p class="muted">Une équipe d'assistance est disponible pour vous accompagner.</p>
+        <h4>Centre d'aide</h4>
+        <p class="muted">Consultez la <a href="{{ url_for('public.faq') }}">FAQ</a> et les pages d'information.</p>
+        <h4>Assistance</h4>
+        <p class="muted">Les coordonnées d'assistance (téléphone, e-mail) seront communiquées lors de la mise en service des fournisseurs de notification.</p>
+    </div>
+</div>
+{% endblock %}

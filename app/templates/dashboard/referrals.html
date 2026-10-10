@@ -1,0 +1,98 @@
+{% extends "app_base.html" %}
+{% block title %}Équipe{% endblock %}
+{% block app_content %}
+
+<div class="page-head">
+    <h1>Mon équipe</h1>
+    <p class="muted">Invitez vos contacts et gagnez des commissions sur 3 niveaux.</p>
+</div>
+
+{% if not enabled %}
+    <div class="alert alert-warning">Le programme de parrainage est actuellement désactivé dans l'attente de la validation de conformité.</div>
+{% endif %}
+
+<div class="card">
+    <p class="muted">Mon code de parrainage</p>
+    <p class="big-code">{{ current_user.referral_code }}</p>
+    <p class="muted mt">Lien d'invitation</p>
+    <div class="referral-link-box">
+        <input type="text" readonly value="{{ referral_link }}" id="referral-link">
+        <button type="button" class="btn btn-primary btn-sm" onclick="copyReferral()">Copier</button>
+    </div>
+    <p class="help-text mt">Niveaux : {{ rate_1|int if rate_1 == rate_1|int else rate_1 }} % (niveau 1), {{ rate_2|int if rate_2 == rate_2|int else rate_2 }} % (niveau 2), {{ rate_3|int if rate_3 == rate_3|int else rate_3 }} % (niveau 3) — sous réserve de validation réglementaire.</p>
+</div>
+
+<div class="section-head">
+    <h2>Mes niveaux</h2>
+</div>
+<div class="levels-grid">
+    <div class="level-card">
+        <div class="lv-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="lv-num">Niveau 1</div>
+        <div class="lv-rate">{{ rate_1|int if rate_1 == rate_1|int else rate_1 }} %</div>
+        <div class="lv-count">{{ level_1 }} filleul(s)</div>
+    </div>
+    <div class="level-card">
+        <div class="lv-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="lv-num">Niveau 2</div>
+        <div class="lv-rate">{{ rate_2|int if rate_2 == rate_2|int else rate_2 }} %</div>
+        <div class="lv-count">{{ level_2 }} filleul(s)</div>
+    </div>
+    <div class="level-card">
+        <div class="lv-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg></div>
+        <div class="lv-num">Niveau 3</div>
+        <div class="lv-rate">{{ rate_3|int if rate_3 == rate_3|int else rate_3 }} %</div>
+        <div class="lv-count">{{ level_3 }} filleul(s)</div>
+    </div>
+</div>
+
+<div class="section-head">
+    <h2>Commissions</h2>
+</div>
+<div class="list-card">
+    {% for c in commissions %}
+        <div class="list-item">
+            <div class="ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="grow">
+                <div class="t">Niveau {{ c.level }} · {{ c.reference }}</div>
+                <div class="s">{{ c.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+            </div>
+            <span class="badge badge-{{ badge_class(c.status) }}">{{ c.status }}</span>
+            <div class="amt">{{ format_amount(c.amount, c.currency) }}</div>
+        </div>
+    {% else %}
+        <div class="empty"><p>Aucune commission pour le moment.</p></div>
+    {% endfor %}
+</div>
+
+<p class="help-text mt">Consultez les <a href="{{ url_for('public.referral_terms') }}">conditions du parrainage</a>.</p>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copyReferral() {
+    var input = document.getElementById('referral-link');
+    var btn = document.querySelector('.referral-link-box button');
+    function feedback() {
+        if (btn) {
+            btn.textContent = 'Copié ✓';
+            setTimeout(function () { btn.textContent = 'Copier'; }, 2000);
+        }
+    }
+    function fallback() {
+        input.select();
+        input.setSelectionRange(0, 99999);
+        try { document.execCommand('copy'); } catch (e) {}
+        feedback();
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(input.value).then(feedback).catch(fallback);
+    } else {
+        fallback();
+    }
+}
+</script>
+{% endblock %}

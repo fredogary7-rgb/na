@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Erreur 403{% endblock %}
+{% block content %}
+<div class="container text-center mt">
+    <h1>Accès refusé</h1>
+    <p class="muted">Vous n'avez pas l'autorisation d'accéder à cette page.</p>
+    <a class="btn btn-primary" href="{{ url_for('public.index') }}">Retour à l'accueil</a>
+</div>
+{% endblock %}

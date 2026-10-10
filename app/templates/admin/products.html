@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Produits{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Produits d'investissement</h2>
+    {% include "admin/_nav.html" %}
+    <div class="card mb">
+        <h4>Nouveau produit</h4>
+        <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+                <div class="form-group">{{ form.name.label }} {{ form.name() }}</div>
+                <div class="form-group">{{ form.duration_days.label }} {{ form.duration_days() }}</div>
+                <div class="form-group">{{ form.min_amount.label }} {{ form.min_amount() }}</div>
+                <div class="form-group">{{ form.max_amount.label }} {{ form.max_amount() }}</div>
+                <div class="form-group">{{ form.currency.label }} {{ form.currency() }}</div>
+                <div class="form-group">{{ form.annual_rate_bps.label }} {{ form.annual_rate_bps() }}</div>
+            </div>
+            <div class="form-group">{{ form.description.label }} {{ form.description() }}</div>
+            <div class="form-group">{{ form.terms.label }} {{ form.terms() }}</div>
+            <button type="submit" class="btn btn-primary">Créer (brouillon)</button>
+        </form>
+    </div>
+
+    <div class="card table-wrap">
+        <table>
+            <thead><tr><th>Nom</th><th>Durée</th><th>Devise</th><th>Min</th><th>Max</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for p in products %}
+                <tr>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.duration_days }} j</td>
+                    <td>{{ p.currency }}</td>
+                    <td>{{ format_amount(p.min_amount, p.currency) }}</td>
+                    <td>{{ format_amount(p.max_amount, p.currency) }}</td>
+                    <td><span class="badge badge-{{ badge_class(p.status) }}">{{ p.status }}</span></td>
+                    <td>
+                        {% if p.status == 'draft' %}
+                            <form method="post" action="{{ url_for('admin.product_action', pid=p.id, action='approve') }}" style="display:inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-primary btn-sm">Approuver</button>
+                            </form>
+                        {% endif %}
+                        {% if p.status == 'approved' %}
+                            <form method="post" action="{{ url_for('admin.product_action', pid=p.id, action='pause') }}" style="display:inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-outline btn-sm">Suspendre</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7" class="muted">Aucun produit.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

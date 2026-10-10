@@ -1,0 +1,123 @@
+{% extends "app_base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block app_content %}
+
+<div class="app-header">
+    <div class="hello">Bonjour, <strong>{{ first_name }} !</strong></div>
+</div>
+
+<div class="balance-card">
+    <div class="top">
+        <span class="label">Solde total</span>
+        <span class="chip">{{ current_user.currency }}</span>
+    </div>
+    <div class="amount">{{ format_amount(total_balance, current_user.currency) }}</div>
+    <div class="sub">Fonds réels (hors bonus non retirable : {{ format_amount(balances.bonus, current_user.currency) }})</div>
+</div>
+
+{% if not current_user.is_phone_verified %}
+    <div class="alert alert-warning mt">Vérifiez votre numéro de téléphone pour activer les opérations financières.</div>
+{% endif %}
+
+<div class="action-grid">
+    <a class="action-card" href="{{ url_for('dashboard.deposits') }}">
+        <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <div>
+            <div class="t">Recharger</div>
+            <div class="s">Ajouter des fonds</div>
+        </div>
+    </a>
+    <a class="action-card" href="{{ url_for('dashboard.cards') }}">
+        <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        </div>
+        <div>
+            <div class="t">Vers carte</div>
+            <div class="s">Alimenter ma carte</div>
+        </div>
+    </a>
+    <a class="action-card" href="{{ url_for('dashboard.withdrawals') }}">
+        <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>
+        </div>
+        <div>
+            <div class="t">Retrait</div>
+            <div class="s">Demander des fonds</div>
+        </div>
+    </a>
+    <a class="action-card" href="{{ url_for('dashboard.transactions') }}">
+        <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div>
+            <div class="t">Historique</div>
+            <div class="s">Mes transactions</div>
+        </div>
+    </a>
+</div>
+
+{% if balances.earnings > 0 or balances.referral > 0 %}
+    <form method="post" action="{{ url_for('dashboard.claim') }}" class="mt">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-outline btn-block">
+            Transférer mes revenus/commissions vers le solde retirable
+        </button>
+    </form>
+{% endif %}
+
+<div class="section-head">
+    <h2>Mes comptes Mobile Money</h2>
+    <a href="{{ url_for('dashboard.cards') }}">Voir tout</a>
+</div>
+{% if cards %}
+    {% for c in cards %}
+        <div class="bank-card" style="margin-bottom:0.85rem;min-height:150px">
+            <div class="bc-top">
+                <img src="{{ url_for('static', filename='images/' ~ c.operator|lower ~ '.jpeg') }}" alt="{{ c.operator }}" style="height:42px;width:42px;object-fit:contain;border-radius:10px;background:#fff;padding:4px">
+                <span style="font-weight:700;letter-spacing:0.04em">{{ c.operator }}</span>
+            </div>
+            <div class="bc-number">{{ c.masked }}</div>
+            <span class="bc-badge">{{ c.name or 'Compte Mobile Money' }}</span>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="bank-card" style="min-height:150px">
+        <div class="bc-top">
+            <span class="bc-brand">NAMARA</span>
+        </div>
+        <div class="bc-number">Aucun compte</div>
+        <span class="bc-badge">Ajoutez un compte Mobile Money</span>
+    </div>
+{% endif %}
+
+<div class="section-head">
+    <h2>Dernières transactions</h2>
+    <a href="{{ url_for('dashboard.transactions') }}">Voir tout</a>
+</div>
+<div class="list-card">
+    {% for e in recent %}
+        <div class="list-item">
+            {% if e.operator %}
+                <img class="card-logo" src="{{ url_for('static', filename='images/' ~ e.operator|lower ~ '.jpeg') }}" alt="{{ e.operator }}">
+            {% else %}
+                <div class="ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+            {% endif %}
+            <div class="grow">
+                <div class="t">{{ e.transaction_type }}{% if e.operator %} · {{ e.operator }}{% endif %}</div>
+                <div class="s">{{ e.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+            </div>
+            <div class="amt {{ 'pos' if e.amount >= 0 else 'neg' }}">{{ format_amount(e.amount, e.currency) }}</div>
+        </div>
+    {% else %}
+        <div class="empty">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <p>Aucune transaction pour le moment.</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "app_base.html" %}
+{% block title %}Wallet{% endblock %}
+{% block app_content %}
+
+<div class="page-head">
+    <h1>Mon portefeuille</h1>
+    <p class="muted">Chaque solde est séparé. Ils ne sont jamais additionnés en une somme retirable.</p>
+</div>
+
+<div class="list-card">
+    <div class="list-item">
+        <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="grow">
+            <div class="t">Solde retirable</div>
+            <div class="s">Fonds disponibles pour retrait</div>
+        </div>
+        <div class="amt">{{ format_amount(balances.withdrawable, current_user.currency) }}</div>
+    </div>
+    <div class="list-item">
+        <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+        </div>
+        <div class="grow">
+            <div class="t">Dépôts</div>
+            <div class="s">Capital déposé (non retirable directement)</div>
+        </div>
+        <div class="amt">{{ format_amount(balances.deposit, current_user.currency) }}</div>
+    </div>
+    <div class="list-item">
+        <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v8H4v-8"/><rect x="2" y="4" width="20" height="8" rx="2"/></svg>
+        </div>
+        <div class="grow">
+            <div class="t">Bonus</div>
+            <div class="s">Bonus promotionnel (non retirable)</div>
+        </div>
+        <div class="amt">{{ format_amount(balances.bonus, current_user.currency) }}</div>
+    </div>
+    <div class="list-item">
+        <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
+        </div>
+        <div class="grow">
+            <div class="t">Revenus validés</div>
+            <div class="s">Revenus d'investissement réalisés</div>
+        </div>
+        <div class="amt">{{ format_amount(balances.earnings, current_user.currency) }}</div>
+    </div>
+    <div class="list-item">
+        <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="grow">
+            <div class="t">Commissions parrainage</div>
+            <div class="s">Commissions confirmées</div>
+        </div>
+        <div class="amt">{{ format_amount(balances.referral, current_user.currency) }}</div>
+    </div>
+</div>
+
+{% if balances.earnings > 0 or balances.referral > 0 %}
+    <form method="post" action="{{ url_for('dashboard.claim') }}" class="mt">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-primary btn-block">
+            Transférer vers le solde retirable
+        </button>
+    </form>
+{% endif %}
+
+{% endblock %}

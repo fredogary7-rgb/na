@@ -1,0 +1,101 @@
+{% extends "app_base.html" %}
+{% block title %}Retrait{% endblock %}
+{% block app_content %}
+
+<div class="page-head">
+    <h1>Retrait</h1>
+    <p class="muted">Minimum 1 500 FCFA · Frais de 8 % · Vers votre compte Mobile Money.</p>
+</div>
+
+{% if created_withdrawal %}
+<div class="withdraw-success">
+    <div class="ws-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="ws-title">Votre demande de retrait a été enregistrée avec succès !</div>
+    <div class="ws-row">
+        <img class="ws-logo" src="{{ url_for('static', filename='images/' ~ created_withdrawal.operator|lower ~ '.jpeg') }}" alt="{{ created_withdrawal.operator }}">
+        <div class="ws-detail">
+            <div class="op">{{ created_withdrawal.operator }} · {{ created_withdrawal.wallet_number }}</div>
+            <div class="amt">{{ format_amount(created_withdrawal.amount, created_withdrawal.currency) }}</div>
+        </div>
+    </div>
+    <div class="ws-note">Votre demande est en attente de validation par un administrateur.</div>
+</div>
+{% endif %}
+
+{% if not cards %}
+    <div class="alert alert-warning">
+        Aucun compte Mobile Money enregistré. <a href="{{ url_for('dashboard.cards') }}">Ajouter un compte</a>.
+    </div>
+{% endif %}
+
+<div class="card">
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.card_id.label }}
+            {{ form.card_id() }}
+            {% for e in form.card_id.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.amount.label }}
+            {{ form.amount(placeholder="1500", inputmode="numeric", id="amount") }}
+            <span class="help-text">Montant minimum : 1 500 FCFA.</span>
+            {% for e in form.amount.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+
+        <div class="fee-box">
+            <div class="fee-row"><span>Montant demandé</span><span id="preview-amount">—</span></div>
+            <div class="fee-row"><span>Frais (8 %)</span><span id="preview-fee">—</span></div>
+            <div class="fee-row total"><span>Vous recevrez</span><span id="preview-net">—</span></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Continuer</button>
+    </form>
+</div>
+
+<div class="section-head"><h2>Mes retraits</h2></div>
+<div class="list-card">
+    {% for w in history %}
+        <div class="list-item">
+            <img class="card-logo" src="{{ url_for('static', filename='images/' ~ w.operator|lower ~ '.jpeg') }}" alt="{{ w.operator }}">
+            <div class="grow">
+                <div class="t">{{ w.operator }} · {{ w.reference }}</div>
+                <div class="s">Demandé le {{ w.created_at.strftime('%d/%m/%Y à %H:%M') }}</div>
+                {% if w.processed_at %}
+                    <div class="s">Approuvé le {{ w.processed_at.strftime('%d/%m/%Y à %H:%M') }}</div>
+                {% else %}
+                    <div class="s">En attente d'approbation</div>
+                {% endif %}
+            </div>
+            <span class="badge badge-{{ badge_class(w.status) }}">{{ w.status }}</span>
+            <div class="amt">{{ format_amount(w.amount, w.currency) }}</div>
+        </div>
+    {% else %}
+        <div class="empty"><p>Aucun retrait pour le moment.</p></div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function calcFee() {
+    var el = document.getElementById('amount');
+    if (!el) return;
+    var amt = parseInt(el.value.replace(/\D/g, ''), 10) || 0;
+    var fee = Math.floor(amt * 8 / 100);
+    var net = amt - fee;
+    function fmt(n) { return n.toLocaleString('fr-FR') + ' FCFA'; }
+    document.getElementById('preview-amount').textContent = fmt(amt);
+    document.getElementById('preview-fee').textContent = '− ' + fmt(fee);
+    document.getElementById('preview-net').textContent = fmt(net);
+}
+document.addEventListener('DOMContentLoaded', function () {
+    var a = document.getElementById('amount');
+    if (a) { a.addEventListener('input', calcFee); calcFee(); }
+});
+</script>
+{% endblock %}
+

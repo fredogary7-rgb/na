@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Erreur 500{% endblock %}
+{% block content %}
+<div class="container text-center mt">
+    <h1>Erreur serveur</h1>
+    <p class="muted">Une erreur interne est survenue. Veuillez réessayer plus tard.</p>
+    <a class="btn btn-primary" href="{{ url_for('public.index') }}">Retour à l'accueil</a>
+</div>
+{% endblock %}

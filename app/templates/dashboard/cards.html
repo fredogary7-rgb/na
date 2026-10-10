@@ -1,0 +1,62 @@
+{% extends "app_base.html" %}
+{% block title %}Cartes{% endblock %}
+{% block app_content %}
+
+<div class="page-head">
+    <h1>Mes comptes Mobile Money</h1>
+    <p class="muted">Enregistrez un compte Mobile Money pour vos retraits.</p>
+</div>
+
+{% if cards %}
+    <div class="section-head"><h2>Comptes enregistrés</h2></div>
+    <div class="list-card">
+        {% for c in cards %}
+            <div class="list-item">
+                <img class="card-logo" src="{{ url_for('static', filename='images/' ~ c.operator|lower ~ '.jpeg') }}" alt="{{ c.operator }}">
+                <div class="grow">
+                    <div class="t">{{ c.operator }} · {{ c.masked }}</div>
+                    <div class="s">{{ c.name or 'Compte Mobile Money' }}</div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></div>
+        <p>Aucun compte Mobile Money enregistré pour le moment.</p>
+    </div>
+{% endif %}
+
+<div class="section-head"><h2>Ajouter un compte</h2></div>
+<div class="card">
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label>Opérateur</label>
+            <div class="operator-grid">
+                {% for subfield in form.operator %}
+                    <label class="operator-option">
+                        {{ subfield() }}
+                        <img src="{{ url_for('static', filename='images/' ~ subfield.label.text|lower ~ '.jpeg') }}" alt="{{ subfield.label.text }}">
+                        <span>{{ subfield.label.text }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+            {% for e in form.operator.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.phone_number.label }}
+            {{ form.phone_number(placeholder="97000000", inputmode="tel") }}
+            {% for e in form.phone_number.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.name.label }}
+            {{ form.name(placeholder="Thomas Waza") }}
+            {% for e in form.name.errors %}<span class="error">{{ e }}</span>{% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Enregistrer le compte</button>
+    </form>
+</div>
+
+{% endblock %}
+

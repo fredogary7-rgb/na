@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Conditions d'utilisation{% endblock %}
+{% block content %}
+<div class="container narrow">
+    <div class="card">
+        <h2>Conditions d'utilisation</h2>
+        <p class="muted">En utilisant {{ APP_NAME }}, vous acceptez les présentes conditions.</p>
+        <h4>1. Objet</h4>
+        <p class="muted">{{ APP_NAME }} est une plateforme financière et de gestion d'investissements destinée aux marchés africains, opérant en franc CFA (XOF/XAF).</p>
+        <h4>2. Comptes</h4>
+        <p class="muted">Vous devez fournir des informations exactes. Votre numéro de téléphone doit être vérifié avant toute opération financière.</p>
+        <h4>3. Aucune garantie de rendement</h4>
+        <p class="muted">{{ APP_NAME }} ne garantit aucun rendement ni résultat financier.</p>
+        <h4>4. Interdictions</h4>
+        <p class="muted">Toute fraude, tentative de manipulation des soldes ou usage abusif entraîne la suspension du compte.</p>
+    </div>
+</div>
+{% endblock %}

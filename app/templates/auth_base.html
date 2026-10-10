@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block body_class %}auth-page{% endblock %}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="auth-shell">
+    <div class="auth-brand">
+        <img src="{{ url_for('static', filename='images/namara.jpeg') }}" alt="Logo NAMARA">
+        <span class="auth-brand-name">{{ APP_NAME }}<span class="auth-brand-dot">.</span></span>
+    </div>
+    <div class="auth-card">
+        {% block auth_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

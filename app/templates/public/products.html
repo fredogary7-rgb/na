@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Produits{% endblock %}
+{% block content %}
+<div class="container narrow">
+    <div class="card">
+        <h2>Produits disponibles</h2>
+        {% if products %}
+            {% for p in products %}
+                <div class="card mb" style="border:1px solid var(--border)">
+                    <h4>{{ p.name }}</h4>
+                    <p class="muted">{{ p.description }}</p>
+                    <p>Durée : {{ p.duration_days }} jours · Minimum : {{ format_amount(p.min_amount, p.currency) }} · Maximum : {{ format_amount(p.max_amount, p.currency) }}</p>
+                    <p class="help-text">{{ p.terms }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="muted">Aucun produit d'investissement n'est actuellement disponible.</p>
+        {% endif %}
+        <p class="help-text mt">Les produits affichés sont approuvés uniquement. Aucun rendement n'est garanti.</p>
+    </div>
+</div>
+{% endblock %}

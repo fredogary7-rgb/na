@@ -1,0 +1,33 @@
+{% extends "app_base.html" %}
+{% block title %}Historique{% endblock %}
+{% block app_content %}
+
+<div class="page-head">
+    <h1>Historique des transactions</h1>
+</div>
+
+<div class="list-card">
+    {% for e in entries %}
+        <div class="list-item">
+            {% if e.operator %}
+                <img class="card-logo" src="{{ url_for('static', filename='images/' ~ e.operator|lower ~ '.jpeg') }}" alt="{{ e.operator }}">
+            {% else %}
+                <div class="ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+            {% endif %}
+            <div class="grow">
+                <div class="t">{{ e.transaction_type }}{% if e.operator %} · {{ e.operator }}{% endif %}</div>
+                <div class="s">{{ e.reference }} · {{ e.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+            </div>
+            <div class="amt {{ 'pos' if e.amount >= 0 else 'neg' }}">{{ format_amount(e.amount, e.currency) }}</div>
+        </div>
+    {% else %}
+        <div class="empty">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <p>Aucune transaction pour le moment.</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "app_base.html" %}
+{% block title %}Investissements{% endblock %}
+{% block app_content %}
+
+<div class="page-head">
+    <h1>Mes investissements</h1>
+</div>
+
+{% if products %}
+    <div class="card">
+        <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.product_id.label }}
+                {{ form.product_id() }}
+            </div>
+            <div class="form-group">
+                {{ form.amount.label }}
+                {{ form.amount() }}
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Investir</button>
+        </form>
+        <p class="help-text mt">Le capital est prélevé sur le portefeuille de dépôts. Aucun rendement n'est garanti.</p>
+    </div>
+{% else %}
+    <div class="alert alert-info">Aucun produit d'investissement n'est actuellement disponible.</div>
+{% endif %}
+
+<div class="section-head">
+    <h2>Mes positions</h2>
+</div>
+<div class="list-card">
+    {% for inv in investments %}
+        <div class="list-item">
+            <div class="ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
+            </div>
+            <div class="grow">
+                <div class="t">{{ inv.product.name }}</div>
+                <div class="s">{{ inv.start_date.strftime('%d/%m/%Y') }} → {{ inv.end_date.strftime('%d/%m/%Y') }}</div>
+            </div>
+            <span class="badge badge-{{ badge_class(inv.status) }}">{{ inv.status }}</span>
+            <div class="amt">{{ format_amount(inv.capital, inv.currency) }}</div>
+        </div>
+    {% else %}
+        <div class="empty"><p>Aucun investissement.</p></div>
+    {% endfor %}
+</div>
+
+{% endblock %}

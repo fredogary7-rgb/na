@@ -1,0 +1,21 @@
+{% extends "auth_base.html" %}
+{% block title %}Vérification{% endblock %}
+{% block auth_content %}
+<div class="auth-title">
+    <h1>Vérification du téléphone</h1>
+    <p>Un code est nécessaire pour activer les opérations financières.</p>
+</div>
+{% if dev_otp %}
+    <div class="alert alert-info">Mode développement : votre code est <strong>{{ dev_otp }}</strong> (aucun SMS envoyé).</div>
+{% endif %}
+<form method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        <label for="otp">Code de vérification</label>
+        {{ form.otp(placeholder="000000", inputmode="numeric") }}
+        {% for e in form.otp.errors %}<span class="error">{{ e }}</span>{% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary btn-block">Vérifier</button>
+</form>
+{% endblock %}
+

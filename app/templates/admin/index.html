@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Administration{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Administration</h2>
+    {% include "admin/_nav.html" %}
+    <div class="grid grid-cards">
+        <div class="card balance-card"><div class="label">Utilisateurs</div><div class="value">{{ stats.users }}</div></div>
+        <div class="card balance-card"><div class="label">Dépôts</div><div class="value">{{ stats.deposits }}</div></div>
+        <div class="card balance-card"><div class="label">Retraits</div><div class="value">{{ stats.withdrawals }}</div></div>
+        <div class="card balance-card"><div class="label">Retraits en attente</div><div class="value">{{ stats.pending_withdrawals }}</div></div>
+        <div class="card balance-card"><div class="label">Dépôts en attente</div><div class="value">{{ stats.pending_deposits }}</div></div>
+        <div class="card balance-card"><div class="label">Produits</div><div class="value">{{ stats.products }}</div></div>
+    </div>
+</div>
+{% endblock %}

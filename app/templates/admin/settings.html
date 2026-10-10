@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Paramètres{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Paramètres</h2>
+    {% include "admin/_nav.html" %}
+    <div class="card narrow">
+        <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="form-group checkbox">{{ form.bonus_enabled() }} <label for="bonus_enabled">Bonus de bienvenue activé</label></div>
+            <div class="form-group">{{ form.bonus_amount.label }} {{ form.bonus_amount() }}</div>
+            <div class="form-group">{{ form.min_deposit.label }} {{ form.min_deposit() }}</div>
+            <div class="form-group">{{ form.min_withdrawal.label }} {{ form.min_withdrawal() }}</div>
+            <div class="form-group checkbox">{{ form.referral_enabled() }} <label for="referral_enabled">Parrainage activé</label></div>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </form>
+        <p class="help-text mt">Tout changement financier est enregistré dans le journal d'audit.</p>
+    </div>
+</div>
+{% endblock %}

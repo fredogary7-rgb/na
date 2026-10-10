@@ -1,0 +1,52 @@
+{% extends "app_base.html" %}
+{% block title %}Recharger{% endblock %}
+{% block app_content %}
+
+<div class="page-head">
+    <h1>Recharger</h1>
+    <p class="muted">Ajouter des fonds à votre compte.</p>
+</div>
+
+<div class="card">
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.amount.label }}
+            {{ form.amount(placeholder="3000") }}
+            <span class="help-text">Montant minimum : 3 000 FCFA.</span>
+        </div>
+        <div class="form-group">
+            {{ form.operator.label }}
+            {{ form.operator() }}
+        </div>
+        <div class="form-group">
+            {{ form.phone_number.label }}
+            {{ form.phone_number() }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Confirmer le dépôt</button>
+    </form>
+    <p class="help-text mt">Le dépôt est crédité uniquement après confirmation authentifiée du prestataire.</p>
+</div>
+
+<div class="section-head">
+    <h2>Mes dépôts</h2>
+</div>
+<div class="list-card">
+    {% for d in history %}
+        <div class="list-item">
+            <div class="ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+            <div class="grow">
+                <div class="t">{{ d.operator }} · {{ d.reference }}</div>
+                <div class="s">{{ d.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+            </div>
+            <span class="badge badge-{{ badge_class(d.status) }}">{{ d.status }}</span>
+            <div class="amt">{{ format_amount(d.amount, d.currency) }}</div>
+        </div>
+    {% else %}
+        <div class="empty"><p>Aucun dépôt.</p></div>
+    {% endfor %}
+</div>
+
+{% endblock %}

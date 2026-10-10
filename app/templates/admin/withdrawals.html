@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Retraits{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Retraits</h2>
+    {% include "admin/_nav.html" %}
+    <div class="card table-wrap">
+        <table>
+            <thead><tr><th>Référence</th><th>Utilisateur</th><th>Montant</th><th>Opérateur</th><th>Numéro</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for w in withdrawals %}
+                <tr>
+                    <td>{{ w.reference }}</td>
+                    <td>{{ w.user_id }}</td>
+                    <td>{{ format_amount(w.amount, w.currency) }}</td>
+                    <td>{{ w.operator }}</td>
+                    <td>{{ w.wallet_number }}</td>
+                    <td><span class="badge badge-{{ badge_class(w.status) }}">{{ w.status }}</span></td>
+                    <td>
+                        {% if w.status == 'pending' %}
+                            <form method="post" action="{{ url_for('admin.withdrawal_action', wid=w.id, action='approve') }}" style="display:inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-outline btn-sm">Approuver</button>
+                            </form>
+                            <form method="post" action="{{ url_for('admin.withdrawal_action', wid=w.id, action='reject') }}" style="display:inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-danger btn-sm">Rejeter</button>
+                            </form>
+                        {% elif w.status == 'approved' %}
+                            <form method="post" action="{{ url_for('admin.withdrawal_action', wid=w.id, action='complete') }}" style="display:inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-primary btn-sm">Marquer payé</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7" class="muted">Aucun retrait.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

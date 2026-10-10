@@ -1,0 +1,58 @@
+<div class="sidebar">
+    <div class="label">Menu</div>
+    <a href="{{ url_for('dashboard.index') }}" class="{{ 'active' if request.endpoint == 'dashboard.index' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+        Accueil
+    </a>
+    <a href="{{ url_for('dashboard.wallet') }}" class="{{ 'active' if request.endpoint == 'dashboard.wallet' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+        Wallet
+    </a>
+    <a href="{{ url_for('dashboard.cards') }}" class="{{ 'active' if request.endpoint == 'dashboard.cards' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Cartes
+    </a>
+
+    <div class="divider"></div>
+    <div class="label">Opérations</div>
+    <a href="{{ url_for('dashboard.deposits') }}" class="{{ 'active' if request.endpoint == 'dashboard.deposits' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Recharger
+    </a>
+    <a href="{{ url_for('dashboard.withdrawals') }}" class="{{ 'active' if request.endpoint == 'dashboard.withdrawals' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+        Retirer
+    </a>
+    <a href="{{ url_for('dashboard.transactions') }}" class="{{ 'active' if request.endpoint == 'dashboard.transactions' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l3-4 3 3 5-6"/></svg>
+        Historique
+    </a>
+
+    <div class="divider"></div>
+    <div class="label">Programmes</div>
+    <a href="{{ url_for('referrals.index') }}" class="{{ 'active' if request.endpoint == 'referrals.index' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Parrainages
+    </a>
+    <a href="{{ url_for('investments.index') }}" class="{{ 'active' if request.endpoint == 'investments.index' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
+        Investissements
+    </a>
+
+    <div class="divider"></div>
+    <a href="{{ url_for('dashboard.profile') }}" class="{{ 'active' if request.endpoint == 'dashboard.profile' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profil
+    </a>
+    <a href="{{ url_for('public.contact') }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Centre d'aide
+    </a>
+    {% if current_user.is_admin %}
+        <div class="divider"></div>
+        <a href="{{ url_for('admin.index') }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Administration
+        </a>
+    {% endif %}
+</div>
