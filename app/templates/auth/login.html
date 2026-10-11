@@ -7,6 +7,7 @@
 </div>
 <form method="post" novalidate>
     {{ form.hidden_tag() }}
+    {% if next_page %}<input type="hidden" name="next" value="{{ next_page }}">{% endif %}
     <div class="form-group">
         <label for="phone_number">Numéro de téléphone</label>
         {{ form.phone_number(placeholder="+228 90 00 00 00", inputmode="tel") }}

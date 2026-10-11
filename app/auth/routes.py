@@ -104,11 +104,22 @@ def register():
     return render_template("auth/register.html", form=form)
 
 
+def _is_safe_next_url(target):
+    """N'autorise que les chemins relatifs commençant par '/' (pas d'URL absolue)."""
+    if not target:
+        return False
+    return target.startswith("/") and not target.startswith("//")
+
+
 @auth_bp.route("/login", methods=["GET", "POST"])
 @limiter.limit("10 per minute")
 def login():
+    next_page = request.values.get("next")
+    if not _is_safe_next_url(next_page):
+        next_page = None
+
     if current_user.is_authenticated:
-        return redirect(url_for("dashboard.index"))
+        return redirect(next_page or url_for("dashboard.index"))
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -124,15 +135,15 @@ def login():
         # Message générique : ne révèle pas si le numéro existe.
         if user is None or not user.check_password(form.password.data):
             flash("Identifiants incorrects.", "danger")
-            return render_template("auth/login.html", form=form)
+            return render_template("auth/login.html", form=form, next_page=next_page)
         if user.status != "active":
             flash("Compte suspendu. Contactez l'assistance.", "danger")
-            return render_template("auth/login.html", form=form)
+            return render_template("auth/login.html", form=form, next_page=next_page)
 
         login_user(user)
-        return redirect(url_for("dashboard.index"))
+        return redirect(next_page or url_for("dashboard.index"))
 
-    return render_template("auth/login.html", form=form)
+    return render_template("auth/login.html", form=form, next_page=next_page)
 
 
 @auth_bp.route("/logout")
