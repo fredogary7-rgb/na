@@ -18,6 +18,7 @@
             <li><span>Total (capital + revenu)</span><strong>{{ format_sim(sim.total, product.currency) }}</strong></li>
         </ul>
         <form method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-primary btn-block">Confirmer l'investissement</button>
         </form>
         <a href="{{ url_for('investments.index') }}" class="btn btn-outline btn-block mt">Annuler</a>
