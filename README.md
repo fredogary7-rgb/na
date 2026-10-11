@@ -120,6 +120,44 @@ gunicorn -w 4 wsgi:app
 Placez l'application derrière un reverse proxy HTTPS. Activez les en-têtes de
 sécurité (HSTS, CSP) au niveau du proxy.
 
+## Déploiement Railway
+
+Le dépôt contient les fichiers nécessaires au déploiement sur
+[Railway](https://railway.app) :
+
+- `Procfile` — commande de démarrage (migrations puis `gunicorn`).
+- `nixpacks.toml` — version Python 3.12.
+- `railway.json` — healthcheck (`/health`) et politique de redémarrage.
+
+### Étapes
+
+1. **Créer le service** : dans Railway → *New Project* → *Deploy from GitHub repo*,
+   sélectionnez `fredogary7-rgb/na`.
+2. **Base de données** : ajoutez un plugin **PostgreSQL** dans Railway. Il fournit
+   automatiquement `DATABASE_URL`.
+3. **Variables d'environnement** (dans Railway, pas dans un fichier) :
+   - `FLASK_ENV=production`
+   - `SECRET_KEY` (valeur aléatoire longue)
+   - `DATABASE_URL` (fournie par le plugin PostgreSQL)
+   - `PAYMENT_MODE=mock` (tant que SoleasPay n'est pas configuré)
+   - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_WEBHOOK_URL`
+   - `TELEGRAM_MODE=webhook`
+4. **Déployer**. Le `Procfile` lance `flask db upgrade` avant `gunicorn` (les
+   migrations sont appliquées à chaque déploiement — retirez cette étape de la
+   commande si vous préférez migrer manuellement).
+5. **Après le premier déploiement**, exécutez une fois (Railway → *Shell* ou
+   commande locale avec l'URL publique) :
+
+   ```bash
+   flask seed-faq                 # FAQ de support
+   flask telegram-set-webhook     # active le webhook Telegram
+   flask create-admin             # premier administrateur (interactif)
+   ```
+
+### Healthcheck
+
+Railway appelle `/health` qui vérifie la connexion à la base de données.
+
 ## Sauvegardes
 
 Sauvegardez régulièrement la base PostgreSQL (`pg_dump`) et conservez les

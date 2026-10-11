@@ -1,9 +1,21 @@
 """Pages publiques de NAMARA."""
-from flask import Blueprint, render_template
+from flask import Blueprint, jsonify, render_template
 
+from app.extensions import db
 from app.services.investment import available_products
 
 public_bp = Blueprint("public", __name__)
+
+
+@public_bp.route("/health")
+def health():
+    """Endpoint de santé (utilisé par Railway pour le healthcheck)."""
+    try:
+        db.session.execute(db.text("SELECT 1"))
+        return jsonify({"status": "ok"}), 200
+    except Exception:
+        db.session.rollback()
+        return jsonify({"status": "error"}), 500
 
 
 @public_bp.route("/")
