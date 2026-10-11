@@ -87,7 +87,7 @@ def api_send_message():
     if result["intent"] == "human":
         reply += f"\n\nRéférence de votre demande : {conv.public_reference}"
 
-    support.add_message(conv, "bot", reply)
+    bot_msg = support.add_message(conv, "bot", reply)
     conv.last_intent = result["intent"]
     if result["category"]:
         conv.category = result["category"]
@@ -98,6 +98,7 @@ def api_send_message():
         "reply": reply,
         "buttons": kb.button_payload(result["buttons"]),
         "reference": conv.public_reference,
+        "last_id": bot_msg.id,
     })
 
 

@@ -9,8 +9,17 @@
 {% endblock %}
 {% block content %}
 <div class="chat-screen">
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="chat-quick" id="chat-quick"></div>
+    <div class="chat-messages" id="chat-messages">
+        <div class="chat-bubble bot">Bonjour et bienvenue chez NAMARA ! Choisissez une option ci-dessous ou écrivez directement votre question.</div>
+    </div>
+    <div class="chat-quick" id="chat-quick">
+        <button type="button" data-action="deposit_how">Dépôt</button>
+        <button type="button" data-action="withdrawal_how">Retrait</button>
+        <button type="button" data-action="products">Produits</button>
+        <button type="button" data-action="referral_how">Parrainage</button>
+        <button type="button" data-action="account_help">Problème de compte</button>
+        <button type="button" data-action="human">Parler à un conseiller</button>
+    </div>
     <div class="chat-input">
         <input type="text" id="chat-input" placeholder="Votre message…" autocomplete="off">
         <button type="button" id="chat-send">Envoyer</button>

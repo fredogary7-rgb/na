@@ -7,15 +7,6 @@
     var inputEl = document.getElementById("chat-input");
     var sendBtn = document.getElementById("chat-send");
 
-    var QUICK_START = [
-        { key: "deposit_how", label: "Dépôt" },
-        { key: "withdrawal_how", label: "Retrait" },
-        { key: "products", label: "Produits" },
-        { key: "referral_how", label: "Parrainage" },
-        { key: "account_help", label: "Problème de compte" },
-        { key: "human", label: "Parler à un conseiller" }
-    ];
-
     var sessionHash = null;
     var reference = null;
     var lastId = 0;
@@ -37,7 +28,7 @@
     function addBubble(sender, text, time) {
         var b = document.createElement("div");
         b.className = "chat-bubble " + sender;
-        b.appendChild(document.createTextNode(text));
+        b.textContent = text;
         if (time) {
             var t = document.createElement("span");
             t.className = "time";
@@ -46,10 +37,6 @@
         }
         messagesEl.appendChild(b);
         messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
-
-    function welcome() {
-        addBubble("bot", "Bonjour et bienvenue chez NAMARA ! Choisissez une option ci-dessous ou écrivez directement votre question.");
     }
 
     function ensureConversation(callback) {
@@ -62,10 +49,10 @@
                 reference = data.reference;
                 if (callback) callback();
             }
-        });
+        }).catch(function () {});
     }
 
-    function pollMessages(callback) {
+    function pollMessages() {
         if (!reference) return;
         fetch(BASE + "/messages?session_hash=" + encodeURIComponent(sessionHash) + "&after_id=" + lastId)
             .then(function (r) { return r.json(); })
@@ -75,8 +62,7 @@
                     addBubble(sender, m.text, m.created_at);
                     lastId = Math.max(lastId, m.id);
                 });
-                if (callback) callback();
-            });
+            }).catch(function () {});
     }
 
     function renderButtons(keys) {
@@ -85,8 +71,8 @@
         keys.forEach(function (k) {
             var b = document.createElement("button");
             b.type = "button";
+            b.setAttribute("data-action", k.key);
             b.textContent = k.label;
-            b.addEventListener("click", function () { sendAction(k.key, k.label); });
             quickEl.appendChild(b);
         });
     }
@@ -104,8 +90,9 @@
             body: JSON.stringify({ session_hash: sessionHash, action: key })
         }).then(function (r) { return r.json(); }).then(function (data) {
             if (data.reply) addBubble("bot", data.reply);
+            if (data.last_id) lastId = Math.max(lastId, data.last_id);
             renderButtons(data.buttons || []);
-        });
+        }).catch(function () {});
     }
 
     function sendText(text) {
@@ -121,8 +108,9 @@
             body: JSON.stringify({ session_hash: sessionHash, text: text })
         }).then(function (r) { return r.json(); }).then(function (data) {
             if (data.reply) addBubble("bot", data.reply);
+            if (data.last_id) lastId = Math.max(lastId, data.last_id);
             renderButtons(data.buttons || []);
-        });
+        }).catch(function () {});
     }
 
     function submit() {
@@ -146,13 +134,15 @@
             if (e.key === "Enter") submit();
         });
 
+        // Délégation : gère aussi les boutons rendus côté serveur.
+        quickEl.addEventListener("click", function (e) {
+            var btn = e.target.closest("button[data-action]");
+            if (!btn) return;
+            sendAction(btn.getAttribute("data-action"), btn.textContent.trim());
+        });
+
         ensureConversation(function () {
-            pollMessages(function () {
-                if (lastId === 0) {
-                    welcome();
-                    renderButtons(QUICK_START);
-                }
-            });
+            pollMessages();
             startPolling();
         });
     }
