@@ -9,14 +9,14 @@ from app.services.finance import InsufficientFundsError
 from tests.helpers import make_user, register
 
 
-def test_welcome_bonus_credited_once(app, client, db):
+def test_no_welcome_bonus(app, client, db):
     register(client)
     user = User.query.filter_by(phone_number="+22997000002").first()
     bonus_entries = LedgerEntry.query.filter_by(
         user_id=user.id, transaction_type="welcome_bonus"
     ).all()
-    assert len(bonus_entries) == 1
-    assert finance.get_balance(user.id, "XOF", WALLET_BONUS) == 1500
+    assert len(bonus_entries) == 0
+    assert finance.get_balance(user.id, "XOF", WALLET_BONUS) == 0
 
 
 def test_wallet_separation(app, db):

@@ -107,8 +107,8 @@ class TestingConfig(Config):
     )
     WTF_CSRF_ENABLED = False
     RATELIMIT_ENABLED = False
-    BONUS_ENABLED = True
-    BONUS_INSCRIPTION = 1500
+    BONUS_ENABLED = False
+    BONUS_INSCRIPTION = 0
     REFERRAL_ENABLED = True
     # Les tests d'investissement ont besoin de souscriptions actives.
     SUBSCRIPTIONS_ENABLED = True

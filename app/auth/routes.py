@@ -20,7 +20,6 @@ from app.auth.forms import (
     LoginForm,
     RegistrationForm,
     ResetPasswordForm,
-    VerifyOtpForm,
 )
 from app.constants import COUNTRIES, WALLET_TYPES
 from app.extensions import db, limiter
@@ -59,10 +58,6 @@ def _apply_welcome_bonus(user: User) -> None:
     )
 
 
-def _generate_otp(user: User) -> str:
-    code = f"{secrets.randbelow(1000000):06d}"
-
-
 @auth_bp.route("/register", methods=["GET", "POST"])
 @limiter.limit("5 per hour")
 def register():
@@ -99,18 +94,12 @@ def register():
                 form.referral_code.errors.append(str(exc))
                 return render_template("auth/register.html", form=form)
 
-        _apply_welcome_bonus(user)
-        otp = _generate_otp(user)
+        user.is_phone_verified = True
         db.session.commit()
 
-        if current_app.config.get("FLASK_ENV") != "production":
-            flash(
-                f"Mode développement : votre code de vérification est {otp} "
-                "(aucun SMS envoyé).",
-                "info",
-            )
-        flash("Inscription réussie. Connectez-vous puis vérifiez votre téléphone.", "success")
-        return redirect(url_for("auth.login"))
+        login_user(user)
+        flash("Inscription réussie. Bienvenue sur NAMARA !", "success")
+        return redirect(url_for("dashboard.index"))
 
     return render_template("auth/register.html", form=form)
 
@@ -153,10 +142,6 @@ def logout():
     flash("Vous êtes déconnecté.", "info")
     return redirect(url_for("auth.login"))
 
-    user.otp_secret = code
-    user.otp_expires_at = utcnow() + timedelta(minutes=10)
-    return code
-
 
 def _normalize_login_phone(raw: str) -> str:
     raw = (raw or "").strip()
@@ -172,32 +157,10 @@ def _normalize_login_phone(raw: str) -> str:
 
 
 
-@auth_bp.route("/verify", methods=["GET", "POST"])
+@auth_bp.route("/verify")
 @login_required
 def verify():
-    if current_user.is_phone_verified:
-        return redirect(url_for("dashboard.index"))
-    form = VerifyOtpForm()
-    if form.validate_on_submit():
-        valid = (
-            current_user.otp_secret
-            and current_user.otp_expires_at
-            and current_user.otp_expires_at > utcnow()
-            and form.otp.data.strip() == current_user.otp_secret
-        )
-        if valid:
-            current_user.is_phone_verified = True
-            current_user.otp_secret = None
-            current_user.otp_expires_at = None
-            db.session.commit()
-            flash("Votre téléphone est vérifié.", "success")
-            return redirect(url_for("dashboard.index"))
-        flash("Code invalide ou expiré.", "danger")
-
-    dev_otp = None
-    if current_app.config.get("FLASK_ENV") != "production" and current_user.otp_secret:
-        dev_otp = current_user.otp_secret
-    return render_template("auth/verify.html", form=form, dev_otp=dev_otp)
+    return redirect(url_for("dashboard.index"))
 
 
 @auth_bp.route("/forgot-password", methods=["GET", "POST"])
