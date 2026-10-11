@@ -49,32 +49,19 @@
     </div>
 </div>
 
+{% if not current_user.is_phone_verified %}
 <div class="section-head"><h2>Sécurité</h2></div>
 <div class="card">
-    {% if not current_user.is_phone_verified %}
-        <div class="alert alert-warning">Vérifiez votre numéro de téléphone pour activer les opérations financières.</div>
-        <a href="{{ url_for('auth.verify') }}" class="btn btn-outline btn-block mb">Vérifier mon téléphone</a>
-    {% endif %}
-    <h3>Changer le mot de passe</h3>
-    <form method="post" novalidate>
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.current_password.label }}
-            {{ form.current_password() }}
-            {% for e in form.current_password.errors %}<span class="error">{{ e }}</span>{% endfor %}
-        </div>
-        <div class="form-group">
-            {{ form.new_password.label }}
-            {{ form.new_password() }}
-            {% for e in form.new_password.errors %}<span class="error">{{ e }}</span>{% endfor %}
-        </div>
-        <div class="form-group">
-            {{ form.confirm_password.label }}
-            {{ form.confirm_password() }}
-            {% for e in form.confirm_password.errors %}<span class="error">{{ e }}</span>{% endfor %}
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">Mettre à jour le mot de passe</button>
-    </form>
+    <div class="alert alert-warning">Vérifiez votre numéro de téléphone pour activer les opérations financières.</div>
+    <a href="{{ url_for('auth.verify') }}" class="btn btn-outline btn-block">Vérifier mon téléphone</a>
+</div>
+{% endif %}
+
+<div class="section-head"><h2>Service client</h2></div>
+<div class="card">
+    <p class="muted mb">Une question, un problème de mot de passe ou de compte ? Notre équipe est disponible :</p>
+    <a class="btn btn-primary btn-block mb" href="https://t.me/narama_bot" target="_blank" rel="noopener">💬 Telegram @narama_bot</a>
+    <a class="btn btn-outline btn-block" href="{{ url_for('support.chat_page') }}">💬 Chat du site</a>
 </div>
 
 <a class="btn btn-danger btn-block mt" href="{{ url_for('auth.logout') }}">

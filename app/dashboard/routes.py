@@ -6,7 +6,7 @@ from flask import Blueprint, current_app, flash, redirect, render_template, requ
 from flask_login import current_user, login_required
 
 from app.constants import ALL_OPERATORS, WALLET_TYPES
-from app.dashboard.forms import CardForm, ChangePasswordForm, ClaimForm, DepositForm, WithdrawalForm
+from app.dashboard.forms import CardForm, ClaimForm, DepositForm, WithdrawalForm
 from app.extensions import db
 from app.models import (
     Card,
@@ -331,16 +331,7 @@ def cards():
     return render_template("dashboard/cards.html", form=form, cards=cards_list)
 
 
-@dashboard_bp.route("/profile", methods=["GET", "POST"])
+@dashboard_bp.route("/profile")
 @login_required
 def profile():
-    form = ChangePasswordForm()
-    if form.validate_on_submit():
-        if not current_user.check_password(form.current_password.data):
-            flash("Mot de passe actuel incorrect.", "danger")
-        else:
-            current_user.set_password(form.new_password.data)
-            db.session.commit()
-            flash("Mot de passe mis à jour.", "success")
-            return redirect(url_for("dashboard.profile"))
-    return render_template("dashboard/profile.html", form=form)
+    return render_template("dashboard/profile.html")

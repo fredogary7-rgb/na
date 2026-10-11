@@ -163,11 +163,11 @@ def answer_referral():
 
 def answer_password():
     return (
-        "Pour réinitialiser votre mot de passe :\n\n"
-        "1. Sur la page de connexion, cliquez sur « Mot de passe oublié ».\n"
-        "2. Saisissez votre numéro de téléphone.\n"
-        "3. Suivez les instructions reçues pour définir un nouveau mot de passe.\n\n"
-        "Nous ne vous demanderons jamais votre mot de passe actuel ni votre code OTP."
+        "Pour réinitialiser votre mot de passe, contactez le service client NAMARA :\n\n"
+        "• Telegram : @narama_bot (ce canal)\n"
+        "• Chat du site : page « Assistance »\n\n"
+        "Un conseiller vérifiera votre identité et vous aidera à définir un nouveau mot de passe "
+        "en toute sécurité. Nous ne vous demanderons jamais votre mot de passe actuel ni votre code OTP."
     )
 
 
@@ -175,20 +175,17 @@ def answer_login():
     return (
         "Si vous n'arrivez pas à vous connecter :\n\n"
         "1. Vérifiez votre numéro de téléphone et votre mot de passe.\n"
-        "2. Assurez-vous que votre compte a été vérifié.\n"
-        "3. Utilisez « Mot de passe oublié » si nécessaire.\n\n"
-        "Si le problème persiste, un conseiller peut vous aider."
+        "2. Assurez-vous que votre compte a été vérifié.\n\n"
+        "Si vous avez oublié votre mot de passe ou si le problème persiste, contactez le "
+        "service client (Telegram @narama_bot ou le chat du site)."
     )
 
 
 def answer_verify():
     return (
-        "La vérification du téléphone est requise avant toute opération financière.\n\n"
-        "Si vous ne recevez pas votre code de vérification :\n"
-        "1. Vérifiez le numéro saisi (indicatif pays inclus).\n"
-        "2. Patientez quelques instants puis renvoyez le code.\n"
-        "3. Vérifiez vos SMS et le dossier spam.\n\n"
-        "Un conseiller peut vous assister si le problème persiste."
+        "La vérification du téléphone est nécessaire pour activer les opérations financières.\n\n"
+        "Cette vérification est réalisée par notre équipe : contactez le service client via "
+        "Telegram (@narama_bot) ou le chat du site, et un conseiller vous aidera à vérifier votre numéro."
     )
 
 

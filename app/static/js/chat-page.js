@@ -10,6 +10,7 @@
     var sessionHash = null;
     var reference = null;
     var lastId = 0;
+    var renderedIds = {};
     var pollTimer = null;
 
     function getSessionHash() {
@@ -69,6 +70,8 @@
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 (data.messages || []).forEach(function (m) {
+                    if (renderedIds[m.id]) return;
+                    renderedIds[m.id] = true;
                     var sender = (m.sender_type === "visitor" || m.sender_type === "user") ? "visitor" : "bot";
                     addBubble(sender, m.text, m.created_at);
                     lastId = Math.max(lastId, m.id);
@@ -93,16 +96,14 @@
             ensureConversation(function () { sendAction(key, label); });
             return;
         }
-        addBubble("visitor", label);
         renderButtons([]);
         fetch(BASE + "/message", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ session_hash: sessionHash, action: key })
         }).then(function (r) { return r.json(); }).then(function (data) {
-            if (data.reply) addBubble("bot", data.reply);
-            if (data.last_id) lastId = Math.max(lastId, data.last_id);
             renderButtons(data.buttons || []);
+            pollMessages();
         }).catch(function () {});
     }
 
@@ -111,16 +112,14 @@
             ensureConversation(function () { sendText(text); });
             return;
         }
-        addBubble("visitor", text);
         renderButtons([]);
         fetch(BASE + "/message", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ session_hash: sessionHash, text: text })
         }).then(function (r) { return r.json(); }).then(function (data) {
-            if (data.reply) addBubble("bot", data.reply);
-            if (data.last_id) lastId = Math.max(lastId, data.last_id);
             renderButtons(data.buttons || []);
+            pollMessages();
         }).catch(function () {});
     }
 

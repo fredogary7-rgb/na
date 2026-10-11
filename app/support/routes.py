@@ -76,7 +76,7 @@ def api_send_message():
         result = kb.resolve_intent(action)
         if result is None:
             return jsonify({"error": "action inconnue"}), 400
-        support.add_message(conv, "visitor", f"[{kb.BUTTON_LABELS.get(action, action)}]")
+        support.add_message(conv, "visitor", kb.BUTTON_LABELS.get(action, action))
     else:
         if len(text) > current_app.config.get("SUPPORT_MESSAGE_MAX_LENGTH", 2000):
             return jsonify({"error": "message trop long"}), 400
