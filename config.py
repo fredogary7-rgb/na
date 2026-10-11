@@ -76,7 +76,7 @@ class Config:
     # SoleasPay — à adapter à la documentation officielle (ajout ultérieur).
     SOLEASPAY_API_KEY = os.environ.get("SOLEASPAY_API_KEY")
     SOLEASPAY_API_SECRET = os.environ.get("SOLEASPAY_API_SECRET")
-    SOLEASPAY_BASE_URL = os.environ.get("SOLEASPAY_BASE_URL")
+    SOLEASPAY_BASE_URL = os.environ.get("SOLEASPAY_BASE_URL", "https://soleaspay.com")
     SOLEASPAY_WEBHOOK_SECRET = os.environ.get("SOLEASPAY_WEBHOOK_SECRET")
 
     # Support client (Telegram + chat web)
