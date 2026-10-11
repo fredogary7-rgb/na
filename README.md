@@ -133,19 +133,22 @@ Le dépôt contient les fichiers nécessaires au déploiement sur
 
 1. **Créer le service** : dans Railway → *New Project* → *Deploy from GitHub repo*,
    sélectionnez `fredogary7-rgb/na`.
-2. **Base de données** : ajoutez un plugin **PostgreSQL** dans Railway. Il fournit
+2. **Nom de domaine** : connectez `namara.win` (Railway → *Settings* → *Networking*
+   → *Custom Domain*). Railway provisionne automatiquement le certificat HTTPS.
+3. **Base de données** : ajoutez un plugin **PostgreSQL** dans Railway. Il fournit
    automatiquement `DATABASE_URL`.
-3. **Variables d'environnement** (dans Railway, pas dans un fichier) :
+4. **Variables d'environnement** (dans Railway, pas dans un fichier) :
    - `FLASK_ENV=production`
    - `SECRET_KEY` (valeur aléatoire longue)
    - `DATABASE_URL` (fournie par le plugin PostgreSQL)
    - `PAYMENT_MODE=mock` (tant que SoleasPay n'est pas configuré)
-   - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_WEBHOOK_URL`
+   - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`
+   - `TELEGRAM_WEBHOOK_URL=https://namara.win/support/telegram/webhook`
    - `TELEGRAM_MODE=webhook`
-4. **Déployer**. Le `Procfile` lance `flask db upgrade` avant `gunicorn` (les
+5. **Déployer**. Le `Procfile` lance `flask db upgrade` avant `gunicorn` (les
    migrations sont appliquées à chaque déploiement — retirez cette étape de la
    commande si vous préférez migrer manuellement).
-5. **Après le premier déploiement**, exécutez une fois (Railway → *Shell* ou
+6. **Après le premier déploiement**, exécutez une fois (Railway → *Shell* ou
    commande locale avec l'URL publique) :
 
    ```bash
@@ -177,9 +180,9 @@ des écritures compensatrices, jamais par la suppression d'opérations.
 ## Service client (Telegram + chat web)
 
 Le service client NAMARA est accessible par **Telegram** (bot `@narama_bot`) et
-par un **widget de chat** sur le site web. Les deux canaux partagent la même
-base de conversations (`SupportConversation` / `SupportMessage`), traitée depuis
-l'espace administrateur (`Admin → Service client`).
+par une **page de chat dédiée** sur le site web (`/support/chat`). Les deux canaux
+partagent la même base de conversations (`SupportConversation` / `SupportMessage`),
+traitée depuis l'espace administrateur (`Admin → Service client`).
 
 ### Variables d'environnement
 
@@ -187,7 +190,7 @@ l'espace administrateur (`Admin → Service client`).
 |---|---|
 | `TELEGRAM_BOT_TOKEN` | Token du bot (BotFather). **Ne jamais le committer.** |
 | `TELEGRAM_WEBHOOK_SECRET` | Secret d'en-tête du webhook (chaîne aléatoire). |
-| `TELEGRAM_WEBHOOK_URL` | URL HTTPS publique du webhook (`https://.../support/telegram/webhook`). |
+| `TELEGRAM_WEBHOOK_URL` | URL HTTPS publique du webhook (`https://namara.win/support/telegram/webhook`). |
 | `TELEGRAM_ADMIN_CHAT_ID` | (Optionnel) chat_id pour les alertes d'assistance. |
 | `TELEGRAM_MODE` | `off` (désactivé), `webhook` (production) ou `polling` (développement). |
 | `SUPPORT_ATTACHMENT_MAX_BYTES` | Taille max d'une pièce jointe (défaut 2 000 000). |
