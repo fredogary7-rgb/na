@@ -3,8 +3,18 @@
     var BASE = "/support/api";
 
     var messagesEl = document.getElementById("chat-messages");
+    var quickEl = document.getElementById("chat-quick");
     var inputEl = document.getElementById("chat-input");
     var sendBtn = document.getElementById("chat-send");
+
+    var QUICK_START = [
+        { key: "deposit_how", label: "Dépôt" },
+        { key: "withdrawal_how", label: "Retrait" },
+        { key: "products", label: "Produits" },
+        { key: "referral_how", label: "Parrainage" },
+        { key: "account_help", label: "Problème de compte" },
+        { key: "human", label: "Parler à un conseiller" }
+    ];
 
     var sessionHash = null;
     var reference = null;
@@ -39,7 +49,7 @@
     }
 
     function welcome() {
-        addBubble("bot", "Bonjour et bienvenue chez NAMARA ! Comment pouvons-nous vous aider aujourd'hui ? Écrivez directement votre question.");
+        addBubble("bot", "Bonjour et bienvenue chez NAMARA ! Choisissez une option ci-dessous ou écrivez directement votre question.");
     }
 
     function ensureConversation(callback) {
@@ -69,18 +79,49 @@
             });
     }
 
+    function renderButtons(keys) {
+        quickEl.innerHTML = "";
+        if (!keys || !keys.length) return;
+        keys.forEach(function (k) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.textContent = k.label;
+            b.addEventListener("click", function () { sendAction(k.key, k.label); });
+            quickEl.appendChild(b);
+        });
+    }
+
+    function sendAction(key, label) {
+        if (!reference) {
+            ensureConversation(function () { sendAction(key, label); });
+            return;
+        }
+        addBubble("visitor", label);
+        renderButtons([]);
+        fetch(BASE + "/message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session_hash: sessionHash, action: key })
+        }).then(function (r) { return r.json(); }).then(function (data) {
+            if (data.reply) addBubble("bot", data.reply);
+            renderButtons(data.buttons || []);
+        });
+    }
+
     function sendText(text) {
         if (!reference) {
             ensureConversation(function () { sendText(text); });
             return;
         }
         addBubble("visitor", text);
+        renderButtons([]);
         fetch(BASE + "/message", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ session_hash: sessionHash, text: text })
         }).then(function (r) { return r.json(); }).then(function (data) {
             if (data.reply) addBubble("bot", data.reply);
+            renderButtons(data.buttons || []);
         });
     }
 
@@ -107,7 +148,10 @@
 
         ensureConversation(function () {
             pollMessages(function () {
-                if (lastId === 0) welcome();
+                if (lastId === 0) {
+                    welcome();
+                    renderButtons(QUICK_START);
+                }
             });
             startPolling();
         });

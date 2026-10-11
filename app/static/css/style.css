@@ -779,6 +779,28 @@ body.chat-body {
 .chat-bubble.bot { background: var(--white); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
 .chat-bubble.visitor, .chat-bubble.user { background: var(--green); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
 .chat-bubble .time { font-size: 0.68rem; opacity: 0.65; margin-top: 0.25rem; display: block; }
+.chat-quick {
+    flex: 0 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+}
+.chat-quick:empty { display: none; }
+.chat-quick button {
+    border: 1px solid var(--green);
+    background: var(--white);
+    color: var(--green);
+    border-radius: 999px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+}
+.chat-quick button:hover { background: var(--green); color: #fff; }
 .chat-input {
     flex: 0 0 auto;
     display: flex; gap: 0.5rem; padding: 0.7rem;

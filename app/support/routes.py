@@ -63,26 +63,42 @@ def api_send_message():
     data = request.get_json(silent=True) or {}
     session_hash = (data.get("session_hash") or "").strip()
     text = (data.get("text") or "").strip()
-    if not text:
+    action = (data.get("action") or "").strip()
+
+    if not text and not action:
         return jsonify({"error": "message vide"}), 400
-    if len(text) > current_app.config.get("SUPPORT_MESSAGE_MAX_LENGTH", 2000):
-        return jsonify({"error": "message trop long"}), 400
 
     conv = support.get_web_conversation(session_hash)
     if conv is None:
         return jsonify({"error": "conversation introuvable"}), 404
 
-    support.add_message(conv, "visitor", text)
-    db.session.commit()
+    if action:
+        result = kb.resolve_intent(action)
+        if result is None:
+            return jsonify({"error": "action inconnue"}), 400
+        support.add_message(conv, "visitor", f"[{kb.BUTTON_LABELS.get(action, action)}]")
+    else:
+        if len(text) > current_app.config.get("SUPPORT_MESSAGE_MAX_LENGTH", 2000):
+            return jsonify({"error": "message trop long"}), 400
+        support.add_message(conv, "visitor", text)
+        result = kb.resolve(text, context=conv.last_intent)
 
-    result = kb.resolve(text, context=conv.last_intent)
-    support.add_message(conv, "bot", result["reply"])
+    reply = result["reply"]
+    if result["intent"] == "human":
+        reply += f"\n\nRéférence de votre demande : {conv.public_reference}"
+
+    support.add_message(conv, "bot", reply)
     conv.last_intent = result["intent"]
     if result["category"]:
         conv.category = result["category"]
     db.session.commit()
 
-    return jsonify({"ok": True, "reply": result["reply"]})
+    return jsonify({
+        "ok": True,
+        "reply": reply,
+        "buttons": kb.button_payload(result["buttons"]),
+        "reference": conv.public_reference,
+    })
 
 
 @support_bp.route("/api/messages", methods=["GET"])

@@ -215,3 +215,29 @@ def test_telegram_free_text_deposit_resolves(app, client, db):
     assert conv.last_intent == "deposit_how"
     bot_messages = [m.message_text for m in conv.messages.filter_by(sender_type="bot").all()]
     assert any("Recharger" in (m or "") for m in bot_messages)
+
+
+def test_web_chat_returns_buttons(app, client, db):
+    session_hash = "c" * 32
+    client.post("/support/api/conversation", json={"session_hash": session_hash})
+    resp = client.post(
+        "/support/api/message",
+        json={"session_hash": session_hash, "text": "Je veux effectuer un dépôt"},
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["reply"]
+    assert any(b["key"] == "deposit_not_credited" for b in data["buttons"])
+
+
+def test_web_chat_button_action(app, client, db):
+    session_hash = "d" * 32
+    client.post("/support/api/conversation", json={"session_hash": session_hash})
+    resp = client.post(
+        "/support/api/message",
+        json={"session_hash": session_hash, "action": "withdrawal_how"},
+    )
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert "Retirer" in data["reply"]
+    assert any(b["key"] == "withdrawal_pending" for b in data["buttons"])

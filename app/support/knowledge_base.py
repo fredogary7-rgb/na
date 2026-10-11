@@ -487,3 +487,29 @@ def resolve(text, context=None):
         "handoff": False,
     }
 
+
+def resolve_intent(key):
+    """Résout une intention à partir de sa clé (clic sur un bouton).
+
+    Retourne le même format que resolve(), ou None si la clé est inconnue.
+    """
+    intent = INTENTS_BY_KEY.get(key)
+    if intent is None:
+        return None
+    return {
+        "reply": intent["answer"](),
+        "intent": key,
+        "category": intent["category"],
+        "buttons": intent.get("buttons", []),
+        "handoff": False,
+    }
+
+
+def button_payload(keys):
+    """Convertit une liste de clés en objets {key, label} pour le frontend."""
+    return [{"key": k, "label": BUTTON_LABELS.get(k, k)} for k in keys]
+
+
+# Menu de démarrage du chat (identique aux catégories Telegram).
+START_ACTIONS = ["deposit_how", "withdrawal_how", "products", "referral_how", "account_help", "human"]
+
