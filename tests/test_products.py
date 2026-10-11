@@ -144,7 +144,7 @@ def test_products_page_renders(app, client, db):
         assert name in html
     assert "90 jours" in html
     assert "Bientôt disponible" in html
-    assert "Simulation indicative" in html
+    assert "Investir" in html
 
 
 def test_products_page_no_footer(app, client, db):
