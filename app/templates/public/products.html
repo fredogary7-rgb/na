@@ -2,12 +2,12 @@
 {% block title %}Produits{% endblock %}
 {% block header %}{% endblock %}
 {% block content %}
-<section class="products-hero">
-    <h1>Nos produits d'investissement</h1>
-    <p>Choisissez un produit NAMARA, investissez en francs CFA et suivez la progression de votre capital sur 90 jours.</p>
-</section>
+<div class="container products-container">
+    <div class="products-head">
+        <h1>Nos produits</h1>
+        <p class="muted">Choisissez un produit et investissez en francs CFA.</p>
+    </div>
 
-<div class="container">
     {% if not subs_enabled %}
     <div class="sim-warning">
         <strong>Les souscriptions seront bientôt ouvertes.</strong>
