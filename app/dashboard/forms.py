@@ -10,6 +10,7 @@ class DepositForm(FlaskForm):
     amount = StringField("Montant (FCFA)", validators=[DataRequired()])
     operator = SelectField("Opérateur Mobile Money", validators=[DataRequired()])
     phone_number = StringField("Numéro de téléphone", validators=[DataRequired()])
+    otp = StringField("Code OTP (Orange Money)", validators=[Optional()])
 
     def clean_amount(self) -> int:
         return parse_amount(self.amount.data)

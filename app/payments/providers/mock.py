@@ -25,7 +25,7 @@ class MockProvider(BaseProvider):
         "cancelled": "cancelled",
     }
 
-    def initiate_deposit(self, deposit):
+    def initiate_deposit(self, deposit, otp=None):
         # Aucun paiement réel : la demande reste en attente d'une confirmation
         # webhook authentifiée (fournie par les tests ou un outil de dev).
         return {"status": "pending", "external_ref": None}

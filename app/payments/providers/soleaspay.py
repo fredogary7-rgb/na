@@ -45,7 +45,7 @@ class SoleasPayProvider(BaseProvider):
     def normalize_status(self, raw):
         return self.STATUS_MAP.get(str(raw).upper(), "pending")
 
-    def initiate_deposit(self, deposit):
+    def initiate_deposit(self, deposit, otp=None):
         """Collecte (Pay-In) d'un dépôt Mobile Money."""
         headers = {
             "Content-Type": "application/json",
@@ -53,6 +53,8 @@ class SoleasPayProvider(BaseProvider):
             "operation": "2",
             "service": str(deposit.service_id),
         }
+        if otp:
+            headers["otp"] = str(otp)  # requis pour Orange Money
         payload = {
             "wallet": deposit.phone_number,
             "amount": deposit.amount,

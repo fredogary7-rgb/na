@@ -151,6 +151,7 @@ def deposits():
                 operator,
                 form.phone_number.data.strip(),
                 service_id=service_id,
+                otp=(form.otp.data or "").strip() or None,
             )
             db.session.commit()
             flash("Demande de dépôt enregistrée. En attente de confirmation du prestataire.", "info")

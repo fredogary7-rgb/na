@@ -11,7 +11,7 @@ class ProviderError(Exception):
 class BaseProvider:
     name = "base"
 
-    def initiate_deposit(self, deposit):
+    def initiate_deposit(self, deposit, otp=None):
         raise NotImplementedError
 
     def verify_status(self, external_ref: str):
