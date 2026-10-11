@@ -44,23 +44,48 @@
 <div class="alert alert-info">Aucun produit d'investissement n'est actuellement disponible.</div>
 {% endif %}
 
-<div class="section-head"><h2>Mes positions</h2></div>
-<div class="list-card">
-    {% for inv in investments %}
-        <div class="list-item">
-            <div class="ico">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
-            </div>
-            <div class="grow">
-                <div class="t">{{ inv.product.name }}</div>
-                <div class="s">{{ inv.start_date.strftime('%d/%m/%Y %H:%M') }} → {{ inv.end_date.strftime('%d/%m/%Y %H:%M') }}</div>
-            </div>
-            <span class="badge badge-{{ badge_class(inv.status) }}">{{ inv.status }}</span>
-            <div class="amt">{{ format_amount(inv.capital, inv.currency) }}</div>
-        </div>
-    {% else %}
-        <div class="empty"><p>Aucun investissement.</p></div>
-    {% endfor %}
+<div class="section-head"><h2>Mes positions <span class="section-sub">({{ active_count }} actif(s))</span></h2></div>
+
+{% if positions %}
+<div class="stats-bar">
+    <div class="stat"><span class="stat-label">Total investi</span><span class="stat-val">{{ format_amount(total_invested, current_user.currency) }}</span></div>
+    <div class="stat"><span class="stat-label">Revenu cumulé</span><span class="stat-val stat-val-green">{{ format_amount(total_income, current_user.currency) }}</span></div>
 </div>
+
+{% for pos in positions %}
+<div class="progress-card {% if pos.inv.status == 'active' %}progress-card--active{% elif pos.inv.status == 'completed' %}progress-card--done{% elif pos.inv.status in ('cancelled','interrupted') %}progress-card--stopped{% endif %}">
+    <div class="pcard-top">
+        <h3>{{ pos.inv.product.name }}</h3>
+        <span class="badge badge-{{ badge_class(pos.inv.status) }}">{{ pos.inv.status }}</span>
+    </div>
+    <div class="pcard-body">
+        <div class="pcard-row">
+            <span>Capital</span>
+            <strong>{{ format_amount(pos.inv.capital, pos.inv.currency) }}</strong>
+        </div>
+        <div class="pcard-row">
+            <span>Revenu perçu</span>
+            <strong class="green">{{ format_amount(pos.income_earned, pos.inv.currency) }}</strong>
+        </div>
+        <div class="pcard-row">
+            <span>Progression</span>
+            <strong>{{ pos.pct }}%</strong>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" style="width:{{ pos.pct }}%;"></div>
+        </div>
+
+        <div class="pcard-dates">
+            <span>{{ pos.days_elapsed }} / {{ pos.days_total }} jours écoulés</span>
+            {% if pos.days_remaining > 0 %}<span class="muted">{{ pos.days_remaining }} jour(s) restant(s)</span>{% endif %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% else %}
+<div class="card"><p class="muted">Aucun investissement pour le moment.</p></div>
+{% endif %}
 
 {% endblock %}

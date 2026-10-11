@@ -1051,6 +1051,55 @@ body.chat-body {
 @media (max-width: 560px) { .invest-grid { grid-template-columns: 1fr; } .invest-success .is-grid { grid-template-columns: 1fr; } }
 
 /* ============================================================
+   PROGRESSION DES INVESTISSEMENTS (barres + cartes)
+   ============================================================ */
+.stats-bar {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.stat {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem 1.2rem;
+    box-shadow: var(--shadow-sm);
+}
+.stat-label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 0.25rem; }
+.stat-val { font-size: 1.25rem; font-weight: 700; }
+.stat-val-green { color: var(--green-dark); }
+
+.progress-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.2rem;
+    margin-bottom: 1rem; box-shadow: var(--shadow-sm);
+}
+.progress-card--active { border-left: 4px solid var(--green); }
+.progress-card--done { border-left: 4px solid #175CD3; opacity: 0.85; }
+.progress-card--stopped { border-left: 4px solid #B42318; opacity: 0.75; }
+
+.pcard-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+.pcard-top h3 { margin: 0; font-size: 1rem; }
+.pcard-body { display: flex; flex-direction: column; gap: 0.5rem; }
+.pcard-row { display: flex; justify-content: space-between; font-size: 0.9rem; }
+.pcard-row .green { color: var(--green-dark); font-weight: 600; }
+
+.progress-bar {
+    height: 10px; background: #E8EDE9; border-radius: 999px;
+    overflow: hidden; margin: 0.3rem 0;
+}
+.progress-fill {
+    height: 100%; border-radius: 999px;
+    background: linear-gradient(90deg, var(--green), var(--green-dark));
+    transition: width 0.6s ease;
+    min-width: 0;
+}
+.progress-card--done .progress-fill { background: linear-gradient(90deg, #175CD3, #0D3B9E); }
+.progress-card--stopped .progress-fill { background: linear-gradient(90deg, #B42318, #7A1B12); }
+
+.pcard-dates { display: flex; justify-content: space-between; font-size: 0.78rem; }
+.pcard-dates .muted { color: var(--muted); }
+
+@media (max-width: 560px) { .stats-bar { grid-template-columns: 1fr; } }
+
+/* ============================================================
    DÉPÔT : sélection des services Mobile Money (logos)
    ============================================================ */
 .service-grid {

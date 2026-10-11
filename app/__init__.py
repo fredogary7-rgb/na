@@ -92,6 +92,8 @@ def register_template_helpers(app):
             "failed": "failed",
             "rejected": "rejected",
             "cancelled": "cancelled",
+            "active": "success",
+            "completed": "approved",
         }
         return mapping.get(status, "cancelled")
 
