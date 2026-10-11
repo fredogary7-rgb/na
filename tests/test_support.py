@@ -4,6 +4,7 @@ import pytest
 from app.models import SupportConversation, SupportMessage, User
 from app.services import support
 from app.services.telegram import TelegramError
+from app.support import knowledge_base as kb
 from app.support import telegram_handler
 
 from tests.helpers import login, make_user
@@ -99,3 +100,118 @@ def test_faq_lookup(app, db):
     faq = support.find_faq("comment créer un compte ?")
     assert faq is not None
     assert "inscription" in (faq.answer or "").lower() or "page d'inscription" in (faq.answer or "")
+
+
+# ---------------------------------------------------------------------------
+# Moteur d'intentions (questions en langage naturel)
+# ---------------------------------------------------------------------------
+def test_intent_detection_common_messages(app):
+    cases = [
+        ("Je veux effectuer un dépôt.", "deposit_how"),
+        ("Comment déposer de l'argent ?", "deposit_how"),
+        ("Mon dépôt n'est pas arrivé.", "deposit_not_credited"),
+        ("Comment retirer mes gains ?", "withdrawal_how"),
+        ("Mon retrait est bloqué.", "withdrawal_pending"),
+        ("Quels sont vos produits ?", "products"),
+        ("Comment fonctionne le parrainage ?", "referral_how"),
+        ("J'ai oublié mon mot de passe.", "account_password"),
+        ("Je veux parler à un conseiller.", "human"),
+        ("Bonjour, j'ai une question.", "greeting"),
+    ]
+    with app.app_context():
+        for text, expected in cases:
+            result = kb.resolve(text)
+            assert result["intent"] == expected, f"{text!r} -> {result['intent']}"
+            assert result["reply"], f"réponse vide pour {text!r}"
+
+
+def test_intent_fault_tolerant(app):
+    with app.app_context():
+        # Sans accents, fautes d'orthographe légères.
+        assert kb.resolve("coment depose de l argent")["intent"] == "deposit_how"
+        assert kb.resolve("je veux fair un depot")["intent"] == "deposit_how"
+        assert kb.resolve("comen retirer mes gain")["intent"] == "withdrawal_how"
+        assert kb.resolve("jai oublie mon mot de passe")["intent"] == "account_password"
+
+
+def test_unknown_question_triggers_handoff(app):
+    with app.app_context():
+        result = kb.resolve("azertyuiop qsdfghjklm wxcvbn")
+        assert result["handoff"] is True
+        assert result["buttons"] == ["human"]
+        assert "conseiller" in result["reply"]
+
+
+def test_ai_unavailable_falls_back_to_handoff(app, monkeypatch):
+    from app.services import ai
+
+    def boom(*args, **kwargs):
+        raise ai.AIUnavailable("service indisponible")
+
+    monkeypatch.setattr(ai, "ask", boom)
+    with app.app_context():
+        result = kb.resolve("question totalement inédite xyz123")
+        assert result["handoff"] is True
+
+
+def test_ai_used_when_configured(app, monkeypatch):
+    from app.services import ai
+
+    monkeypatch.setattr(ai, "ask", lambda question, context: "Réponse IA de test")
+    with app.app_context():
+        result = kb.resolve("question jamais vue auparavant")
+        assert result["reply"] == "Réponse IA de test"
+        assert result["handoff"] is False
+
+
+def test_conversation_memory_followup(app):
+    with app.app_context():
+        assert kb.resolve("Je veux faire un dépôt")["intent"] == "deposit_how"
+        followup = kb.resolve("Et si l'argent n'arrive pas ?", context="deposit_how")
+        assert followup["intent"] == "deposit_not_credited"
+
+
+def test_deposit_answer_uses_real_minimum(app):
+    with app.app_context():
+        app.config["MIN_DEPOSIT"] = 5000
+        result = kb.resolve("Comment faire un dépôt ?")
+        assert "5 000" in result["reply"]
+
+
+def test_withdrawal_answer_uses_real_fee(app):
+    with app.app_context():
+        app.config["WITHDRAWAL_FEE_BPS"] = 800
+        result = kb.resolve("Comment retirer mes gains ?")
+        assert "8.00" in result["reply"]
+
+
+def test_telegram_human_handoff_creates_ticket(app, client, db):
+    app.config["TELEGRAM_WEBHOOK_SECRET"] = "bon-secret"
+    app.config["TELEGRAM_BOT_TOKEN"] = None  # éviter tout appel réseau
+    update = {"update_id": 900, "message": {"chat": {"id": "700"}, "text": "Je veux parler à un conseiller"}}
+    resp = client.post(
+        "/support/telegram/webhook", json=update,
+        headers={"X-Telegram-Bot-Api-Secret-Token": "bon-secret"},
+    )
+    assert resp.status_code == 200
+    conv = SupportConversation.query.filter_by(channel="telegram", telegram_chat_id="700").first()
+    assert conv is not None
+    assert conv.category == "human"
+    assert conv.last_intent == "human"
+    assert conv.messages.filter_by(sender_type="bot").count() >= 1
+
+
+def test_telegram_free_text_deposit_resolves(app, client, db):
+    app.config["TELEGRAM_WEBHOOK_SECRET"] = "bon-secret"
+    app.config["TELEGRAM_BOT_TOKEN"] = None
+    update = {"update_id": 901, "message": {"chat": {"id": "701"}, "text": "Je veux effectuer un dépôt"}}
+    resp = client.post(
+        "/support/telegram/webhook", json=update,
+        headers={"X-Telegram-Bot-Api-Secret-Token": "bon-secret"},
+    )
+    assert resp.status_code == 200
+    conv = SupportConversation.query.filter_by(channel="telegram", telegram_chat_id="701").first()
+    assert conv is not None
+    assert conv.last_intent == "deposit_how"
+    bot_messages = [m.message_text for m in conv.messages.filter_by(sender_type="bot").all()]
+    assert any("Recharger" in (m or "") for m in bot_messages)

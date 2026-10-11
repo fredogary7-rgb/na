@@ -81,6 +81,13 @@ class Config:
     SUPPORT_ATTACHMENT_MAX_BYTES = int(os.environ.get("SUPPORT_ATTACHMENT_MAX_BYTES", "2000000"))
     SUPPORT_MESSAGE_MAX_LENGTH = int(os.environ.get("SUPPORT_MESSAGE_MAX_LENGTH", "2000"))
 
+    # Fournisseur d'IA optionnel (niveau 3 du support). Désactivé par défaut.
+    # L'IA ne reçoit que le contexte factuel du site et n'exécute aucune opération.
+    AI_API_KEY = os.environ.get("AI_API_KEY")
+    AI_BASE_URL = os.environ.get("AI_BASE_URL", "https://api.openai.com/v1")
+    AI_MODEL = os.environ.get("AI_MODEL", "gpt-4o-mini")
+    AI_TIMEOUT = int(os.environ.get("AI_TIMEOUT", "10"))
+
 
 class DevelopmentConfig(Config):
     DEBUG = True

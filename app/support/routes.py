@@ -8,6 +8,7 @@ from werkzeug.exceptions import abort
 from app.extensions import csrf, db, limiter
 from app.models import SupportConversation
 from app.services import support
+from app.support import knowledge_base as kb
 from app.support import telegram_handler
 
 support_bp = Blueprint("support", __name__)
@@ -74,13 +75,14 @@ def api_send_message():
     support.add_message(conv, "visitor", text)
     db.session.commit()
 
-    faq = support.find_faq(text)
-    if faq:
-        support.add_message(conv, "bot", faq.answer)
-        db.session.commit()
-        return jsonify({"ok": True, "reply": faq.answer})
+    result = kb.resolve(text, context=conv.last_intent)
+    support.add_message(conv, "bot", result["reply"])
+    conv.last_intent = result["intent"]
+    if result["category"]:
+        conv.category = result["category"]
+    db.session.commit()
 
-    return jsonify({"ok": True, "reply": None})
+    return jsonify({"ok": True, "reply": result["reply"]})
 
 
 @support_bp.route("/api/messages", methods=["GET"])

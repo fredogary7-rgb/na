@@ -31,6 +31,9 @@ class SupportConversation(TimestampMixin, db.Model):
     status = db.Column(db.String(20), default="open", nullable=False, index=True)  # open/pending/answered/closed
     assigned_admin_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     last_message_at = db.Column(db.DateTime, nullable=True)
+    # Mémoire de conversation : dernière intention détectée (avec horodatage).
+    last_intent = db.Column(db.String(40), nullable=True)
+    last_intent_at = db.Column(db.DateTime, nullable=True)
 
     messages = db.relationship(
         "SupportMessage", backref="conversation", lazy="dynamic",

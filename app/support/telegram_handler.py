@@ -5,6 +5,7 @@ from app.extensions import db
 from app.models import SupportConversation, SupportMessage
 from app.services import support
 from app.services.telegram import TelegramError, send_message
+from app.support import knowledge_base as kb
 
 WELCOME = (
     "Bonjour et bienvenue chez NAMARA ! 🌿\n\n"
@@ -149,6 +150,7 @@ def _status(chat_id, reference):
 def _request_human(chat_id):
     conv = support.get_or_create_telegram_conversation(chat_id, category="human", subject="Demande de conseiller")
     support.add_message(conv, "visitor", "Demande de conseiller")
+    conv.last_intent = "human"
     _notify_support(conv)
     try:
         send_message(
@@ -164,23 +166,42 @@ def _route_text(chat_id, text, update_id):
     conv = support.get_or_create_telegram_conversation(chat_id)
     support.add_message(conv, "visitor", text, telegram_update_id=update_id)
 
-    faq = support.find_faq(text)
-    if faq:
-        support.add_message(conv, "bot", faq.answer)
-        try:
-            send_message(chat_id, faq.answer)
-        except TelegramError:
-            pass
-        return
+    result = kb.resolve(text, context=conv.last_intent)
+    reply = result["reply"]
 
-    reply = support.unavailable_reply()
+    if result["intent"] == "human":
+        reply += f"\n\nRéférence de votre demande : {conv.public_reference}"
+        conv.category = "human"
+        conv.last_intent = "human"
+        _notify_support(conv)
+    else:
+        conv.last_intent = result["intent"]
+        if result["category"]:
+            conv.category = result["category"]
+        if result["handoff"]:
+            _notify_support(conv)
+
     support.add_message(conv, "bot", reply)
     try:
-        send_message(
-            chat_id,
-            reply + "\n\nSouhaitez-vous parler à un conseiller ? (/contact)",
-            reply_markup=CATEGORY_KEYBOARD,
-        )
+        send_message(chat_id, reply, reply_markup=kb.build_keyboard(result["buttons"]))
+    except TelegramError:
+        pass
+
+
+def _answer_intent(chat_id, key, update_id=None):
+    intent = kb.INTENTS_BY_KEY.get(key)
+    if intent is None:
+        return
+    conv = support.get_or_create_telegram_conversation(chat_id, category=intent["category"])
+    reply = intent["answer"]()
+    conv.last_intent = key
+    conv.category = intent["category"]
+    if key == "human":
+        reply += f"\n\nRéférence de votre demande : {conv.public_reference}"
+        _notify_support(conv)
+    support.add_message(conv, "bot", reply)
+    try:
+        send_message(chat_id, reply, reply_markup=kb.build_keyboard(intent.get("buttons", [])))
     except TelegramError:
         pass
 
@@ -188,25 +209,10 @@ def _route_text(chat_id, text, update_id):
 def _handle_callback(callback, update_id):
     chat_id = callback.get("message", {}).get("chat", {}).get("id")
     data = callback.get("data", "")
-    if not data.startswith("cat:"):
+    if not data:
         return
-    category = data[4:]
-    conv = support.get_or_create_telegram_conversation(chat_id, category=category)
-    support.add_message(
-        conv, "visitor", f"[Catégorie choisie : {support.category_label(category)}]",
-        telegram_update_id=update_id,
-    )
-    if category == "human":
-        _notify_support(conv)
-        try:
-            send_message(chat_id, "Votre demande de conseiller a été transmise. Un conseiller vous répondra.")
-        except TelegramError:
-            pass
-    else:
-        try:
-            send_message(
-                chat_id,
-                f"Catégorie : {support.category_label(category)}.\nDécrivez votre demande en quelques mots.",
-            )
-        except TelegramError:
-            pass
+    if data.startswith("intent:"):
+        _answer_intent(chat_id, data[7:], update_id)
+    elif data.startswith("cat:"):
+        category = data[4:]
+        _answer_intent(chat_id, kb.CATEGORY_TO_INTENT.get(category, category), update_id)

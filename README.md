@@ -195,6 +195,10 @@ traitée depuis l'espace administrateur (`Admin → Service client`).
 | `TELEGRAM_MODE` | `off` (désactivé), `webhook` (production) ou `polling` (développement). |
 | `SUPPORT_ATTACHMENT_MAX_BYTES` | Taille max d'une pièce jointe (défaut 2 000 000). |
 | `SUPPORT_MESSAGE_MAX_LENGTH` | Longueur max d'un message (défaut 2 000). |
+| `AI_API_KEY` | (Optionnel) clé du fournisseur d'IA (niveau 3). Vide = IA désactivée. |
+| `AI_BASE_URL` | URL de base de l'API compatible OpenAI (défaut `https://api.openai.com/v1`). |
+| `AI_MODEL` | Nom du modèle (défaut `gpt-4o-mini`). |
+| `AI_TIMEOUT` | Délai max (secondes) d'appel à l'IA (défaut `10`). |
 
 ### Créer un nouveau token (BotFather)
 
