@@ -1047,9 +1047,9 @@ body.chat-body {
 .service-card input { position: absolute; opacity: 0; pointer-events: none; }
 .service-card:has(input:checked) { border-color: var(--green); box-shadow: 0 0 0 2px rgba(22, 122, 53, 0.16); }
 .service-card:hover { border-color: var(--green); }
-.sc-logo { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-.sc-logo img { width: 40px; height: 40px; object-fit: contain; border-radius: 8px; background: #fff; border: 1px solid var(--border); padding: 2px; }
-.sc-avatar { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, var(--green), var(--green-dark)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; }
+.sc-logo { width: 32px; height: 32px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.sc-logo img { width: 32px; height: 32px; object-fit: cover; border-radius: 50%; background: #fff; border: 1px solid var(--border); }
+.sc-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--green), var(--green-dark)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; }
 .sc-info { flex: 1; min-width: 0; line-height: 1.25; }
 .sc-name { font-weight: 600; font-size: 0.88rem; }
 .sc-desc { font-size: 0.72rem; color: var(--muted); }
