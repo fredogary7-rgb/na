@@ -2,27 +2,38 @@
 {% block title %}Assistance{% endblock %}
 {% block body_class %}chat-body{% endblock %}
 {% block header %}
-<div class="chat-topbar">
-    <a href="{{ url_for('public.index') }}" aria-label="Retour">←</a>
-    <span>Assistance</span>
-</div>
+<header class="chat-header">
+    <a class="chat-back" href="{{ url_for('public.index') }}" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </a>
+    <img class="chat-avatar" src="{{ url_for('static', filename='images/namara.jpeg') }}" alt="Logo NAMARA">
+    <div class="chat-head-info">
+        <span class="chat-head-title">Service client NAMARA</span>
+        <span class="chat-head-status"><span class="dot"></span> En ligne</span>
+    </div>
+</header>
 {% endblock %}
 {% block content %}
 <div class="chat-screen">
     <div class="chat-messages" id="chat-messages">
-        <div class="chat-bubble bot">Bonjour et bienvenue chez NAMARA ! Choisissez une option ci-dessous ou écrivez directement votre question.</div>
+        <div class="chat-row bot">
+            <img class="chat-row-avatar" src="{{ url_for('static', filename='images/namara.jpeg') }}" alt="">
+            <div class="chat-bubble bot">Bonjour et bienvenue chez NAMARA ! Choisissez une option ci-dessous ou écrivez directement votre question.</div>
+        </div>
     </div>
     <div class="chat-quick" id="chat-quick">
-        <button type="button" data-action="deposit_how">Dépôt</button>
-        <button type="button" data-action="withdrawal_how">Retrait</button>
-        <button type="button" data-action="products">Produits</button>
-        <button type="button" data-action="referral_how">Parrainage</button>
-        <button type="button" data-action="account_help">Problème de compte</button>
-        <button type="button" data-action="human">Parler à un conseiller</button>
+        <button type="button" data-action="deposit_how">💳 Dépôt</button>
+        <button type="button" data-action="withdrawal_how">🏦 Retrait</button>
+        <button type="button" data-action="products">📦 Produits</button>
+        <button type="button" data-action="referral_how">🤝 Parrainage</button>
+        <button type="button" data-action="account_help">👤 Compte</button>
+        <button type="button" data-action="human">👨‍💼 Conseiller</button>
     </div>
     <div class="chat-input">
-        <input type="text" id="chat-input" placeholder="Votre message…" autocomplete="off">
-        <button type="button" id="chat-send">Envoyer</button>
+        <input type="text" id="chat-input" placeholder="Écrivez votre message…" autocomplete="off">
+        <button type="button" id="chat-send" aria-label="Envoyer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
     </div>
 </div>
 {% endblock %}

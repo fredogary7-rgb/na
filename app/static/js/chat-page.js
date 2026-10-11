@@ -26,8 +26,18 @@
     }
 
     function addBubble(sender, text, time) {
+        var isUser = (sender === "visitor" || sender === "user");
+        var row = document.createElement("div");
+        row.className = "chat-row " + (isUser ? "user" : "bot");
+        if (!isUser) {
+            var av = document.createElement("img");
+            av.className = "chat-row-avatar";
+            av.src = "/static/images/namara.jpeg";
+            av.alt = "";
+            row.appendChild(av);
+        }
         var b = document.createElement("div");
-        b.className = "chat-bubble " + sender;
+        b.className = "chat-bubble " + (isUser ? "visitor" : "bot");
         b.textContent = text;
         if (time) {
             var t = document.createElement("span");
@@ -35,7 +45,8 @@
             t.textContent = time;
             b.appendChild(t);
         }
-        messagesEl.appendChild(b);
+        row.appendChild(b);
+        messagesEl.appendChild(row);
         messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
