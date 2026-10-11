@@ -6,29 +6,45 @@
     <h1>Mes investissements</h1>
 </div>
 
-{% if products %}
-    <div class="card">
-        <form method="post" novalidate>
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                {{ form.product_id.label }}
-                {{ form.product_id() }}
-            </div>
-            <div class="form-group">
-                {{ form.amount.label }}
-                {{ form.amount() }}
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Investir</button>
-        </form>
-        <p class="help-text mt">Le capital est prélevé sur le portefeuille de dépôts. Aucun rendement n'est garanti.</p>
+{% if created_investment %}
+<div class="invest-success">
+    <div class="is-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
-{% else %}
-    <div class="alert alert-info">Aucun produit d'investissement n'est actuellement disponible.</div>
+    <h3>Investissement confirmé 🎉</h3>
+    <p class="is-sub">{{ created_investment.product.name }} — {{ format_amount(created_investment.capital, created_investment.currency) }}</p>
+    <div class="is-grid">
+        <div class="is-cell"><span>Heure d'achat</span><strong>{{ created_investment.start_date.strftime('%d/%m/%Y %H:%M') }}</strong></div>
+        <div class="is-cell"><span>Heure de fin</span><strong>{{ created_investment.end_date.strftime('%d/%m/%Y %H:%M') }}</strong></div>
+        <div class="is-cell"><span>Revenu quotidien</span><strong>{{ format_sim(created_sim.daily, created_investment.currency) }}</strong></div>
+        <div class="is-cell"><span>Total (capital + revenu)</span><strong>{{ format_sim(created_sim.total, created_investment.currency) }}</strong></div>
+    </div>
+</div>
 {% endif %}
 
-<div class="section-head">
-    <h2>Mes positions</h2>
+{% if products %}
+<div class="section-head"><h2>Choisir un produit</h2></div>
+<div class="invest-grid">
+    {% for p in products %}
+    <div class="invest-card">
+        <div class="ic-bg" style="background-image:url('{{ url_for('static', filename='images/login-bg.jpg') }}')"></div>
+        <div class="ic-body">
+            <div class="ic-head">
+                <h3>{{ p.name }}</h3>
+                <span class="badge badge-success">Disponible</span>
+            </div>
+            <div class="ic-price">{{ format_amount(p.min_amount, p.currency) }}</div>
+            <div class="ic-meta"><span class="chip">⏱ {{ p.duration_days }} jours</span></div>
+            <a class="btn btn-primary btn-block" href="{{ url_for('investments.confirm', product_id=p.id) }}">Investir</a>
+        </div>
+    </div>
+    {% endfor %}
 </div>
+{% else %}
+<div class="alert alert-info">Aucun produit d'investissement n'est actuellement disponible.</div>
+{% endif %}
+
+<div class="section-head"><h2>Mes positions</h2></div>
 <div class="list-card">
     {% for inv in investments %}
         <div class="list-item">
@@ -37,7 +53,7 @@
             </div>
             <div class="grow">
                 <div class="t">{{ inv.product.name }}</div>
-                <div class="s">{{ inv.start_date.strftime('%d/%m/%Y') }} → {{ inv.end_date.strftime('%d/%m/%Y') }}</div>
+                <div class="s">{{ inv.start_date.strftime('%d/%m/%Y %H:%M') }} → {{ inv.end_date.strftime('%d/%m/%Y %H:%M') }}</div>
             </div>
             <span class="badge badge-{{ badge_class(inv.status) }}">{{ inv.status }}</span>
             <div class="amt">{{ format_amount(inv.capital, inv.currency) }}</div>

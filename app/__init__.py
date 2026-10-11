@@ -216,6 +216,16 @@ def register_cli(app):
             db.session.commit()
             click.echo(f"Catalogue NAMARA initialisé ({created} produit(s) créé(s)).")
 
+    @app.cli.command("accrue-daily")
+    def accrue_daily():
+        """Verse le revenu quotidien des investissements actifs (idempotent)."""
+        from app.services.investment import payout_daily_income
+
+        with app.app_context():
+            paid = payout_daily_income()
+            db.session.commit()
+            click.echo(f"{paid} revenu(s) quotidien(s) versé(s).")
+
 
 def configure_logging(app):
     handler = logging.StreamHandler()

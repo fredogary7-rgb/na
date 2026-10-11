@@ -1,0 +1,26 @@
+{% extends "app_base.html" %}
+{% block title %}Confirmer l'investissement{% endblock %}
+{% block app_content %}
+<div class="page-head">
+    <a class="back-link" href="{{ url_for('investments.index') }}">← Retour</a>
+    <h1>Confirmer l'investissement</h1>
+</div>
+
+<div class="invest-confirm-card">
+    <div class="icc-bg" style="background-image:url('{{ url_for('static', filename='images/login-bg.jpg') }}')"></div>
+    <div class="icc-body">
+        <h2>{{ product.name }}</h2>
+        <div class="icc-price">{{ format_amount(product.min_amount, product.currency) }}</div>
+        <ul>
+            <li><span>Durée</span><strong>{{ product.duration_days }} jours</strong></li>
+            <li><span>Revenu quotidien</span><strong>{{ format_sim(sim.daily, product.currency) }}</strong></li>
+            <li><span>Revenu sur {{ product.duration_days }} jours</span><strong>+{{ format_sim(sim.revenue, product.currency) }}</strong></li>
+            <li><span>Total (capital + revenu)</span><strong>{{ format_sim(sim.total, product.currency) }}</strong></li>
+        </ul>
+        <form method="post">
+            <button type="submit" class="btn btn-primary btn-block">Confirmer l'investissement</button>
+        </form>
+        <a href="{{ url_for('investments.index') }}" class="btn btn-outline btn-block mt">Annuler</a>
+    </div>
+</div>
+{% endblock %}

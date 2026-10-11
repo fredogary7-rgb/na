@@ -21,6 +21,7 @@
         {% set p = e.product %}
         {% set disabled = (p.status != 'approved') %}
         <div class="product-card {{ 'is-disabled' if disabled }}">
+            <div class="pc-bg" style="background-image:url('{{ url_for('static', filename='images/login-bg.jpg') }}')"></div>
             <div class="pc-head">
                 <h3>{{ p.name }}</h3>
                 {% if disabled %}

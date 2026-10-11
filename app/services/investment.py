@@ -205,3 +205,50 @@ def complete_investment(investment: Investment) -> None:
     investment.capital_repaid = investment.capital
     investment.status = "completed"
     db.session.flush()
+
+
+def payout_daily_income(as_of=None) -> int:
+    """Verse le revenu quotidien des investissements actifs (idempotent).
+
+    Revenu quotidien = capital * taux quotidien (hypothétique). Chaque
+    investissement n'est crédité qu'une seule fois par jour (sur le portefeuille
+    'earnings'). À exécuter quotidiennement (ex. tâche planifiée / CLI).
+    """
+    from app.services import finance
+
+    day = (as_of or utcnow()).date()
+    rate = simulation_daily_rate()
+    paid = 0
+    for inv in Investment.query.filter_by(status="active").all():
+        if InvestmentAccrual.query.filter_by(
+            investment_id=inv.id, accrual_date=day
+        ).first() is not None:
+            continue
+        daily = int(round(inv.capital * rate))
+        if daily <= 0:
+            continue
+        finance.credit(
+            inv.user_id,
+            inv.currency,
+            "earnings",
+            daily,
+            "investment_income",
+            "investments",
+            reference=f"INC-{inv.id}-{day.strftime('%Y%m%d')}",
+            description=f"Revenu quotidien {inv.product.name}",
+        )
+        db.session.add(
+            InvestmentAccrual(
+                investment_id=inv.id,
+                accrual_date=day,
+                estimated_amount=daily,
+                accrued_amount=daily,
+                confirmed_amount=daily,
+                paid_amount=daily,
+                status="paid",
+            )
+        )
+        paid += 1
+    db.session.flush()
+    return paid
+
