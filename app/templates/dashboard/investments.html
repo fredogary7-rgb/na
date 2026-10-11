@@ -2,8 +2,31 @@
 {% block title %}Investissements{% endblock %}
 {% block app_content %}
 
-<div class="page-head">
-    <h1>Mes investissements</h1>
+<!-- ==========================================================
+     HERO : bannière statistiques
+     ========================================================== -->
+<div class="inv-hero">
+    <div class="inv-hero-inner">
+        <h1 class="inv-hero-title">Mon portefeuille</h1>
+        <p class="inv-hero-sub">Suivez vos investissements et vos rendements en temps réel</p>
+        <div class="inv-hero-stats">
+            <div class="inv-stat">
+                <span class="inv-stat-icon">💰</span>
+                <span class="inv-stat-label">Total investi</span>
+                <span class="inv-stat-val">{{ format_amount(total_invested, current_user.currency) }}</span>
+            </div>
+            <div class="inv-stat">
+                <span class="inv-stat-icon">📈</span>
+                <span class="inv-stat-label">Revenus perçus</span>
+                <span class="inv-stat-val inv-stat-val--green">{{ format_amount(total_income, current_user.currency) }}</span>
+            </div>
+            <div class="inv-stat">
+                <span class="inv-stat-icon">⚡</span>
+                <span class="inv-stat-label">Actifs</span>
+                <span class="inv-stat-val">{{ active_count }}</span>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% if created_investment %}
@@ -23,69 +46,95 @@
 {% endif %}
 
 {% if products %}
-<div class="section-head"><h2>Choisir un produit</h2></div>
-<div class="invest-grid">
+<div class="section-head"><h2>Produits disponibles</h2></div>
+<div class="inv-product-grid">
     {% for p in products %}
-    <div class="invest-card">
-        <div class="ic-bg" style="background-image:url('{{ url_for('static', filename='images/login-bg.jpg') }}')"></div>
-        <div class="ic-body">
-            <div class="ic-head">
-                <h3>{{ p.name }}</h3>
-                <span class="badge badge-success">Disponible</span>
-            </div>
-            <div class="ic-price">{{ format_amount(p.min_amount, p.currency) }}</div>
-            <div class="ic-meta"><span class="chip">⏱ {{ p.duration_days }} jours</span></div>
-            <a class="btn btn-primary btn-block" href="{{ url_for('investments.confirm', product_id=p.id) }}">Investir</a>
+    {% set colors = [
+        ('#059669', '#047857'),
+        ('#2563eb', '#1d4ed8'),
+        ('#7c3aed', '#6d28d9'),
+        ('#d97706', '#b45309'),
+        ('#0891b2', '#0e7490'),
+        ('#e11d48', '#be123c'),
+    ] %}
+    {% set c = colors[loop.index0 % 6] %}
+    <a class="inv-product-card" href="{{ url_for('investments.confirm', product_id=p.id) }}">
+        <div class="ipc-header" style="background:linear-gradient(135deg, {{ c[0] }}, {{ c[1] }})">
+            <span class="ipc-badge">Disponible</span>
+            <span class="ipc-icon">{{ ['🏦','💎','🚀','🏆','🌟','👑'][loop.index0 % 6] }}</span>
         </div>
-    </div>
+        <div class="ipc-body">
+            <h3 class="ipc-name">{{ p.name }}</h3>
+            <div class="ipc-price">{{ format_amount(p.min_amount, p.currency) }}</div>
+            <div class="ipc-meta">
+                <span class="ipc-chip">⏱ {{ p.duration_days }} jours</span>
+                <span class="ipc-chip ipc-chip--rate">+{{ ('%.1f'|format(rate_percent)).rstrip('0').rstrip('.') }}%/j</span>
+            </div>
+            <span class="ipc-cta">Investir maintenant →</span>
+        </div>
+    </a>
     {% endfor %}
 </div>
 {% else %}
 <div class="alert alert-info">Aucun produit d'investissement n'est actuellement disponible.</div>
 {% endif %}
 
-<div class="section-head"><h2>Mes positions <span class="section-sub">({{ active_count }} actif(s))</span></h2></div>
+<div class="section-head"><h2>Mes positions <span class="section-sub">({{ active_count }} actif{% if active_count > 1 %}s{% endif %})</span></h2></div>
 
 {% if positions %}
-<div class="stats-bar">
-    <div class="stat"><span class="stat-label">Total investi</span><span class="stat-val">{{ format_amount(total_invested, current_user.currency) }}</span></div>
-    <div class="stat"><span class="stat-label">Revenu cumulé</span><span class="stat-val stat-val-green">{{ format_amount(total_income, current_user.currency) }}</span></div>
-</div>
-
-{% for pos in positions %}
-<div class="progress-card {% if pos.inv.status == 'active' %}progress-card--active{% elif pos.inv.status == 'completed' %}progress-card--done{% elif pos.inv.status in ('cancelled','interrupted') %}progress-card--stopped{% endif %}">
-    <div class="pcard-top">
-        <h3>{{ pos.inv.product.name }}</h3>
-        <span class="badge badge-{{ badge_class(pos.inv.status) }}">{{ pos.inv.status }}</span>
+<div class="inv-positions">
+    {% for pos in positions %}
+    {% set pcolors = [
+        ('#059669', '#047857'),
+        ('#2563eb', '#1d4ed8'),
+        ('#7c3aed', '#6d28d9'),
+        ('#d97706', '#b45309'),
+        ('#0891b2', '#0e7490'),
+        ('#e11d48', '#be123c'),
+    ] %}
+    {% set pc = pcolors[loop.index0 % 6] %}
+    <div class="ipos-card {% if pos.inv.status == 'active' %}ipos--active{% elif pos.inv.status == 'completed' %}ipos--done{% elif pos.inv.status in ('cancelled','interrupted') %}ipos--stopped{% endif %}">
+        <div class="ipos-left" style="background:linear-gradient(135deg, {{ pc[0] }}, {{ pc[1] }})">
+            <span class="ipos-emoji">{{ ['🏦','💎','🚀','🏆','🌟','👑'][loop.index0 % 6] }}</span>
+        </div>
+        <div class="ipos-main">
+            <div class="ipos-top">
+                <h3>{{ pos.inv.product.name }}</h3>
+                <span class="badge badge-{{ badge_class(pos.inv.status) }}">{{ pos.inv.status }}</span>
+            </div>
+            <div class="ipos-info">
+                <div class="ipos-info-item">
+                    <span class="ipos-info-label">Capital</span>
+                    <strong>{{ format_amount(pos.inv.capital, pos.inv.currency) }}</strong>
+                </div>
+                <div class="ipos-info-item">
+                    <span class="ipos-info-label">Revenu perçu</span>
+                    <strong class="green">{{ format_amount(pos.income_earned, pos.inv.currency) }}</strong>
+                </div>
+            </div>
+            <div class="ipos-progress">
+                <div class="ipos-progress-head">
+                    <span>Progression</span>
+                    <strong>{{ pos.pct }}%</strong>
+                </div>
+                <div class="ipos-bar">
+                    <div class="ipos-fill" style="width:{{ pos.pct }}%; background:linear-gradient(90deg, {{ pc[0] }}, {{ pc[1] }})"></div>
+                </div>
+                <div class="ipos-dates">
+                    <span>{{ pos.days_elapsed }} / {{ pos.days_total }} jours</span>
+                    {% if pos.days_remaining > 0 %}<span class="muted">Encore {{ pos.days_remaining }}j</span>{% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="pcard-body">
-        <div class="pcard-row">
-            <span>Capital</span>
-            <strong>{{ format_amount(pos.inv.capital, pos.inv.currency) }}</strong>
-        </div>
-        <div class="pcard-row">
-            <span>Revenu perçu</span>
-            <strong class="green">{{ format_amount(pos.income_earned, pos.inv.currency) }}</strong>
-        </div>
-        <div class="pcard-row">
-            <span>Progression</span>
-            <strong>{{ pos.pct }}%</strong>
-        </div>
-
-        <div class="progress-bar">
-            <div class="progress-fill" style="width:{{ pos.pct }}%;"></div>
-        </div>
-
-        <div class="pcard-dates">
-            <span>{{ pos.days_elapsed }} / {{ pos.days_total }} jours écoulés</span>
-            {% if pos.days_remaining > 0 %}<span class="muted">{{ pos.days_remaining }} jour(s) restant(s)</span>{% endif %}
-        </div>
-    </div>
+    {% endfor %}
 </div>
-{% endfor %}
-
 {% else %}
-<div class="card"><p class="muted">Aucun investissement pour le moment.</p></div>
+<div class="inv-empty">
+    <div class="inv-empty-icon">📊</div>
+    <h3>Pas encore d'investissement</h3>
+    <p>Choisissez un produit ci-dessus pour commencer à faire fructifier votre capital.</p>
+</div>
 {% endif %}
 
 {% endblock %}
