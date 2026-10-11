@@ -22,32 +22,34 @@
         {% set disabled = (p.status != 'approved') %}
         <div class="product-card {{ 'is-disabled' if disabled }}">
             <div class="pc-bg" style="background-image:url('{{ url_for('static', filename='images/login-bg.jpg') }}')"></div>
-            <div class="pc-head">
-                <h3>{{ p.name }}</h3>
-                {% if disabled %}
-                    <span class="badge badge-disabled">🔒 Bientôt disponible</span>
-                {% else %}
-                    <span class="badge badge-success">Disponible</span>
+            <div class="pc-body">
+                <div class="pc-head">
+                    <h3>{{ p.name }}</h3>
+                    {% if disabled %}
+                        <span class="badge badge-disabled">🔒 Bientôt disponible</span>
+                    {% else %}
+                        <span class="badge badge-success">Disponible</span>
+                    {% endif %}
+                </div>
+                <div class="pc-price">{{ format_amount(p.min_amount, p.currency) }}</div>
+                <div class="pc-meta">
+                    <span class="chip">⏱ {{ p.duration_days }} jours</span>
+                    <span class="chip">FCFA</span>
+                </div>
+                {% if show_sim and e.sim %}
+                <ul>
+                    <li><span>Revenu quotidien</span><strong>{{ format_sim(e.sim.daily, p.currency) }}</strong></li>
+                    <li><span>Revenu sur 90 jours</span><strong>+{{ format_sim(e.sim.revenue, p.currency) }}</strong></li>
+                    <li><span>Capital + revenu</span><strong>{{ format_sim(e.sim.total, p.currency) }}</strong></li>
+                </ul>
                 {% endif %}
-            </div>
-            <div class="pc-price">{{ format_amount(p.min_amount, p.currency) }}</div>
-            <div class="pc-meta">
-                <span class="chip">⏱ {{ p.duration_days }} jours</span>
-                <span class="chip">FCFA</span>
-            </div>
-            {% if show_sim and e.sim %}
-            <ul>
-                <li><span>Revenu quotidien</span><strong>{{ format_sim(e.sim.daily, p.currency) }}</strong></li>
-                <li><span>Revenu sur 90 jours</span><strong>+{{ format_sim(e.sim.revenue, p.currency) }}</strong></li>
-                <li><span>Capital + revenu</span><strong>{{ format_sim(e.sim.total, p.currency) }}</strong></li>
-            </ul>
-            {% endif %}
-            <div class="pc-cta">
-                {% if disabled %}
-                    <span class="btn btn-outline btn-block" aria-disabled="true">🔒 Bientôt disponible</span>
-                {% else %}
-                    <a class="btn btn-primary btn-block" href="{{ url_for('auth.login') }}">Investir</a>
-                {% endif %}
+                <div class="pc-cta">
+                    {% if disabled %}
+                        <span class="btn btn-outline btn-block" aria-disabled="true">🔒 Bientôt disponible</span>
+                    {% else %}
+                        <a class="btn btn-primary btn-block" href="{{ url_for('auth.login') }}">Investir</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
         {% endfor %}
