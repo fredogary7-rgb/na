@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Produits{% endblock %}
+{% block header %}{% endblock %}
 {% block content %}
 <section class="products-hero">
     <h1>Nos produits d'investissement</h1>
@@ -53,10 +54,6 @@
     {% else %}
         <p class="muted">Aucun produit n'est actuellement disponible.</p>
     {% endif %}
-
-    <div class="risk-warning">
-        <strong>⚠️ Avertissement.</strong> Les revenus affichés sont des estimations indicatives basées sur un taux hypothétique de {{ rate_percent }} % par jour. Ce taux n'est pas validé et ne constitue pas une promesse de rendement. Les revenus réels éventuels dépendent d'un modèle économique vérifié, des risques et des conditions applicables.
-    </div>
 </div>
 {% endblock %}
 
