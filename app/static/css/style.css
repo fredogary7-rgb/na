@@ -1053,6 +1053,15 @@ body.chat-body {
 .sc-info { flex: 1; min-width: 0; line-height: 1.25; }
 .sc-name { font-weight: 600; font-size: 0.88rem; }
 .sc-desc { font-size: 0.72rem; color: var(--muted); }
+.sc-check {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0;
+    transition: border-color 0.15s;
+}
+.service-card:has(input:checked) .sc-check {
+    border-color: var(--green);
+    background: radial-gradient(circle, var(--green) 42%, transparent 46%);
+}
 
 
 

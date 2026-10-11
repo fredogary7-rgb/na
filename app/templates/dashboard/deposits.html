@@ -23,7 +23,7 @@
                     <input type="radio" name="operator" value="{{ s.name }}" {% if form.operator.data == s.name or (not form.operator.data and loop.first) %}checked{% endif %} required>
                     <div class="sc-logo">
                         {% if s.logo %}
-                            <img src="{{ url_for('static', filename='images/' ~ s.logo ~ '.jpeg') }}" alt="{{ s.name }}">
+                            <img src="{{ url_for('static', filename='images/' ~ s.logo ~ '.jpeg') }}" alt="">
                         {% else %}
                             <span class="sc-avatar">{{ s.operator[:1] }}</span>
                         {% endif %}
@@ -32,6 +32,7 @@
                         <div class="sc-name">{{ s.name }}</div>
                         <div class="sc-desc">{{ s.description }}</div>
                     </div>
+                    <span class="sc-check"></span>
                 </label>
                 {% endfor %}
             </div>
