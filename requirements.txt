@@ -12,3 +12,4 @@ psycopg2-binary==2.9.9
 psycopg[binary]==3.2.3
 gunicorn==22.0.0
 pytest==8.2.2
+APScheduler==3.10.4

@@ -161,6 +161,29 @@ Le dépôt contient les fichiers nécessaires au déploiement sur
 
 Railway appelle `/health` qui vérifie la connexion à la base de données.
 
+## Versement quotidien des revenus
+
+Le revenu quotidien des investissements actifs (capital × taux quotidien) est
+versé sur le portefeuille « revenus » de façon **idempotente** (une seule fois
+par jour par investissement). Deux façons de le déclencher :
+
+1. **Service planificateur** (recommandé) : déployez `scheduler.py` comme
+   processus séparé (Railway → *New service* → même dépôt → commande de démarrage
+   `python scheduler.py`). Il verse une fois au démarrage puis chaque jour à
+   `DAILY_PAYOUT_HOUR:DAILY_PAYOUT_MINUTE` (UTC, défaut `00:05`).
+
+2. **Tâche Cron Railway** : créez un *Cron Job* qui exécute chaque jour :
+
+   ```bash
+   python -m flask --app wsgi accrue-daily
+   ```
+
+Variables d'environnement (optionnelles) : `DAILY_PAYOUT_HOUR`, `DAILY_PAYOUT_MINUTE`.
+
+> ⚠️ Le taux quotidien (8 % par jour) est **hypothétique et non validé**. Ne
+> versez pas ces montants en production tant que le modèle économique et le taux
+> réel ne sont pas validés.
+
 ## Sauvegardes
 
 Sauvegardez régulièrement la base PostgreSQL (`pg_dump`) et conservez les
