@@ -4,7 +4,7 @@ from flask_login import current_user, login_required
 
 from app.extensions import db
 from app.models import Investment, InvestmentProduct
-from app.services import investment as investment_service
+from app.services import finance, investment as investment_service
 
 
 investments_bp = Blueprint("investments", __name__)
@@ -62,5 +62,10 @@ def confirm(product_id):
             flash(str(exc), "danger")
             return redirect(url_for("investments.index"))
 
-    return render_template("dashboard/investments_confirm.html", product=product, sim=sim)
+    return render_template(
+        "dashboard/investments_confirm.html",
+        product=product,
+        sim=sim,
+        deposit_balance=finance.get_balance(current_user.id, current_user.currency, "deposit"),
+    )
 

@@ -126,12 +126,18 @@ def invest(user, product: InvestmentProduct, amount: int) -> Investment:
         raise InvestmentError("Devise incompatible.")
 
     reference = f"INV-{utcnow().strftime('%Y%m%d%H%M%S')}"
-    finance.debit(
-        user.id, user.currency, "deposit", amount,
-        "investment_capital", "investments",
-        reference=f"{reference}-CAP",
-        description=f"Capital investi : {product.name}",
-    )
+    try:
+        finance.debit(
+            user.id, user.currency, "deposit", amount,
+            "investment_capital", "investments",
+            reference=f"{reference}-CAP",
+            description=f"Capital investi : {product.name}",
+        )
+    except finance.InsufficientFundsError as exc:
+        raise InvestmentError(
+            "Solde insuffisant sur votre portefeuille dépôt. "
+            "Rechargez votre compte avant d'investir."
+        ) from exc
     start = utcnow()
     end = start + timedelta(days=product.duration_days)
     investment = Investment(

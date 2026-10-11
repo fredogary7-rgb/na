@@ -43,6 +43,19 @@ def test_invest_debits_deposit_wallet(app, db):
     assert inv.status == "active"
 
 
+def test_invest_insufficient_funds_raises_investment_error(app, db):
+    user = make_user(db)
+    # Aucun crédit : le portefeuille dépôt est vide.
+    product = InvestmentProduct(
+        name="Produit test", status="approved", duration_days=120,
+        min_amount=1000, max_amount=1000000, currency="XOF",
+    )
+    db.session.add(product)
+    db.session.flush()
+    with pytest.raises(InvestmentError):
+        investment.invest(user, product, 5000)
+
+
 def test_daily_accrue_idempotent(app, db):
     user = make_user(db)
     finance.credit(user.id, "XOF", WALLET_DEPOSIT, 100000, "test", "test")
