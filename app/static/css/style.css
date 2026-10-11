@@ -1027,31 +1027,31 @@ body.chat-body {
    ============================================================ */
 .service-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 0.7rem;
 }
 .service-card {
     position: relative;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    padding: 0.85rem 0.7rem;
+    padding: 0.7rem 0.85rem;
     cursor: pointer;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 0.45rem;
-    text-align: center;
+    gap: 0.7rem;
+    text-align: left;
     transition: border-color 0.15s, box-shadow 0.15s;
     background: var(--white);
 }
 .service-card input { position: absolute; opacity: 0; pointer-events: none; }
 .service-card:has(input:checked) { border-color: var(--green); box-shadow: 0 0 0 2px rgba(22, 122, 53, 0.16); }
 .service-card:hover { border-color: var(--green); }
-.sc-logo { width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; }
-.sc-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; background: #fff; border: 1px solid var(--border); padding: 4px; }
-.sc-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--green-light); color: var(--green-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; }
-.sc-info { line-height: 1.25; }
-.sc-name { font-weight: 600; font-size: 0.86rem; }
+.sc-logo { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.sc-logo img { width: 40px; height: 40px; object-fit: contain; border-radius: 8px; background: #fff; border: 1px solid var(--border); padding: 2px; }
+.sc-avatar { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, var(--green), var(--green-dark)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; }
+.sc-info { flex: 1; min-width: 0; line-height: 1.25; }
+.sc-name { font-weight: 600; font-size: 0.88rem; }
 .sc-desc { font-size: 0.72rem; color: var(--muted); }
 
 
