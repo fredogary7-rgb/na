@@ -75,7 +75,7 @@ def register_error_handlers(app):
 
 
 def register_template_helpers(app):
-    from app.utils import format_amount
+    from app.utils import format_amount, operator_logo
 
     def badge_class(status):
         mapping = {
@@ -96,6 +96,7 @@ def register_template_helpers(app):
     app.jinja_env.globals["format_amount"] = format_amount
     app.jinja_env.globals["format_sim"] = format_sim
     app.jinja_env.globals["badge_class"] = badge_class
+    app.jinja_env.globals["operator_logo"] = operator_logo
     app.jinja_env.globals["APP_NAME"] = "NAMARA"
     app.jinja_env.globals["APP_SLOGAN"] = "Votre capital, une vision d'avenir."
 

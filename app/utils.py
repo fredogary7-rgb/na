@@ -40,3 +40,27 @@ def operators_for_country(country: str):
     from app.constants import OPERATORS
 
     return OPERATORS.get(country, [])
+
+
+# Mapping marque (opérateur) -> nom de fichier logo (sans extension).
+OPERATOR_LOGOS = {
+    "MTN": "mtn",
+    "Orange": "orange",
+    "Moov": "moov",
+    "Wave": "wave",
+    "Airtel": "airtel",
+    "Mov": "mov",
+    "Mix": "mix",
+}
+
+
+def operator_logo(operator):
+    """Renvoie le nom du fichier logo (sans extension) d'un opérateur, ou None."""
+    if not operator:
+        return None
+    op = str(operator)
+    return (
+        OPERATOR_LOGOS.get(op)
+        or OPERATOR_LOGOS.get(op.upper())
+        or OPERATOR_LOGOS.get(op.capitalize())
+    )

@@ -99,8 +99,9 @@
 <div class="list-card">
     {% for e in recent %}
         <div class="list-item">
-            {% if e.operator %}
-                <img class="card-logo" src="{{ url_for('static', filename='images/' ~ e.operator|lower ~ '.jpeg') }}" alt="{{ e.operator }}">
+            {% set rlogo = operator_logo(e.operator) %}
+            {% if rlogo %}
+                <img class="card-logo" src="{{ url_for('static', filename='images/' ~ rlogo ~ '.jpeg') }}" alt="{{ e.operator }}">
             {% else %}
                 <div class="ico">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>

@@ -424,7 +424,7 @@ th { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-
 .operator-option span { font-size: 0.7rem; font-weight: 600; color: var(--text); }
 .operator-option input { position: absolute; opacity: 0; width: 0; height: 0; }
 .operator-option:has(input:checked) { border-color: var(--green); background: var(--green-50); box-shadow: 0 0 0 2px rgba(22, 122, 53, 0.14); }
-.card-logo { width: 40px; height: 40px; border-radius: 10px; object-fit: contain; background: #fff; border: 1px solid var(--border); padding: 4px; flex-shrink: 0; }
+.card-logo { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #fff; border: 1px solid var(--border); flex-shrink: 0; }
 
 /* ---------- En-tête de profil ---------- */
 .profile-header {
