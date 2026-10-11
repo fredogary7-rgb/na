@@ -43,7 +43,7 @@ SERVICES = {
     ],
     # 🇹🇬 Togo
     "TG": [
-        {"id": 37, "name": "T-MONEY TG", "description": "T-Money Togo", "operator": "T-Money", "logo": None},
+        {"id": 37, "name": "T-MONEY TG", "description": "T-Money Togo", "operator": "Mix", "logo": "mix"},
         {"id": 38, "name": "MOOV TG", "description": "Moov Togo", "operator": "Moov", "logo": "moov"},
     ],
     # 🇨🇩 Congo RDC
