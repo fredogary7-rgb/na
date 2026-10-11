@@ -14,12 +14,33 @@ investments_bp = Blueprint("investments", __name__)
 @investments_bp.route("/")
 @login_required
 def index():
-    products = investment_service.available_products(currency=current_user.currency)
-    investments = (
-        Investment.query.filter_by(user_id=current_user.id)
-        .order_by(Investment.created_at.desc())
-        .all()
-    )
+    status_filter = request.args.get("status", "").strip().lower()
+    search_query = request.args.get("q", "").strip()
+
+    # Base query: own investments only.
+    query = Investment.query.filter_by(user_id=current_user.id)
+
+    # Apply status filter.
+    if status_filter in ("active", "completed", "cancelled", "interrupted"):
+        query = query.filter_by(status=status_filter)
+
+    # Apply search by product name.
+    if search_query:
+        from app.models import InvestmentProduct
+        matching_product_ids = (
+            db.session.query(InvestmentProduct.id)
+            .filter(InvestmentProduct.name.ilike(f"%{search_query}%"))
+        )
+        query = query.filter(Investment.product_id.in_(matching_product_ids))
+
+    investments = query.order_by(Investment.created_at.desc()).all()
+
+    # Statistics (all investments, unfiltered).
+    all_user_investments = Investment.query.filter_by(user_id=current_user.id).all()
+    total_count = len(all_user_investments)
+    total_capital = sum(inv.capital for inv in all_user_investments)
+    active_count = sum(1 for inv in all_user_investments if inv.status == "active")
+    completed_count = sum(1 for inv in all_user_investments if inv.status == "completed")
 
     created_investment = None
     created_sim = None
@@ -30,24 +51,35 @@ def index():
             created_investment = inv
             created_sim = investment_service.simulation_for(inv.product)
 
-    # Progression de chaque position + statistiques d'ensemble.
+    # Progression for each investment.
     now = utcnow()
     positions = []
-    total_invested = 0
-    total_income = 0
     for inv in investments:
         total_secs = (inv.end_date - inv.start_date).total_seconds()
         days_total = max(1, (inv.end_date - inv.start_date).days)
-        days_elapsed = min(days_total, max(0, (now - inv.start_date).days))
-        days_remaining = max(0, days_total - days_elapsed)
+
         if inv.status == "completed":
             pct = 100
+            reference_point = inv.end_date
         elif inv.status in ("cancelled", "interrupted"):
-            pct = 100
+            # Freeze at the moment the status was last updated.
+            reference_point = inv.updated_at or now
+            if total_secs > 0:
+                elapsed = max(0, (reference_point - inv.start_date).total_seconds())
+                pct = max(0, min(100, int(elapsed / total_secs * 100)))
+            else:
+                pct = 0
         elif total_secs > 0:
-            pct = max(0, min(100, int((now - inv.start_date).total_seconds() / total_secs * 100)))
+            reference_point = now
+            elapsed = max(0, (now - inv.start_date).total_seconds())
+            pct = max(0, min(100, int(elapsed / total_secs * 100)))
         else:
             pct = 0
+            reference_point = now
+
+        days_elapsed = min(days_total, max(0, (reference_point - inv.start_date).days))
+        days_remaining = max(0, days_total - days_elapsed)
+
         income_earned = (
             db.session.query(
                 db.func.coalesce(db.func.sum(InvestmentAccrual.paid_amount), 0)
@@ -55,8 +87,7 @@ def index():
             .filter_by(investment_id=inv.id)
             .scalar()
         ) or 0
-        total_invested += inv.capital
-        total_income += income_earned
+
         positions.append({
             "inv": inv,
             "pct": pct,
@@ -66,18 +97,17 @@ def index():
             "income_earned": income_earned,
         })
 
-    active_count = sum(1 for inv in investments if inv.status == "active")
-
     return render_template(
         "dashboard/investments.html",
-        products=products,
         positions=positions,
-        total_invested=total_invested,
-        total_income=total_income,
+        total_count=total_count,
+        total_capital=total_capital,
         active_count=active_count,
+        completed_count=completed_count,
         created_investment=created_investment,
         created_sim=created_sim,
-        rate_percent=investment_service.simulation_daily_rate() * 100,
+        status_filter=status_filter,
+        search_query=search_query,
     )
 
 

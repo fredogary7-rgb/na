@@ -1,31 +1,21 @@
 {% extends "app_base.html" %}
-{% block title %}Investissements{% endblock %}
+{% block title %}Mes produits{% endblock %}
 {% block app_content %}
 
 <!-- ==========================================================
-     HERO : bannière statistiques
+     HEADER PREMIUM
      ========================================================== -->
-<div class="inv-hero">
-    <div class="inv-hero-inner">
-        <h1 class="inv-hero-title">Mon portefeuille</h1>
-        <p class="inv-hero-sub">Suivez vos investissements et vos rendements en temps réel</p>
-        <div class="inv-hero-stats">
-            <div class="inv-stat">
-                <span class="inv-stat-icon">💰</span>
-                <span class="inv-stat-label">Total investi</span>
-                <span class="inv-stat-val">{{ format_amount(total_invested, current_user.currency) }}</span>
-            </div>
-            <div class="inv-stat">
-                <span class="inv-stat-icon">📈</span>
-                <span class="inv-stat-label">Revenus perçus</span>
-                <span class="inv-stat-val inv-stat-val--green">{{ format_amount(total_income, current_user.currency) }}</span>
-            </div>
-            <div class="inv-stat">
-                <span class="inv-stat-icon">⚡</span>
-                <span class="inv-stat-label">Actifs</span>
-                <span class="inv-stat-val">{{ active_count }}</span>
-            </div>
-        </div>
+<div class="inv-page-header">
+    <div class="inv-ph-left">
+        <span class="inv-ph-label">ESPACE PERSONNEL</span>
+        <h1 class="inv-ph-title">Mes produits</h1>
+        <p class="inv-ph-sub">Retrouvez vos produits, suivez leur évolution et consultez leur historique en un seul endroit.</p>
+    </div>
+    <div class="inv-ph-right">
+        <a href="{{ url_for('public.products') }}" class="inv-ph-cta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Découvrir les produits
+        </a>
     </div>
 </div>
 
@@ -34,57 +24,96 @@
     <div class="is-check">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
-    <h3>Investissement confirmé 🎉</h3>
+    <h3>Investissement confirmé</h3>
     <p class="is-sub">{{ created_investment.product.name }} — {{ format_amount(created_investment.capital, created_investment.currency) }}</p>
     <div class="is-grid">
         <div class="is-cell"><span>Heure d'achat</span><strong>{{ created_investment.start_date.strftime('%d/%m/%Y %H:%M') }}</strong></div>
         <div class="is-cell"><span>Heure de fin</span><strong>{{ created_investment.end_date.strftime('%d/%m/%Y %H:%M') }}</strong></div>
         <div class="is-cell"><span>Revenu quotidien</span><strong>{{ format_sim(created_sim.daily, created_investment.currency) }}</strong></div>
-        <div class="is-cell"><span>Total (capital + revenu)</span><strong>{{ format_sim(created_sim.total, created_investment.currency) }}</strong></div>
+        <div class="is-cell"><span>Total</span><strong>{{ format_sim(created_sim.total, created_investment.currency) }}</strong></div>
     </div>
 </div>
 {% endif %}
 
-{% if products %}
-<div class="section-head"><h2>Produits disponibles</h2></div>
-<div class="inv-product-grid">
-    {% for p in products %}
-    {% set colors = [
-        ('#059669', '#047857'),
-        ('#2563eb', '#1d4ed8'),
-        ('#7c3aed', '#6d28d9'),
-        ('#d97706', '#b45309'),
-        ('#0891b2', '#0e7490'),
-        ('#e11d48', '#be123c'),
-    ] %}
-    {% set c = colors[loop.index0 % 6] %}
-    <a class="inv-product-card" href="{{ url_for('investments.confirm', product_id=p.id) }}">
-        <div class="ipc-header" style="background:linear-gradient(135deg, {{ c[0] }}, {{ c[1] }})">
-            <span class="ipc-badge">Disponible</span>
-            <span class="ipc-icon">{{ ['🏦','💎','🚀','🏆','🌟','👑'][loop.index0 % 6] }}</span>
+<!-- ==========================================================
+     CARTES DE SYNTHÈSE
+     ========================================================== -->
+<div class="inv-summary">
+    <div class="inv-sum-card">
+        <div class="inv-sum-icon inv-sum-icon--primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
         </div>
-        <div class="ipc-body">
-            <h3 class="ipc-name">{{ p.name }}</h3>
-            <div class="ipc-price">{{ format_amount(p.min_amount, p.currency) }}</div>
-            <div class="ipc-meta">
-                <span class="ipc-chip">⏱ {{ p.duration_days }} jours</span>
-                <span class="ipc-chip ipc-chip--rate">+{{ ('%.1f'|format(rate_percent)).rstrip('0').rstrip('.') }}%/j</span>
-            </div>
-            <span class="ipc-cta">Investir maintenant →</span>
+        <div class="inv-sum-body">
+            <span class="inv-sum-label">Mes produits</span>
+            <span class="inv-sum-val">{{ total_count }}</span>
         </div>
-    </a>
-    {% endfor %}
+    </div>
+    <div class="inv-sum-card">
+        <div class="inv-sum-icon inv-sum-icon--green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        </div>
+        <div class="inv-sum-body">
+            <span class="inv-sum-label">Capital engagé</span>
+            <span class="inv-sum-val">{{ format_amount(total_capital, current_user.currency) }}</span>
+        </div>
+    </div>
+    <div class="inv-sum-card">
+        <div class="inv-sum-icon inv-sum-icon--amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="inv-sum-body">
+            <span class="inv-sum-label">Produits actifs</span>
+            <span class="inv-sum-val">{{ active_count }}</span>
+        </div>
+    </div>
+    <div class="inv-sum-card">
+        <div class="inv-sum-icon inv-sum-icon--blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="inv-sum-body">
+            <span class="inv-sum-label">Terminés</span>
+            <span class="inv-sum-val">{{ completed_count }}</span>
+        </div>
+    </div>
 </div>
-{% else %}
-<div class="alert alert-info">Aucun produit d'investissement n'est actuellement disponible.</div>
+
+<!-- ==========================================================
+     FILTRES + RECHERCHE
+     ========================================================== -->
+{% if total_count > 0 %}
+<div class="inv-toolbar">
+    <div class="inv-filters">
+        {% set statuses = [('', 'Tous'), ('active', 'Actifs'), ('completed', 'Terminés'), ('cancelled', 'Annulés')] %}
+        {% for s_val, s_label in statuses %}
+            <a href="{{ url_for('investments.index', status=s_val, q=search_query) }}"
+               class="inv-filter {{ 'inv-filter--active' if status_filter == s_val }}">
+                {{ s_label }}
+                {% if s_val == 'active' and active_count %}
+                    <span class="inv-filter-count">{{ active_count }}</span>
+                {% elif s_val == 'completed' and completed_count %}
+                    <span class="inv-filter-count">{{ completed_count }}</span>
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
+    <form class="inv-search" method="get" action="{{ url_for('investments.index') }}">
+        <input type="hidden" name="status" value="{{ status_filter }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inv-search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Rechercher un produit..." class="inv-search-input">
+        {% if search_query %}
+            <a href="{{ url_for('investments.index', status=status_filter) }}" class="inv-search-clear" aria-label="Effacer">&times;</a>
+        {% endif %}
+    </form>
+</div>
 {% endif %}
 
-<div class="section-head"><h2>Mes positions <span class="section-sub">({{ active_count }} actif{% if active_count > 1 %}s{% endif %})</span></h2></div>
-
+<!-- ==========================================================
+     MES PRODUITS ACHETÉS
+     ========================================================== -->
 {% if positions %}
 <div class="inv-positions">
     {% for pos in positions %}
-    {% set pcolors = [
+    {% set gradients = [
         ('#059669', '#047857'),
         ('#2563eb', '#1d4ed8'),
         ('#7c3aed', '#6d28d9'),
@@ -92,48 +121,96 @@
         ('#0891b2', '#0e7490'),
         ('#e11d48', '#be123c'),
     ] %}
-    {% set pc = pcolors[loop.index0 % 6] %}
-    <div class="ipos-card {% if pos.inv.status == 'active' %}ipos--active{% elif pos.inv.status == 'completed' %}ipos--done{% elif pos.inv.status in ('cancelled','interrupted') %}ipos--stopped{% endif %}">
-        <div class="ipos-left" style="background:linear-gradient(135deg, {{ pc[0] }}, {{ pc[1] }})">
-            <span class="ipos-emoji">{{ ['🏦','💎','🚀','🏆','🌟','👑'][loop.index0 % 6] }}</span>
+    {% set g = gradients[loop.index0 % 6] %}
+    {% set emojis = ['🏦','💎','🚀','🏆','🌟','👑'] %}
+    <article class="ipos-card {% if pos.inv.status == 'active' %}ipos--active{% elif pos.inv.status == 'completed' %}ipos--done{% elif pos.inv.status in ('cancelled','interrupted') %}ipos--stopped{% endif %}" tabindex="0">
+        <div class="ipos-left" style="background:linear-gradient(135deg, {{ g[0] }}, {{ g[1] }})">
+            <span class="ipos-emoji">{{ emojis[loop.index0 % 6] }}</span>
         </div>
         <div class="ipos-main">
-            <div class="ipos-top">
-                <h3>{{ pos.inv.product.name }}</h3>
-                <span class="badge badge-{{ badge_class(pos.inv.status) }}">{{ pos.inv.status }}</span>
-            </div>
-            <div class="ipos-info">
-                <div class="ipos-info-item">
-                    <span class="ipos-info-label">Capital</span>
-                    <strong>{{ format_amount(pos.inv.capital, pos.inv.currency) }}</strong>
+            <!-- En-tête : nom + référence + badge -->
+            <div class="ipos-head">
+                <div class="ipos-head-left">
+                    <h3 class="ipos-name">{{ pos.inv.product.name }}</h3>
+                    <span class="ipos-ref">Réf. INV-{{ pos.inv.id }}</span>
                 </div>
-                <div class="ipos-info-item">
-                    <span class="ipos-info-label">Revenu perçu</span>
-                    <strong class="green">{{ format_amount(pos.income_earned, pos.inv.currency) }}</strong>
-                </div>
+                <span class="ipos-status ipos-status--{{ badge_class(pos.inv.status) }}">{{ pos.inv.status }}</span>
             </div>
+
+            <!-- Montant -->
+            <div class="ipos-capital">
+                <span class="ipos-capital-label">CAPITAL INITIAL</span>
+                <span class="ipos-capital-val">{{ format_amount(pos.inv.capital, pos.inv.currency) }}</span>
+            </div>
+
+            <!-- Progression -->
             <div class="ipos-progress">
                 <div class="ipos-progress-head">
-                    <span>Progression</span>
+                    <span>JOUR {{ pos.days_elapsed }} / {{ pos.days_total }}</span>
                     <strong>{{ pos.pct }}%</strong>
                 </div>
                 <div class="ipos-bar">
-                    <div class="ipos-fill" style="width:{{ pos.pct }}%; background:linear-gradient(90deg, {{ pc[0] }}, {{ pc[1] }})"></div>
-                </div>
-                <div class="ipos-dates">
-                    <span>{{ pos.days_elapsed }} / {{ pos.days_total }} jours</span>
-                    {% if pos.days_remaining > 0 %}<span class="muted">Encore {{ pos.days_remaining }}j</span>{% endif %}
+                    <div class="ipos-fill" style="width:{{ pos.pct }}%; background:linear-gradient(90deg, {{ g[0] }}, {{ g[1] }})" role="progressbar" aria-valuenow="{{ pos.pct }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
+
+            <!-- Dates détaillées -->
+            <div class="ipos-detail">
+                <div class="ipos-detail-item">
+                    <span class="ipos-detail-label">Début</span>
+                    <span class="ipos-detail-val">{{ pos.inv.start_date.strftime('%d/%m/%Y') }}</span>
+                </div>
+                <div class="ipos-detail-item">
+                    <span class="ipos-detail-label">Fin prévue</span>
+                    <span class="ipos-detail-val">{{ pos.inv.end_date.strftime('%d/%m/%Y') }}</span>
+                </div>
+                <div class="ipos-detail-item">
+                    <span class="ipos-detail-label">Durée</span>
+                    <span class="ipos-detail-val">{{ pos.days_total }} jours</span>
+                </div>
+                <div class="ipos-detail-item">
+                    <span class="ipos-detail-label">Restants</span>
+                    <span class="ipos-detail-val">{{ pos.days_remaining }} jours</span>
+                </div>
+            </div>
+
+            <!-- Revenu perçu (si > 0) -->
+            {% if pos.income_earned > 0 %}
+            <div class="ipos-income">
+                <span class="ipos-income-label">Revenu perçu</span>
+                <span class="ipos-income-val">{{ format_amount(pos.income_earned, pos.inv.currency) }}</span>
+            </div>
+            {% endif %}
         </div>
-    </div>
+    </article>
     {% endfor %}
 </div>
-{% else %}
+
+{% elif total_count > 0 and not positions %}
 <div class="inv-empty">
-    <div class="inv-empty-icon">📊</div>
-    <h3>Pas encore d'investissement</h3>
-    <p>Choisissez un produit ci-dessus pour commencer à faire fructifier votre capital.</p>
+    <div class="inv-empty-icon">🔍</div>
+    <h3>Aucun résultat</h3>
+    <p>Aucun produit ne correspond à votre recherche ou au filtre sélectionné.</p>
+    <a class="btn btn-outline" href="{{ url_for('investments.index') }}">Réinitialiser les filtres</a>
+</div>
+
+{% else %}
+<!-- État vide -->
+<div class="inv-empty">
+    <div class="inv-empty-illustration" aria-hidden="true">
+        <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:120px;height:120px">
+            <rect x="20" y="30" width="80" height="70" rx="8" stroke="#D0D5DD" stroke-width="2" fill="none"/>
+            <line x1="20" y1="50" x2="100" y2="50" stroke="#D0D5DD" stroke-width="2"/>
+            <circle cx="60" cy="75" r="10" stroke="#D0D5DD" stroke-width="2" fill="none"/>
+            <path d="M56 75l4 4 8-8" stroke="#D0D5DD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="22" cy="30" r="5" fill="#059669" opacity="0.12"/>
+            <circle cx="98" cy="80" r="8" fill="#2563eb" opacity="0.10"/>
+            <circle cx="30" cy="90" r="4" fill="#d97706" opacity="0.12"/>
+        </svg>
+    </div>
+    <h3>Vous n'avez pas encore de produit</h3>
+    <p>Découvrez notre catalogue pour consulter les produits proposés par NAMARA.</p>
+    <a class="btn btn-primary" href="{{ url_for('public.products') }}">Découvrir les produits</a>
 </div>
 {% endif %}
 

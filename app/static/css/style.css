@@ -988,164 +988,191 @@ body.chat-body {
 .products-head p { color: var(--muted); }
 
 /* ============================================================
-   INVESTISSEMENT : hero + cartes produits
+   INVESTISSEMENT : header + synthèse + filtres
    ============================================================ */
 
-/* ---------- Hero ---------- */
-.inv-hero {
-    background: linear-gradient(135deg, #0a2e1a 0%, #0d4726 40%, #0b3620 100%);
-    border-radius: var(--radius);
-    padding: 2rem 2rem 1.5rem;
+.inv-page-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+}
+.inv-ph-left { flex: 1; min-width: 0; }
+.inv-ph-label {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 1.2px;
+    color: var(--green); text-transform: uppercase;
+}
+.inv-ph-title { font-size: 1.55rem; font-weight: 700; margin: 0.15rem 0 0.3rem; }
+.inv-ph-sub { color: var(--muted); font-size: 0.9rem; max-width: 520px; line-height: 1.5; }
+.inv-ph-right { flex-shrink: 0; }
+.inv-ph-cta {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.55rem 1.1rem; border-radius: var(--radius-sm);
+    background: var(--white); border: 1px solid var(--border);
+    font-size: 0.85rem; font-weight: 600; color: var(--green-dark);
+    text-decoration: none; transition: box-shadow 0.15s, border-color 0.15s;
+}
+.inv-ph-cta:hover { border-color: var(--green); box-shadow: var(--shadow-sm); }
+
+/* ---------- Cartes de synthèse ---------- */
+.inv-summary {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.9rem;
     margin-bottom: 1.8rem;
-    position: relative;
-    overflow: hidden;
 }
-.inv-hero::after {
-    content: ''; position: absolute; right: -40px; top: -40px;
-    width: 200px; height: 200px; border-radius: 50%;
-    background: rgba(255,255,255,0.04);
+.inv-sum-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.1rem 1.1rem 1rem;
+    display: flex; align-items: flex-start; gap: 0.8rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    transition: box-shadow 0.2s;
 }
-.inv-hero-inner { position: relative; z-index: 1; }
-.inv-hero-title { font-size: 1.6rem; font-weight: 700; color: #fff; margin: 0 0 0.2rem; }
-.inv-hero-sub { color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 1.3rem; }
-.inv-hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
-.inv-stat {
-    background: rgba(255,255,255,0.1); border-radius: var(--radius-sm);
-    padding: 1rem 1rem 0.9rem; backdrop-filter: blur(4px);
+.inv-sum-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.inv-sum-icon {
+    width: 40px; height: 40px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
 }
-.inv-stat-icon { font-size: 1.3rem; display: block; margin-bottom: 0.25rem; }
-.inv-stat-label { color: rgba(255,255,255,0.65); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; }
-.inv-stat-val { color: #fff; font-size: 1.15rem; font-weight: 700; display: block; margin-top: 0.15rem; }
-.inv-stat-val--green { color: #4ade80; }
+.inv-sum-icon svg { width: 20px; height: 20px; }
+.inv-sum-icon--primary { background: #EEF2E6; color: #166535; }
+.inv-sum-icon--green { background: #ECFDF5; color: #059669; }
+.inv-sum-icon--amber { background: #FFF7ED; color: #D97706; }
+.inv-sum-icon--blue { background: #EFF6FF; color: #2563EB; }
+.inv-sum-body { display: flex; flex-direction: column; gap: 0.15rem; }
+.inv-sum-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.inv-sum-val { font-size: 1.25rem; font-weight: 700; }
 
-/* ---------- Grille produits ---------- */
-.inv-product-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.2rem;
-    margin-bottom: 2rem;
+/* ---------- Barre filtres + recherche ---------- */
+.inv-toolbar {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 0.8rem; margin-bottom: 1.3rem; flex-wrap: wrap;
 }
-.inv-product-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    overflow: hidden;
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    border: 1px solid var(--border);
+.inv-filters { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.inv-filter {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.4rem 0.85rem; border-radius: 999px;
+    font-size: 0.8rem; font-weight: 500; color: var(--muted);
+    background: var(--white); border: 1px solid var(--border);
+    text-decoration: none; transition: background 0.15s, color 0.15s;
 }
-.inv-product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.10);
+.inv-filter:hover { background: var(--green-50); color: var(--green-dark); }
+.inv-filter--active { background: var(--green-50); color: var(--green-dark); border-color: var(--green); font-weight: 600; }
+.inv-filter-count {
+    background: var(--green); color: #fff; font-size: 0.65rem;
+    font-weight: 700; padding: 0.05rem 0.38rem; border-radius: 999px;
 }
-.ipc-header {
-    height: 90px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 0.9rem 1rem;
+.inv-search { position: relative; flex-shrink: 0; }
+.inv-search-icon {
+    position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%);
+    width: 15px; height: 15px; color: var(--muted); pointer-events: none;
 }
-.ipc-badge {
-    background: rgba(255,255,255,0.25);
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.18rem 0.55rem;
-    border-radius: 999px;
-    backdrop-filter: blur(4px);
+.inv-search-input {
+    width: 220px; padding: 0.45rem 0.85rem 0.45rem 2rem;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-size: 0.82rem; background: var(--white); outline: none;
 }
-.ipc-icon { font-size: 2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
-.ipc-body {
-    padding: 1.1rem 1.1rem 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    flex: 1;
+.inv-search-input:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(5,150,105,0.12); }
+.inv-search-clear {
+    position: absolute; right: 0.55rem; top: 50%; transform: translateY(-50%);
+    font-size: 1.15rem; color: var(--muted); text-decoration: none;
+    line-height: 1; width: 20px; text-align: center;
 }
-.ipc-name { font-size: 1.05rem; font-weight: 700; margin: 0; }
-.ipc-price { font-size: 1.55rem; font-weight: 800; color: var(--green-dark); }
-.ipc-meta { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-.ipc-chip {
-    background: var(--green-50);
-    color: var(--green-dark);
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 0.15rem 0.55rem;
-    border-radius: 999px;
-}
-.ipc-chip--rate { background: #EEF2FF; color: #4338CA; }
-.ipc-cta {
-    margin-top: 0.4rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--green);
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    transition: gap 0.2s;
-}
-.inv-product-card:hover .ipc-cta { gap: 0.55rem; }
+.inv-search-clear:hover { color: var(--text); }
 
-@media (max-width: 900px) { .inv-product-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px) { .inv-summary { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) {
-    .inv-product-grid { grid-template-columns: 1fr; }
-    .inv-hero { padding: 1.4rem 1.2rem 1.2rem; }
-    .inv-hero-stats { grid-template-columns: 1fr; }
+    .inv-summary { grid-template-columns: 1fr 1fr; }
+    .inv-toolbar { flex-direction: column; align-items: stretch; }
+    .inv-search-input { width: 100%; }
+    .inv-ph-right { width: 100%; }
+    .inv-ph-cta { width: 100%; justify-content: center; }
 }
 
 /* ============================================================
-   INVESTISSEMENT : positions, confirmation, succès
+   INVESTISSEMENT : cartes positions premium
    ============================================================ */
 
-/* ---------- Positions ---------- */
-.inv-positions { display: flex; flex-direction: column; gap: 0.9rem; margin-bottom: 1.5rem; }
+.inv-positions { display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem; }
 .ipos-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    overflow: hidden;
-    display: flex;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    background: var(--white); border-radius: var(--radius);
+    overflow: hidden; display: flex;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     border: 1px solid var(--border);
     transition: box-shadow 0.2s;
 }
-.ipos-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+.ipos-card:focus-within { box-shadow: 0 0 0 2px rgba(5,150,105,0.15); }
+.ipos-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
 .ipos--done { opacity: 0.82; }
 .ipos--stopped { opacity: 0.7; }
+
 .ipos-left {
-    width: 72px; flex-shrink: 0;
+    width: 80px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
 }
-.ipos-emoji { font-size: 1.8rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); }
-.ipos-main { flex: 1; padding: 1rem 1.1rem; min-width: 0; }
-.ipos-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
-.ipos-top h3 { margin: 0; font-size: 0.95rem; font-weight: 700; }
-.ipos-info { display: flex; gap: 1.5rem; margin-bottom: 0.7rem; }
-.ipos-info-item { display: flex; flex-direction: column; gap: 0.1rem; }
-.ipos-info-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
-.ipos-info-item strong { font-size: 0.95rem; }
-.ipos-info-item .green { color: var(--green-dark); }
-.ipos-progress-head { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.3rem; }
-.ipos-progress-head strong { font-weight: 700; }
-.ipos-bar {
-    height: 8px; background: #E8EDE9; border-radius: 999px;
-    overflow: hidden; margin-bottom: 0.35rem;
-}
-.ipos-fill { height: 100%; border-radius: 999px; transition: width 0.7s ease; }
-.ipos-dates { display: flex; justify-content: space-between; font-size: 0.74rem; }
-.ipos-dates .muted { color: var(--muted); }
+.ipos-emoji { font-size: 2rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); }
+.ipos-main { flex: 1; padding: 1.1rem 1.2rem; min-width: 0; }
 
-/* ---------- État vide ---------- */
+/* En-tête */
+.ipos-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.7rem; }
+.ipos-head-left { min-width: 0; }
+.ipos-name { font-size: 1rem; font-weight: 700; margin: 0 0 0.15rem; }
+.ipos-ref { font-size: 0.72rem; color: var(--muted); font-family: 'SF Mono', 'Fira Code', monospace; }
+.ipos-status {
+    display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px;
+    font-size: 0.7rem; font-weight: 600; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.3px;
+}
+.ipos-status--success { background: #ECFDF5; color: #059669; }
+.ipos-status--approved { background: #EFF6FF; color: #175CD3; }
+.ipos-status--pending { background: #FEF6E7; color: #B54708; }
+.ipos-status--failed { background: #FDECEC; color: #B42318; }
+.ipos-status--cancelled { background: #F2F4F3; color: #667085; }
+
+/* Capital */
+.ipos-capital { margin-bottom: 0.75rem; }
+.ipos-capital-label { display: block; font-size: 0.66rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 0.1rem; }
+.ipos-capital-val { font-size: 1.3rem; font-weight: 800; color: var(--green-dark); }
+
+/* Progression */
+.ipos-progress-head { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.3rem; color: var(--muted); }
+.ipos-progress-head strong { font-weight: 700; color: var(--text); }
+.ipos-bar { height: 8px; background: #E8EDE9; border-radius: 999px; overflow: hidden; }
+.ipos-fill { height: 100%; border-radius: 999px; transition: width 0.7s ease; }
+
+/* Dates */
+.ipos-detail {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;
+    margin-top: 0.65rem; padding-top: 0.65rem;
+    border-top: 1px solid var(--border);
+}
+.ipos-detail-item { display: flex; flex-direction: column; gap: 0.1rem; }
+.ipos-detail-label { font-size: 0.66rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.ipos-detail-val { font-size: 0.82rem; font-weight: 600; }
+
+/* Revenu */
+.ipos-income {
+    margin-top: 0.65rem; padding-top: 0.65rem;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.ipos-income-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.ipos-income-val { font-size: 0.95rem; font-weight: 700; color: #059669; }
+
+/* État vide */
 .inv-empty {
-    text-align: center; padding: 2.5rem 1rem;
+    text-align: center; padding: 2.8rem 1.2rem;
     background: var(--white); border-radius: var(--radius);
     border: 1px dashed var(--border);
 }
-.inv-empty-icon { font-size: 2.8rem; margin-bottom: 0.6rem; }
-.inv-empty h3 { font-size: 1rem; margin-bottom: 0.3rem; }
-.inv-empty p { color: var(--muted); font-size: 0.88rem; max-width: 380px; margin: 0 auto; }
+.inv-empty-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
+.inv-empty-illustration { margin-bottom: 0.8rem; }
+.inv-empty h3 { font-size: 1.05rem; margin-bottom: 0.3rem; }
+.inv-empty p { color: var(--muted); font-size: 0.88rem; max-width: 400px; margin: 0 auto 1.2rem; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 560px) {
+    .ipos-card { flex-direction: column; }
+    .ipos-left { width: 100%; height: 56px; }
+    .ipos-detail { grid-template-columns: 1fr 1fr; }
+    .ipos-head { flex-direction: column; gap: 0.4rem; }
+    .ipos-status { align-self: flex-start; }
+}
 
 /* ---------- Confirmation ---------- */
 .invest-confirm-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
