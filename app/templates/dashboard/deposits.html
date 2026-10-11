@@ -16,8 +16,26 @@
             <span class="help-text">Montant minimum : 3 000 FCFA.</span>
         </div>
         <div class="form-group">
-            {{ form.operator.label }}
-            {{ form.operator() }}
+            <label>Opérateur Mobile Money</label>
+            <div class="service-grid">
+                {% for s in services %}
+                <label class="service-card">
+                    <input type="radio" name="operator" value="{{ s.name }}" {% if form.operator.data == s.name or (not form.operator.data and loop.first) %}checked{% endif %} required>
+                    <div class="sc-logo">
+                        {% if s.logo %}
+                            <img src="{{ url_for('static', filename='images/' ~ s.logo ~ '.jpeg') }}" alt="{{ s.name }}">
+                        {% else %}
+                            <span class="sc-avatar">{{ s.operator[:1] }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="sc-info">
+                        <div class="sc-name">{{ s.name }}</div>
+                        <div class="sc-desc">{{ s.description }}</div>
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+            {% for e in form.operator.errors %}<span class="error">{{ e }}</span>{% endfor %}
         </div>
         <div class="form-group">
             {{ form.phone_number.label }}

@@ -8,6 +8,21 @@ from app.services import finance
 from tests.helpers import login, make_user, signed_webhook
 
 
+def test_services_catalog(app):
+    from app.payments.services import service_by_name, services_for_country
+
+    benin = services_for_country("Benin")
+    assert len(benin) == 2
+    assert benin[0]["operator"] == "MTN"
+
+    ci = services_for_country("Cote d'Ivoire")
+    assert len(ci) == 4
+
+    s = service_by_name("Benin", "MOMO BJ")
+    assert s is not None
+    assert s["id"] == 35
+
+
 def test_deposit_minimum_rejected(app, client, db):
     user = make_user(db)
     db.session.commit()

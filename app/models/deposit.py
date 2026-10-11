@@ -14,6 +14,7 @@ class Deposit(TimestampMixin, db.Model):
     operator = db.Column(db.String(30), nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
     provider = db.Column(db.String(30), nullable=False)
+    service_id = db.Column(db.Integer, nullable=True)  # id du service Mobile Money (SoleasPay)
     reference = db.Column(db.String(64), unique=True, index=True, nullable=False)
     status = db.Column(db.String(20), default="pending", nullable=False, index=True)
     external_ref = db.Column(db.String(120), nullable=True)

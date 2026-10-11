@@ -132,18 +132,25 @@ def transactions():
 @login_required
 @verified_required
 def deposits():
+    from app.payments.services import service_by_name, services_for_country
+
+    services = services_for_country(current_user.country)
     form = DepositForm()
-    form.operator.choices = [(o, o) for o in operators_for_country(current_user.country)]
+    form.operator.choices = [(s["name"], s["name"]) for s in services]
     if form.validate_on_submit():
         try:
             amount = form.clean_amount()
+            service = service_by_name(current_user.country, form.operator.data)
+            operator = service["operator"] if service else form.operator.data
+            service_id = service["id"] if service else None
             payments.initiate_deposit(
                 current_user,
                 amount,
                 current_user.currency,
                 current_user.country,
-                form.operator.data,
+                operator,
                 form.phone_number.data.strip(),
+                service_id=service_id,
             )
             db.session.commit()
             flash("Demande de dépôt enregistrée. En attente de confirmation du prestataire.", "info")
@@ -158,7 +165,7 @@ def deposits():
         .limit(50)
         .all()
     )
-    return render_template("dashboard/deposits.html", form=form, history=history)
+    return render_template("dashboard/deposits.html", form=form, history=history, services=services)
 
 
 @dashboard_bp.route("/withdrawals", methods=["GET", "POST"])

@@ -22,7 +22,7 @@ def get_provider():
     return MockProvider()
 
 
-def initiate_deposit(user, amount, currency, country, operator, phone) -> Deposit:
+def initiate_deposit(user, amount, currency, country, operator, phone, service_id=None) -> Deposit:
     if amount < settings.get_int("MIN_DEPOSIT", current_app.config["MIN_DEPOSIT"]):
         raise ValueError(f"Le dépôt minimum est de {settings.get_int('MIN_DEPOSIT', 3000)} FCFA.")
     if currency != user.currency:
@@ -39,6 +39,7 @@ def initiate_deposit(user, amount, currency, country, operator, phone) -> Deposi
         provider=provider.name,
         reference=new_reference("DEP"),
         status="pending",
+        service_id=service_id,
     )
     db.session.add(deposit)
     db.session.flush()
