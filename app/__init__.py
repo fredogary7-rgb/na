@@ -4,6 +4,7 @@ import os
 
 import click
 from flask import Flask, render_template
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from app.extensions import csrf, db, limiter, login_manager, migrate
 from config import config_by_name
@@ -13,6 +14,11 @@ def create_app(config_name: str = None) -> Flask:
     config_name = config_name or os.environ.get("FLASK_ENV", "development")
     app = Flask(__name__)
     app.config.from_object(config_by_name[config_name])
+
+    # Derrière le proxy Railway (HTTPS en externe, HTTP en interne) : faire
+    # confiance aux en-têtes X-Forwarded-* pour générer des URL absolues en
+    # https:// (liens de parrainage et de réinitialisation de mot de passe).
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
     register_extensions(app)
     register_blueprints(app)
