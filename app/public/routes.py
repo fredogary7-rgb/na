@@ -1,5 +1,6 @@
 """Pages publiques de NAMARA."""
-from flask import Blueprint, jsonify, render_template
+from flask import Blueprint, jsonify, redirect, render_template, url_for
+from flask_login import current_user
 
 from app.extensions import db
 from app.services.investment import available_products
@@ -20,7 +21,10 @@ def health():
 
 @public_bp.route("/")
 def index():
-    return render_template("index.html")
+    """Racine du site : redirige vers le tableau de bord ou la connexion."""
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard.index"))
+    return redirect(url_for("auth.login"))
 
 
 @public_bp.route("/how-it-works")

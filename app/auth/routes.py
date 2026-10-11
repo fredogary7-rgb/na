@@ -151,7 +151,7 @@ def login():
 def logout():
     logout_user()
     flash("Vous êtes déconnecté.", "info")
-    return redirect(url_for("public.index"))
+    return redirect(url_for("auth.login"))
 
     user.otp_secret = code
     user.otp_expires_at = utcnow() + timedelta(minutes=10)
