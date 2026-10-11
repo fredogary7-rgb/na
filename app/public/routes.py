@@ -3,7 +3,13 @@ from flask import Blueprint, jsonify, redirect, render_template, url_for
 from flask_login import current_user
 
 from app.extensions import db
-from app.services.investment import available_products
+from app.services.investment import (
+    catalog_products,
+    simulation_daily_rate,
+    simulation_enabled,
+    simulation_for,
+    subscriptions_enabled,
+)
 
 public_bp = Blueprint("public", __name__)
 
@@ -34,7 +40,18 @@ def how_it_works():
 
 @public_bp.route("/products")
 def products():
-    return render_template("public/products.html", products=available_products())
+    show_sim = simulation_enabled()
+    rate_percent = simulation_daily_rate() * 100
+    entries = []
+    for p in catalog_products():
+        entries.append({"product": p, "sim": simulation_for(p) if show_sim else None})
+    return render_template(
+        "public/products.html",
+        entries=entries,
+        show_sim=show_sim,
+        rate_percent=rate_percent,
+        subs_enabled=subscriptions_enabled(),
+    )
 
 
 @public_bp.route("/terms")

@@ -4,7 +4,7 @@ from functools import wraps
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, IntegerField, SelectField, StringField, TextAreaField
+from wtforms import BooleanField, FloatField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 
 from app.extensions import db
@@ -207,6 +207,9 @@ class SettingsForm(FlaskForm):
     min_deposit = IntegerField("Dépôt minimum (FCFA)", validators=[Optional()])
     min_withdrawal = IntegerField("Retrait minimum (FCFA)", validators=[Optional()])
     referral_enabled = BooleanField("Parrainage activé")
+    subscriptions_enabled = BooleanField("Souscriptions réelles autorisées")
+    simulation_show = BooleanField("Afficher les montants simulés")
+    simulation_daily_rate = FloatField("Taux de simulation quotidien (%)", validators=[Optional()])
 
 
 @admin_bp.route("/settings", methods=["GET", "POST"])
@@ -222,6 +225,9 @@ def settings():
         settings_service.set_setting("MIN_DEPOSIT", form.min_deposit.data or 3000, "Dépôt minimum")
         settings_service.set_setting("MIN_WITHDRAWAL", form.min_withdrawal.data or 1500, "Retrait minimum")
         settings_service.set_setting("REFERRAL_ENABLED", "true" if form.referral_enabled.data else "false", "Parrainage")
+        settings_service.set_setting("SUBSCRIPTIONS_ENABLED", "true" if form.subscriptions_enabled.data else "false", "Souscriptions réelles")
+        settings_service.set_setting("SIMULATION_SHOW_AMOUNTS", "true" if form.simulation_show.data else "false", "Affichage des montants simulés")
+        settings_service.set_setting("SIMULATION_DAILY_RATE", (form.simulation_daily_rate.data or 0) / 100.0, "Taux de simulation quotidien (fraction)")
         _audit("settings_update", "settings", None)
         db.session.commit()
         flash("Paramètres enregistrés.", "success")
@@ -232,6 +238,9 @@ def settings():
     form.min_deposit.data = settings_service.get_int("MIN_DEPOSIT", 3000)
     form.min_withdrawal.data = settings_service.get_int("MIN_WITHDRAWAL", 1500)
     form.referral_enabled.data = settings_service.get_bool("REFERRAL_ENABLED", False)
+    form.subscriptions_enabled.data = settings_service.get_bool("SUBSCRIPTIONS_ENABLED", False)
+    form.simulation_show.data = settings_service.get_bool("SIMULATION_SHOW_AMOUNTS", True)
+    form.simulation_daily_rate.data = settings_service.get_float("SIMULATION_DAILY_RATE", 0.08) * 100.0
     return render_template("admin/settings.html", form=form)
 
 

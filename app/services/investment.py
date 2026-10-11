@@ -1,6 +1,8 @@
 """Service d'investissement (moteur de calcul quotidien, idempotent)."""
 from datetime import date, timedelta
 
+from flask import current_app
+
 from app.extensions import db
 from app.models import Investment, InvestmentAccrual, InvestmentProduct
 from app.models.base import utcnow
@@ -17,12 +19,107 @@ def available_products(currency=None):
     return query.order_by(InvestmentProduct.id.asc()).all()
 
 
+def catalog_products(currency=None):
+    """Produits visibles dans le catalogue public (actifs + désactivés)."""
+    query = InvestmentProduct.query.filter(
+        InvestmentProduct.status.in_(["approved", "disabled"])
+    )
+    if currency:
+        query = query.filter_by(currency=currency)
+    return query.order_by(InvestmentProduct.id.asc()).all()
+
+
+# ---------------------------------------------------------------------------
+# Simulation hypothétique (NON validée — aucune promesse de rendement)
+# ---------------------------------------------------------------------------
+def subscriptions_enabled() -> bool:
+    """Les souscriptions réelles sont autorisées uniquement après validation."""
+    from app.services import settings
+
+    return settings.get_bool("SUBSCRIPTIONS_ENABLED", current_app.config.get("SUBSCRIPTIONS_ENABLED", False))
+
+
+def simulation_enabled() -> bool:
+    """L'affichage des montants simulés peut être désactivé globalement."""
+    from app.services import settings
+
+    return settings.get_bool("SIMULATION_SHOW_AMOUNTS", current_app.config.get("SIMULATION_SHOW_AMOUNTS", True))
+
+
+def simulation_daily_rate() -> float:
+    """Taux quotidien hypothétique (fraction, ex. 0.08 = 8 %/jour)."""
+    from app.services import settings
+
+    return settings.get_float("SIMULATION_DAILY_RATE", current_app.config.get("SIMULATION_DAILY_RATE", 0.08))
+
+
+def simulation_for(product: InvestmentProduct) -> dict:
+    """Calcule les montants de simulation (sans capitalisation, non arrondis).
+
+    quotidien = prix * taux
+    revenu_90j = quotidien * durée
+    total = prix + revenu_90j
+    """
+    rate = simulation_daily_rate()
+    price = product.min_amount  # catalogue : prix unique (min == max)
+    daily = price * rate
+    revenue = daily * product.duration_days
+    total = price + revenue
+    return {
+        "price": price,
+        "daily": daily,
+        "revenue": revenue,
+        "total": total,
+        "duration_days": product.duration_days,
+    }
+
+
+# Catalogue officiel NAMARA (prix en FCFA, durée 90 jours).
+# Les trois derniers produits sont désactivés par défaut.
+CATALOG = [
+    ("NAMARA 1", 3000, "approved"),
+    ("NAMARA 2", 5000, "approved"),
+    ("NAMARA 3", 10000, "approved"),
+    ("NAMARA 4", 25000, "approved"),
+    ("NAMARA 5", 50000, "approved"),
+    ("NAMARA 6", 100000, "approved"),
+    ("NAMARA 7", 150000, "disabled"),
+    ("NAMARA 8", 200000, "disabled"),
+    ("NAMARA 9", 250000, "disabled"),
+]
+
+
+def seed_catalog_products(currency="XOF", duration_days=90) -> int:
+    """Initialisation idempotente du catalogue (n'ajoute pas les doublons)."""
+    created = 0
+    for name, price, status in CATALOG:
+        if InvestmentProduct.query.filter_by(name=name).first() is not None:
+            continue
+        db.session.add(
+            InvestmentProduct(
+                name=name,
+                description=f"{name} — produit NAMARA (simulation indicative).",
+                duration_days=duration_days,
+                min_amount=price,
+                max_amount=price,
+                currency=currency,
+                annual_rate_bps=0,
+                status=status,
+            )
+        )
+        created += 1
+    db.session.flush()
+    return created
+
+
 def invest(user, product: InvestmentProduct, amount: int) -> Investment:
     """Crée un investissement en débitant le portefeuille 'deposit'."""
     from app.services import finance
 
+    if not subscriptions_enabled():
+        raise InvestmentError("Les souscriptions ne sont pas encore ouvertes (validation en attente).")
     if product.status != "approved":
-        raise InvestmentError("Ce produit n'est pas approuvé.")
+        raise InvestmentError("Ce produit n'est pas actif à la souscription.")
     if amount < product.min_amount or amount > product.max_amount:
         raise InvestmentError("Montant hors des limites du produit.")
     if product.currency != user.currency:

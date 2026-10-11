@@ -1,22 +1,112 @@
 {% extends "base.html" %}
 {% block title %}Produits{% endblock %}
 {% block content %}
-<div class="container narrow">
-    <div class="card">
-        <h2>Produits disponibles</h2>
-        {% if products %}
-            {% for p in products %}
-                <div class="card mb" style="border:1px solid var(--border)">
-                    <h4>{{ p.name }}</h4>
-                    <p class="muted">{{ p.description }}</p>
-                    <p>Durée : {{ p.duration_days }} jours · Minimum : {{ format_amount(p.min_amount, p.currency) }} · Maximum : {{ format_amount(p.max_amount, p.currency) }}</p>
-                    <p class="help-text">{{ p.terms }}</p>
+<section class="products-hero">
+    <h1>Nos produits</h1>
+    <p>Découvrez le catalogue NAMARA : des produits structurés en francs CFA, avec une durée de 90 jours et des montants adaptés à chaque profil.</p>
+</section>
+
+<div class="container">
+    <div class="products-intro">
+        <p>NAMARA propose un catalogue de neuf produits, du plus accessible au plus ambitieux. Chaque produit est présenté avec son prix, sa durée et une simulation indicative de revenus — à lire uniquement à titre d'illustration.</p>
+    </div>
+
+    {% if not subs_enabled %}
+    <div class="sim-warning">
+        <strong>Les souscriptions réelles ne sont pas encore ouvertes.</strong>
+        Tant que le modèle économique et les obligations réglementaires ne sont pas validés, aucune souscription n'est autorisée et aucun montant simulé n'est crédité sur les soldes.
+    </div>
+    {% endif %}
+
+    {% if entries %}
+        {# ---------- Tableau (ordinateur) ---------- #}
+        <div class="products-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th>Prix (FCFA)</th>
+                        <th>Quotidien</th>
+                        <th>Revenu 90 jours</th>
+                        <th>Total</th>
+                        <th>Temps</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in entries %}
+                    {% set p = e.product %}
+                    {% set disabled = (p.status != 'approved') %}
+                    <tr class="{{ 'disabled' if disabled else '' }}">
+                        <td class="prod-name">{{ p.name }}</td>
+                        <td>{{ format_amount(p.min_amount, p.currency) }}</td>
+                        {% if show_sim and e.sim %}
+                            <td>{{ format_sim(e.sim.daily, p.currency) }}</td>
+                            <td>{{ format_sim(e.sim.revenue, p.currency) }}</td>
+                            <td>{{ format_sim(e.sim.total, p.currency) }}</td>
+                        {% else %}
+                            <td>—</td><td>—</td><td>—</td>
+                        {% endif %}
+                        <td>{{ p.duration_days }} jours</td>
+                        <td>
+                            {% if disabled %}
+                                <span class="badge badge-disabled">🔒 Bientôt disponible</span>
+                            {% else %}
+                                <span class="badge badge-success">Disponible</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# ---------- Cartes (mobile) ---------- #}
+        <div class="products-cards">
+            {% for e in entries %}
+            {% set p = e.product %}
+            {% set disabled = (p.status != 'approved') %}
+            <div class="product-card {{ 'disabled' if disabled else '' }}">
+                <div class="pc-head">
+                    <h3>{{ p.name }}</h3>
+                    {% if disabled %}
+                        <span class="badge badge-disabled">🔒 Bientôt disponible</span>
+                    {% else %}
+                        <span class="badge badge-success">Disponible</span>
+                    {% endif %}
                 </div>
+                <div class="pc-price">{{ format_amount(p.min_amount, p.currency) }}</div>
+                <ul>
+                    {% if show_sim and e.sim %}
+                        <li><span>Revenu quotidien simulé</span><strong>{{ format_sim(e.sim.daily, p.currency) }}</strong></li>
+                        <li><span>Revenu total sur 90 jours</span><strong>{{ format_sim(e.sim.revenue, p.currency) }}</strong></li>
+                        <li><span>Capital + revenu simulé</span><strong>{{ format_sim(e.sim.total, p.currency) }}</strong></li>
+                    {% endif %}
+                    <li><span>Durée</span><strong>{{ p.duration_days }} jours</strong></li>
+                </ul>
+                <p class="pc-warning">Simulation indicative, sans capitalisation. Aucun rendement n'est garanti.</p>
+            </div>
             {% endfor %}
-        {% else %}
-            <p class="muted">Aucun produit d'investissement n'est actuellement disponible.</p>
+        </div>
+
+        {% if show_sim %}
+        <div class="calc-explain card">
+            <h2>Comprendre les calculs affichés</h2>
+            <p>Ces montants résultent d'une simulation mathématique simple, sans capitalisation :</p>
+            <p>• Revenu quotidien simulé = prix × {{ rate_percent }} %</p>
+            <p>• Revenu sur 90 jours = revenu quotidien × 90</p>
+            <p>• Total (capital + revenu) = prix + revenu sur 90 jours</p>
+            <p class="help-text mt">Le taux de {{ rate_percent }} % par jour est <strong>hypothétique et non validé</strong>. Il ne reflète aucun rendement réel, garanti ou financé.</p>
+        </div>
         {% endif %}
-        <p class="help-text mt">Les produits affichés sont approuvés uniquement. Aucun rendement n'est garanti.</p>
+    {% else %}
+        <p class="muted">Aucun produit n'est actuellement disponible.</p>
+    {% endif %}
+
+    <div class="risk-warning">
+        <strong>⚠️ Avertissement important.</strong> Simulation indicative basée sur un taux hypothétique de {{ rate_percent }} % par jour.
+        Ce taux n'est pas validé et ne constitue pas une promesse de rendement. Les revenus réels éventuels dépendent d'un modèle économique vérifié, des risques et des conditions applicables. Aucun gain simulé n'est crédité sur un solde, aucun capital n'est débité et aucun retrait n'est créé tant que la validation n'a pas eu lieu.
     </div>
 </div>
 {% endblock %}
+

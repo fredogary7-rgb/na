@@ -32,6 +32,14 @@ def get_int(key, default=0):
         return default
 
 
+def get_float(key, default=0.0):
+    value = get_setting(key, default)
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def set_setting(key, value, description=None):
     row = ApplicationSetting.query.filter_by(key=key).first()
     if row is None:

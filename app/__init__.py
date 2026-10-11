@@ -89,7 +89,12 @@ def register_template_helpers(app):
         }
         return mapping.get(status, "cancelled")
 
+    def format_sim(amount, currency="XOF"):
+        """Formate un montant simulé (arrondi uniquement à l'affichage)."""
+        return format_amount(int(round(amount)), currency)
+
     app.jinja_env.globals["format_amount"] = format_amount
+    app.jinja_env.globals["format_sim"] = format_sim
     app.jinja_env.globals["badge_class"] = badge_class
     app.jinja_env.globals["APP_NAME"] = "NAMARA"
     app.jinja_env.globals["APP_SLOGAN"] = "Votre capital, une vision d'avenir."
@@ -200,6 +205,16 @@ def register_cli(app):
             seed_default_faq()
             db.session.commit()
             click.echo("FAQ de support insérées.")
+
+    @app.cli.command("seed-products")
+    def seed_products():
+        """Initialise le catalogue NAMARA (idempotent — aucun doublon)."""
+        from app.services.investment import seed_catalog_products
+
+        with app.app_context():
+            created = seed_catalog_products()
+            db.session.commit()
+            click.echo(f"Catalogue NAMARA initialisé ({created} produit(s) créé(s)).")
 
 
 def configure_logging(app):
