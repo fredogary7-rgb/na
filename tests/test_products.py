@@ -147,14 +147,11 @@ def test_products_page_renders(app, client, db):
     assert "Simulation indicative" in html
 
 
-def test_products_page_footer_links(app, client, db):
+def test_products_page_no_footer(app, client, db):
     _seed(app, db)
     html = client.get("/products").get_data(as_text=True)
-    for path in ["/how-it-works", "/products", "/faq", "/terms", "/privacy",
-                 "/risk-policy", "/withdrawal-policy", "/bonus-terms",
-                 "/referral-terms", "/contact"]:
-        assert path in html, path
-    assert "ne prétend pas être agréée" in html
+    assert "Informations légales" not in html
+    assert "ne prétend pas être agréée" not in html
 
 
 def test_simulation_display_can_be_disabled(app, client, db):

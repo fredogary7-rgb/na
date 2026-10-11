@@ -46,39 +46,7 @@
 
 {% block content %}{% endblock %}
 
-{% block footer %}
-<footer class="footer">
-    <div class="container">
-        <div>
-            <h4>{{ APP_NAME }}</h4>
-            <p style="font-size:0.85rem">{{ APP_SLOGAN }}</p>
-        </div>
-        <div>
-            <h4>Plateforme</h4>
-            <a href="{{ url_for('public.how_it_works') }}">Fonctionnement</a>
-            <a href="{{ url_for('public.products') }}">Produits</a>
-            <a href="{{ url_for('public.faq') }}">FAQ</a>
-        </div>
-        <div>
-            <h4>Informations légales</h4>
-            <a href="{{ url_for('public.terms') }}">Conditions d'utilisation</a>
-            <a href="{{ url_for('public.privacy') }}">Politique de confidentialité</a>
-            <a href="{{ url_for('public.risk_policy') }}">Politique de risques</a>
-            <a href="{{ url_for('public.withdrawal_policy') }}">Politique de retrait</a>
-        </div>
-        <div>
-            <h4>Programmes</h4>
-            <a href="{{ url_for('public.bonus_terms') }}">Conditions du bonus</a>
-            <a href="{{ url_for('public.referral_terms') }}">Conditions du parrainage</a>
-            <a href="{{ url_for('public.contact') }}">Contact et assistance</a>
-        </div>
-    </div>
-    <div class="legal">
-        {{ APP_NAME }} ne prétend pas être agréée, réglementée ou garantie par une banque centrale.
-        Les paiements réels ne sont pas activés par défaut.
-    </div>
-</footer>
-{% endblock %}
+{% block footer %}{% endblock %}
 
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% block extra_js %}{% endblock %}
