@@ -122,6 +122,15 @@ def confirm_commission(commission: ReferralCommission) -> None:
     commission.confirmed_at = utcnow()
     db.session.flush()
 
+    from app.notifications.service import notify
+
+    notify(
+        commission.referrer_id,
+        "referral_commission",
+        "Commission de parrainage reçue",
+        f"Vous avez reçu une commission de {commission.amount} {commission.currency}.",
+    )
+
 
 def reverse_commission(commission: ReferralCommission) -> None:
     """Annulation comptable d'une commission déjà confirmée."""
