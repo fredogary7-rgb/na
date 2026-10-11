@@ -1,18 +1,8 @@
 (function () {
     "use strict";
     var BASE = "/support/api";
-    var CATEGORIES = [
-        { key: "account", label: "Problème de compte" },
-        { key: "deposit", label: "Dépôt" },
-        { key: "withdrawal", label: "Retrait" },
-        { key: "products", label: "Produits" },
-        { key: "referral", label: "Parrainage" },
-        { key: "technical", label: "Problème technique" },
-        { key: "human", label: "Parler à un conseiller" }
-    ];
 
     var messagesEl = document.getElementById("chat-messages");
-    var catsEl = document.getElementById("chat-categories");
     var inputEl = document.getElementById("chat-input");
     var sendBtn = document.getElementById("chat-send");
 
@@ -49,7 +39,7 @@
     }
 
     function welcome() {
-        addBubble("bot", "Bonjour et bienvenue chez NAMARA ! Comment pouvons-nous vous aider aujourd'hui ? Choisissez une catégorie ou écrivez directement votre question.");
+        addBubble("bot", "Bonjour et bienvenue chez NAMARA ! Comment pouvons-nous vous aider aujourd'hui ? Écrivez directement votre question.");
     }
 
     function ensureConversation(callback) {
@@ -94,18 +84,6 @@
         });
     }
 
-    function chooseCategory(key, label) {
-        if (!reference) {
-            ensureConversation(function () { chooseCategory(key, label); });
-            return;
-        }
-        if (key === "human") {
-            sendText("Je souhaite parler à un conseiller.");
-        } else {
-            addBubble("visitor", "[Catégorie : " + label + "]");
-        }
-    }
-
     function submit() {
         var t = inputEl.value.trim();
         if (t) {
@@ -121,13 +99,6 @@
 
     function init() {
         sessionHash = getSessionHash();
-
-        CATEGORIES.forEach(function (c) {
-            var b = document.createElement("button");
-            b.textContent = c.label;
-            b.addEventListener("click", function () { chooseCategory(c.key, c.label); });
-            catsEl.appendChild(b);
-        });
 
         sendBtn.addEventListener("click", submit);
         inputEl.addEventListener("keydown", function (e) {
