@@ -11,9 +11,11 @@
         { key: "human", label: "Parler à un conseiller" }
     ];
 
-    var messagesEl = null;
-    var inputEl = null;
-    var win = null;
+    var messagesEl = document.getElementById("chat-messages");
+    var catsEl = document.getElementById("chat-categories");
+    var inputEl = document.getElementById("chat-input");
+    var sendBtn = document.getElementById("chat-send");
+
     var sessionHash = null;
     var reference = null;
     var lastId = 0;
@@ -32,17 +34,16 @@
         return h;
     }
 
-    function el(tag, cls, text) {
-        var e = document.createElement(tag);
-        if (cls) e.className = cls;
-        if (text) e.textContent = text;
-        return e;
-    }
-
     function addBubble(sender, text, time) {
-        var b = el("div", "chat-bubble " + sender);
+        var b = document.createElement("div");
+        b.className = "chat-bubble " + sender;
         b.appendChild(document.createTextNode(text));
-        if (time) b.appendChild(el("span", "time", time));
+        if (time) {
+            var t = document.createElement("span");
+            t.className = "time";
+            t.textContent = time;
+            b.appendChild(t);
+        }
         messagesEl.appendChild(b);
         messagesEl.scrollTop = messagesEl.scrollHeight;
     }
@@ -64,7 +65,7 @@
         });
     }
 
-    function pollMessages() {
+    function pollMessages(callback) {
         if (!reference) return;
         fetch(BASE + "/messages?session_hash=" + encodeURIComponent(sessionHash) + "&after_id=" + lastId)
             .then(function (r) { return r.json(); })
@@ -74,6 +75,7 @@
                     addBubble(sender, m.text, m.created_at);
                     lastId = Math.max(lastId, m.id);
                 });
+                if (callback) callback();
             });
     }
 
@@ -112,72 +114,37 @@
         }
     }
 
-
     function startPolling() {
         if (pollTimer) clearInterval(pollTimer);
-        pollMessages();
         pollTimer = setInterval(pollMessages, 5000);
     }
 
-    function buildWidget() {
-        var btn = el("button", "chat-widget-btn", "💬 Assistance");
-        win = el("div", "chat-window");
+    function init() {
+        sessionHash = getSessionHash();
 
-        var header = el("div", "chat-header");
-        header.appendChild(document.createTextNode("Service client NAMARA"));
-        var closeBtn = el("button", "close", "×");
-        header.appendChild(closeBtn);
-
-        messagesEl = el("div", "chat-messages");
-
-        var catsEl = el("div", "chat-categories");
         CATEGORIES.forEach(function (c) {
-            var b = el("button", "", c.label);
+            var b = document.createElement("button");
+            b.textContent = c.label;
             b.addEventListener("click", function () { chooseCategory(c.key, c.label); });
             catsEl.appendChild(b);
         });
 
-        inputEl = el("input", "");
-        inputEl.setAttribute("type", "text");
-        inputEl.setAttribute("placeholder", "Écrivez votre message…");
-        var sendBtn = el("button", "", "Envoyer");
-        var inputRow = el("div", "chat-input");
-        inputRow.appendChild(inputEl);
-        inputRow.appendChild(sendBtn);
-
-        win.appendChild(header);
-        win.appendChild(messagesEl);
-        win.appendChild(catsEl);
-        win.appendChild(inputRow);
-
-        document.body.appendChild(btn);
-        document.body.appendChild(win);
-
-        btn.addEventListener("click", function () {
-            var opened = win.classList.toggle("open");
-            if (opened) {
-                ensureConversation(function () {
-                    if (lastId === 0) welcome();
-                    startPolling();
-                });
-            } else if (pollTimer) {
-                clearInterval(pollTimer);
-            }
-        });
-        closeBtn.addEventListener("click", function () {
-            win.classList.remove("open");
-            if (pollTimer) clearInterval(pollTimer);
-        });
         sendBtn.addEventListener("click", submit);
         inputEl.addEventListener("keydown", function (e) {
             if (e.key === "Enter") submit();
         });
+
+        ensureConversation(function () {
+            pollMessages(function () {
+                if (lastId === 0) welcome();
+            });
+            startPolling();
+        });
     }
 
-    sessionHash = getSessionHash();
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", buildWidget);
+        document.addEventListener("DOMContentLoaded", init);
     } else {
-        buildWidget();
+        init();
     }
 })();

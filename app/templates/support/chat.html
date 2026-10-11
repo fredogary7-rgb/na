@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Assistance{% endblock %}
+{% block content %}
+<div class="container chat-page">
+    <div class="chat-page-head">
+        <h1>Assistance</h1>
+        <p>Bonjour et bienvenue chez {{ APP_NAME }} ! Choisissez une catégorie ou écrivez directement votre question.</p>
+    </div>
+    <div class="chat-page-body">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-categories" id="chat-categories"></div>
+        <div class="chat-input">
+            <input type="text" id="chat-input" placeholder="Écrivez votre message…" autocomplete="off">
+            <button type="button" id="chat-send">Envoyer</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/chat-page.js') }}"></script>
+{% endblock %}

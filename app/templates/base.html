@@ -23,7 +23,7 @@
         <a href="{{ url_for('public.how_it_works') }}">Fonctionnement</a>
         <a href="{{ url_for('public.products') }}">Produits</a>
         <a href="{{ url_for('public.faq') }}">FAQ</a>
-        <a href="{{ url_for('public.contact') }}">Contact</a>
+        <a href="{{ url_for('support.chat_page') }}">Assistance</a>
         {% if current_user.is_authenticated %}
             <a class="btn btn-primary btn-sm" href="{{ url_for('dashboard.index') }}">Tableau de bord</a>
             <a class="btn btn-outline btn-sm" href="{{ url_for('auth.logout') }}">Déconnexion</a>
@@ -82,7 +82,6 @@
 {% endblock %}
 
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-<script src="{{ url_for('static', filename='js/chat-widget.js') }}"></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

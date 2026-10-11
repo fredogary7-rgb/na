@@ -1,7 +1,7 @@
 """Routes du support client : API chat web + webhook Telegram."""
 import hmac
 
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, current_app, jsonify, render_template, request
 from flask_login import current_user
 from werkzeug.exceptions import abort
 
@@ -11,6 +11,12 @@ from app.services import support
 from app.support import telegram_handler
 
 support_bp = Blueprint("support", __name__)
+
+
+@support_bp.route("/chat")
+def chat_page():
+    """Page de chat dédiée (service client)."""
+    return render_template("support/chat.html")
 
 
 def _serialize_message(msg):
