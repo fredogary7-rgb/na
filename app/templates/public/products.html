@@ -99,55 +99,45 @@
             {% set p = e.product %}
             {% set disabled = (p.status != 'approved') %}
             <article class="prd-card {{ 'prd-card--disabled' if disabled }}">
-                <div class="prd-card__head">
-                    <h3 class="prd-card__name">{{ p.name }}</h3>
-                    {% if disabled %}
-                        <span class="prd-badge prd-badge--soon">Bientôt disponible</span>
-                    {% else %}
-                        <span class="prd-badge prd-badge--ok">Disponible</span>
-                    {% endif %}
-                </div>
-                <div class="prd-card__price">
-                    {% set _price = format_amount(p.min_amount, p.currency).rsplit(' ', 1) %}
-                    <span class="prd-card__amount">{{ _price[0] }}</span>
-                    <span class="prd-card__currency">{{ _price[1] }}</span>
-                </div>
-                <div class="prd-card__meta">
-                    <span class="prd-chip">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        {{ p.duration_days }} jours
-                    </span>
-                </div>
-                {% if show_sim and e.sim %}
-                <div class="prd-card__details">
-                    <div class="prd-detail">
-                        <span class="prd-detail__label">Revenu quotidien</span>
-                        <span class="prd-detail__value">{{ format_sim(e.sim.daily, p.currency) }}</span>
+                <div class="prd-card__top">
+                    <div class="prd-card__media">
+                        <img class="prd-card__img" src="{{ url_for('static', filename='images/login-bg.jpg') }}" alt="">
                     </div>
-                    <div class="prd-detail">
-                        <span class="prd-detail__label">Revenu sur {{ p.duration_days }} jours</span>
-                        <span class="prd-detail__value prd-detail__value--gain">+{{ format_sim(e.sim.revenue, p.currency) }}</span>
-                    </div>
-                    <div class="prd-detail">
-                        <span class="prd-detail__label">Capital + revenu</span>
-                        <span class="prd-detail__value">{{ format_sim(e.sim.total, p.currency) }}</span>
+                    <div class="prd-card__identity">
+                        {% if disabled %}
+                            <span class="prd-badge prd-badge--soon">Bientôt disponible</span>
+                        {% else %}
+                            <span class="prd-badge prd-badge--ok">Disponible</span>
+                        {% endif %}
+                        <h3 class="prd-card__name">{{ p.name }}</h3>
                     </div>
                 </div>
-                {% endif %}
-                <div class="prd-card__cta">
-                    {% if disabled %}
-                        <span class="prd-btn prd-btn--disabled" aria-disabled="true">Bientôt disponible</span>
-                    {% elif current_user.is_authenticated %}
-                        <a class="prd-btn prd-btn--primary" href="{{ url_for('investments.confirm', product_id=p.id) }}">
-                            Investir
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                        </a>
-                    {% else %}
-                        <a class="prd-btn prd-btn--primary" href="{{ url_for('auth.login', next=url_for('investments.confirm', product_id=p.id)) }}">
-                            Investir
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                        </a>
-                    {% endif %}
+                <div class="prd-card__bottom">
+                    <div class="prd-card__facts">
+                        <div class="prd-fact">
+                            <span class="prd-fact__value">{{ p.duration_days }} jours</span>
+                            <span class="prd-fact__label">Durée</span>
+                        </div>
+                        <div class="prd-fact">
+                            <span class="prd-fact__value">{{ format_amount(p.min_amount, p.currency) }}</span>
+                            <span class="prd-fact__label">Prix du produit</span>
+                        </div>
+                        {% if show_sim and e.sim %}
+                        <div class="prd-fact">
+                            <span class="prd-fact__value">{{ format_sim(e.sim.daily, p.currency) }}</span>
+                            <span class="prd-fact__label">Revenu quotidien</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="prd-card__action">
+                        {% if disabled %}
+                            <span class="prd-btn prd-btn--disabled" aria-disabled="true">Bientôt disponible</span>
+                        {% elif current_user.is_authenticated %}
+                            <a class="prd-btn prd-btn--primary" href="{{ url_for('investments.confirm', product_id=p.id) }}">Investir</a>
+                        {% else %}
+                            <a class="prd-btn prd-btn--primary" href="{{ url_for('auth.login', next=url_for('investments.confirm', product_id=p.id)) }}">Investir</a>
+                        {% endif %}
+                    </div>
                 </div>
             </article>
             {% endfor %}

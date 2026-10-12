@@ -1424,9 +1424,12 @@ html { scroll-behavior: smooth; }
 
 .prd-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
     align-items: stretch;
+}
+@media (min-width: 1024px) {
+    .prd-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 }
 
 /* Cartes produits */
@@ -1438,7 +1441,7 @@ html { scroll-behavior: smooth; }
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
-    padding: 1.5rem 1.5rem 1.4rem;
+    padding: 1rem 1rem 1.1rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .prd-card:hover {
@@ -1447,56 +1450,89 @@ html { scroll-behavior: smooth; }
     border-color: #D4E7D7;
 }
 
-.prd-card__head {
+.prd-card__top {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 0.6rem;
-    margin-bottom: 1rem;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 0.95rem;
 }
-.prd-card__name { font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--text); }
-
-.prd-card__price {
+.prd-card__media {
+    flex-shrink: 0;
+    width: 76px;
+    height: 76px;
+    border-radius: var(--radius-sm);
+    background: var(--green-50);
+    border: 1px solid #DCEBE0;
     display: flex;
-    align-items: baseline;
-    gap: 0.4rem;
-    margin-bottom: 0.9rem;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
-.prd-card__amount {
-    font-size: 1.9rem; font-weight: 800; color: var(--green-dark);
-    line-height: 1.05; letter-spacing: -0.01em;
+.prd-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    padding: 0.45rem;
 }
-.prd-card__currency { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
-
-.prd-card__meta { margin-bottom: 1rem; }
-
-.prd-card__details {
+.prd-card__identity {
     display: flex;
     flex-direction: column;
-    margin-bottom: 1.1rem;
+    align-items: flex-start;
+    gap: 0.4rem;
+    min-width: 0;
 }
-.prd-detail {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 0;
-    border-top: 1px solid var(--border);
-    font-size: 0.88rem;
-}
-.prd-detail__label { color: var(--muted); }
-.prd-detail__value { font-weight: 600; color: var(--text); }
-.prd-detail__value--gain { color: var(--green); }
+.prd-card__name { font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--text); }
 
-.prd-card__cta { margin-top: auto; }
+.prd-card__bottom {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    padding-top: 0.95rem;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+.prd-card__facts {
+    display: flex;
+    gap: 1.5rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+.prd-fact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    min-width: 0;
+}
+.prd-fact__value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+}
+.prd-fact__label {
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+.prd-card__action {
+    flex-shrink: 0;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
 
 .prd-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    padding: 0.28rem 0.7rem;
+    padding: 0.24rem 0.6rem;
     border-radius: 999px;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 600;
     white-space: nowrap;
 }
@@ -1508,43 +1544,28 @@ html { scroll-behavior: smooth; }
 }
 .prd-badge--soon { background: #EEF1EF; color: #5B6B62; }
 
-.prd-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    background: var(--green-50);
-    color: var(--green-dark);
-    border-radius: 999px;
-    padding: 0.3rem 0.75rem;
-    font-size: 0.78rem;
-    font-weight: 600;
-}
-.prd-chip svg { width: 14px; height: 14px; }
-
 .prd-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
+    gap: 0.45rem;
     border: none;
-    border-radius: var(--radius-sm);
-    padding: 0.78rem 1.2rem;
-    font-size: 0.95rem;
+    border-radius: 999px;
+    padding: 0.62rem 1.25rem;
+    font-size: 0.9rem;
     font-weight: 600;
     font-family: inherit;
     text-decoration: none;
     cursor: pointer;
+    white-space: nowrap;
     transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
 }
-.prd-btn svg { width: 17px; height: 17px; transition: transform 0.18s ease; }
 .prd-btn--primary { background: var(--green); color: #fff; }
 .prd-btn--primary:hover {
     background: var(--green-dark);
     transform: translateY(-1px);
     box-shadow: 0 8px 18px rgba(22, 122, 53, 0.24);
 }
-.prd-btn--primary:hover svg { transform: translateX(3px); }
 .prd-btn--disabled {
     background: #EEF1EF;
     color: #98A29C;
@@ -1557,9 +1578,9 @@ html { scroll-behavior: smooth; }
     border-color: #E7ECE9;
 }
 .prd-card--disabled .prd-card__name { color: #5B6B62; }
-.prd-card--disabled .prd-card__amount { color: #8A958E; }
-.prd-card--disabled .prd-detail__value { color: #98A29C; }
-.prd-card--disabled .prd-chip { background: #F2F4F3; color: #7C8780; }
+.prd-card--disabled .prd-fact__value { color: #8A958E; }
+.prd-card--disabled .prd-card__media { background: #F2F4F3; border-color: #E4E9E6; }
+.prd-card--disabled .prd-card__img { opacity: 0.6; }
 
 /* Responsive */
 @media (max-width: 900px) {
@@ -1567,7 +1588,6 @@ html { scroll-behavior: smooth; }
     .prd-hero__title { font-size: 2.2rem; }
     .prd-hero__sub { max-width: none; }
     .prd-hero__frame { height: 300px; }
-    .prd-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
@@ -1589,7 +1609,6 @@ html { scroll-behavior: smooth; }
 }
 
 @media (max-width: 560px) {
-    .prd-grid { grid-template-columns: 1fr; }
     .prd-catalog__title { font-size: 1.55rem; }
 }
 
@@ -1598,6 +1617,9 @@ html { scroll-behavior: smooth; }
     .prd-hero__title { font-size: 1.85rem; }
     .prd-hero__sub { font-size: 0.95rem; }
     .prd-hero__frame { height: 230px; padding: 1rem; }
+    .prd-card__media { width: 64px; height: 64px; }
+    .prd-card__facts { gap: 1.1rem; }
+    .prd-fact__value { font-size: 0.9rem; }
 }
 
 /* Animations discrètes */
