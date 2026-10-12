@@ -16,20 +16,11 @@
     </div>
 </div>
 
-{% set gradients = [
-    ('#059669', '#047857'),
-    ('#2563eb', '#1d4ed8'),
-    ('#7c3aed', '#6d28d9'),
-    ('#d97706', '#b45309'),
-    ('#0891b2', '#0e7490'),
-    ('#e11d48', '#be123c'),
-] %}
-{% set g = gradients[(product.id - 1) % 6] %}
-{% set emojis = ['🏦','💎','🚀','🏆','🌟','👑'] %}
-
 <div class="icf-card">
-    <div class="icf-banner" style="background:linear-gradient(135deg, {{ g[0] }}, {{ g[1] }})">
-        <span class="icf-banner__emoji">{{ emojis[(product.id - 1) % 6] }}</span>
+    <div class="icf-banner">
+        <span class="icf-banner__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
+        </span>
         <div>
             <h2 class="icf-banner__name">{{ product.name }}</h2>
             <span class="icf-banner__sub">Durée · {{ product.duration_days }} jours</span>

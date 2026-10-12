@@ -139,7 +139,7 @@ def test_products_page_renders(app, client, db):
     resp = client.get("/products")
     assert resp.status_code == 200
     html = resp.get_data(as_text=True)
-    assert "Catalogue NAMARA" in html
+    assert "Nos produits" in html
     for name in ["NAMARA 1", "NAMARA 6", "NAMARA 9"]:
         assert name in html
     assert "90 jours" in html
