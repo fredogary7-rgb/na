@@ -121,4 +121,35 @@
     {% endfor %}
 </div>
 
+<!-- ============================================================
+     POPUP TELEGRAM NAMARA — communauté officielle
+     Affiché à chaque visite, sans mémorisation de la fermeture.
+     ============================================================ -->
+<div class="namara-telegram-modal" id="namaraTelegramModal" role="dialog" aria-modal="true" aria-labelledby="namaraTelegramTitle" aria-hidden="true">
+    <div class="namara-telegram-modal__overlay" data-namara-telegram-close></div>
+    <div class="namara-telegram-modal__card">
+        <button type="button" class="namara-telegram-modal__close" data-namara-telegram-close aria-label="Fermer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+
+        <div class="namara-telegram-modal__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </div>
+
+        <span class="namara-telegram-modal__badge">Communauté officielle</span>
+
+        <h2 class="namara-telegram-modal__title" id="namaraTelegramTitle">Rejoignez la communauté NAMARA !</h2>
+
+        <p class="namara-telegram-modal__desc">Retrouvez notre communauté sur Telegram pour suivre les annonces, recevoir les informations importantes et rester informé des nouveautés de NAMARA.</p>
+
+        <div class="namara-telegram-modal__actions">
+            <a class="namara-telegram-modal__btn namara-telegram-modal__btn--primary" href="https://t.me/+OoNON2l4z2M3MTQ0" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                Rejoindre le groupe Telegram
+            </a>
+            <button type="button" class="namara-telegram-modal__btn namara-telegram-modal__btn--secondary" data-namara-telegram-close>Plus tard</button>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

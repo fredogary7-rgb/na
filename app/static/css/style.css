@@ -1606,6 +1606,179 @@ html { scroll-behavior: smooth; }
     .btn-spinner { animation: none; }
 }
 
+/* ============================================================
+   POPUP TELEGRAM NAMARA (tableau de bord uniquement)
+   ============================================================ */
+body.namara-modal-open { overflow: hidden; }
+
+.namara-telegram-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    padding: 1.25rem;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+
+.namara-telegram-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.namara-telegram-modal__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(16, 24, 40, 0.55);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+.namara-telegram-modal__card {
+    position: relative;
+    margin: auto;
+    width: 100%;
+    max-width: 440px;
+    max-height: calc(100vh - 2.5rem);
+    overflow-y: auto;
+    background: linear-gradient(180deg, var(--white) 0%, var(--green-50) 100%);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: 0 24px 60px rgba(16, 24, 40, 0.28);
+    padding: 2.4rem 2rem 2rem;
+    text-align: center;
+    transform: translateY(16px) scale(0.96);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.namara-telegram-modal.is-open .namara-telegram-modal__card {
+    transform: translateY(0) scale(1);
+}
+
+.namara-telegram-modal__close {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.namara-telegram-modal__close:hover { background: var(--green-50); color: var(--text); }
+.namara-telegram-modal__close:active { transform: scale(0.94); }
+.namara-telegram-modal__close svg { width: 18px; height: 18px; }
+
+.namara-telegram-modal__icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 1.1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: linear-gradient(135deg, #34AADF 0%, #1F92D0 100%);
+    box-shadow: 0 12px 26px rgba(31, 146, 208, 0.35);
+}
+.namara-telegram-modal__icon svg { width: 34px; height: 34px; }
+
+.namara-telegram-modal__badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green-dark);
+    background: var(--green-light);
+    border: 1px solid #CBE6D0;
+    padding: 0.32rem 0.8rem;
+    border-radius: 999px;
+    margin-bottom: 0.85rem;
+}
+
+.namara-telegram-modal__title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.6rem;
+    line-height: 1.25;
+}
+
+.namara-telegram-modal__desc {
+    color: var(--muted);
+    font-size: 0.93rem;
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+}
+
+.namara-telegram-modal__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.namara-telegram-modal__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.85rem 1.1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.namara-telegram-modal__btn:active { transform: scale(0.98); }
+.namara-telegram-modal__btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+.namara-telegram-modal__btn--primary {
+    background: var(--green);
+    color: #fff;
+    box-shadow: 0 10px 22px rgba(22, 122, 53, 0.28);
+}
+.namara-telegram-modal__btn--primary:hover { background: var(--green-dark); }
+
+.namara-telegram-modal__btn--secondary {
+    background: transparent;
+    color: var(--muted);
+    border-color: var(--border);
+}
+.namara-telegram-modal__btn--secondary:hover { background: var(--green-50); color: var(--text); }
+
+/* Responsive : mobile / tablette */
+@media (max-width: 480px) {
+    .namara-telegram-modal { padding: 1rem; }
+    .namara-telegram-modal__card { padding: 2rem 1.35rem 1.5rem; border-radius: 22px; }
+    .namara-telegram-modal__title { font-size: 1.25rem; }
+    .namara-telegram-modal__icon { width: 62px; height: 62px; }
+    .namara-telegram-modal__icon svg { width: 30px; height: 30px; }
+}
+
+/* Accessibilité : réduction des animations */
+@media (prefers-reduced-motion: reduce) {
+    .namara-telegram-modal,
+    .namara-telegram-modal__card,
+    .namara-telegram-modal__btn {
+        transition: none;
+    }
+    .namara-telegram-modal__card { transform: none; }
+}
+
 
 
 
