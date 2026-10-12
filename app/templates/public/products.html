@@ -17,33 +17,37 @@
     {% endif %}
 
     {% if entries %}
-    <div class="prd-list">
+    <div class="pcard-list">
         {% for e in entries %}
         {% set p = e.product %}
         {% set disabled = (p.status != 'approved') %}
-        <div class="prd-row {{ 'prd-row--disabled' if disabled }}">
-            <div class="prd-row__main">
-                <div class="prd-row__title">
-                    <span class="prd-row__name">{{ p.name }}</span>
+        <article class="pcard {{ 'pcard--disabled' if disabled }}">
+            <div class="pcard__left">
+                <div class="pcard__media">
+                    <img class="pcard__img" src="{{ url_for('static', filename='images/login-bg.jpg') }}" alt="{{ p.name }}">
+                </div>
+                <div class="pcard__cta">
                     {% if disabled %}
-                    <span class="prd-row__badge prd-row__badge--soon">Bientôt</span>
+                        <span class="prd-btn prd-btn--disabled">Bientôt disponible</span>
+                    {% elif current_user.is_authenticated %}
+                        <a class="prd-btn prd-btn--primary" href="{{ url_for('investments.confirm', product_id=p.id) }}">Investir</a>
                     {% else %}
-                    <span class="prd-row__badge prd-row__badge--ok">Disponible</span>
+                        <a class="prd-btn prd-btn--primary" href="{{ url_for('auth.login', next=url_for('investments.confirm', product_id=p.id)) }}">Investir</a>
                     {% endif %}
                 </div>
-                <span class="prd-row__meta">{{ p.duration_days }} jours{% if show_sim and e.sim %} · +{{ format_sim(e.sim.daily, p.currency) }}/jour{% endif %}</span>
             </div>
-            <div class="prd-row__price">{{ format_amount(p.min_amount, p.currency) }}</div>
-            <div class="prd-row__cta">
-                {% if disabled %}
-                    <span class="prd-btn prd-btn--disabled">Bientôt disponible</span>
-                {% elif current_user.is_authenticated %}
-                    <a class="prd-btn prd-btn--primary" href="{{ url_for('investments.confirm', product_id=p.id) }}">Investir</a>
-                {% else %}
-                    <a class="prd-btn prd-btn--primary" href="{{ url_for('auth.login', next=url_for('investments.confirm', product_id=p.id)) }}">Investir</a>
-                {% endif %}
+            <div class="pcard__right">
+                <h2 class="pcard__name">{{ p.name }}</h2>
+                <ul class="pcard__info">
+                    <li class="pcard__line"><span class="pcard__label">Prix</span><span class="pcard__value">{{ format_amount(p.min_amount, p.currency) }}</span></li>
+                    <li class="pcard__line"><span class="pcard__label">Durée</span><span class="pcard__value">{{ p.duration_days }} jours</span></li>
+                    {% if show_sim and e.sim %}
+                    <li class="pcard__line"><span class="pcard__label">Revenu quotidien</span><span class="pcard__value">{{ format_sim(e.sim.daily, p.currency) }}</span></li>
+                    <li class="pcard__line"><span class="pcard__label">Revenu total</span><span class="pcard__value">{{ format_sim(e.sim.revenue, p.currency) }}</span></li>
+                    {% endif %}
+                </ul>
             </div>
-        </div>
+        </article>
         {% endfor %}
     </div>
     {% else %}
