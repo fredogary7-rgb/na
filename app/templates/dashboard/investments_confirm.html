@@ -1,28 +1,57 @@
 {% extends "app_base.html" %}
 {% block title %}Confirmer l'investissement{% endblock %}
 {% block app_content %}
-<div class="page-head">
-    <a class="back-link" href="{{ url_for('investments.index') }}">← Retour</a>
-    <h1>Confirmer l'investissement</h1>
+
+<div class="inv-page-header">
+    <div class="inv-ph-left">
+        <span class="inv-ph-label">INVESTISSEMENT</span>
+        <h1 class="inv-ph-title">Confirmer l'investissement</h1>
+        <p class="inv-ph-sub">Vérifiez les détails du produit avant de valider votre souscription.</p>
+    </div>
+    <div class="inv-ph-right">
+        <a href="{{ url_for('investments.index') }}" class="inv-ph-cta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Mes produits
+        </a>
+    </div>
 </div>
 
-<div class="invest-confirm-card">
-    <div class="icc-bg" style="background-image:url('{{ url_for('static', filename='images/login-bg.jpg') }}')"></div>
-    <div class="icc-body">
-        <h2>{{ product.name }}</h2>
-        <div class="icc-price">{{ format_amount(product.min_amount, product.currency) }}</div>
-        <ul>
-            <li><span>Durée</span><strong>{{ product.duration_days }} jours</strong></li>
-            <li><span>Revenu quotidien</span><strong>{{ format_sim(sim.daily, product.currency) }}</strong></li>
-            <li><span>Revenu sur {{ product.duration_days }} jours</span><strong>+{{ format_sim(sim.revenue, product.currency) }}</strong></li>
-            <li><span>Total (capital + revenu)</span><strong>{{ format_sim(sim.total, product.currency) }}</strong></li>
-        </ul>
+{% set gradients = [
+    ('#059669', '#047857'),
+    ('#2563eb', '#1d4ed8'),
+    ('#7c3aed', '#6d28d9'),
+    ('#d97706', '#b45309'),
+    ('#0891b2', '#0e7490'),
+    ('#e11d48', '#be123c'),
+] %}
+{% set g = gradients[(product.id - 1) % 6] %}
+{% set emojis = ['🏦','💎','🚀','🏆','🌟','👑'] %}
+
+<div class="icf-card">
+    <div class="icf-banner" style="background:linear-gradient(135deg, {{ g[0] }}, {{ g[1] }})">
+        <span class="icf-banner__emoji">{{ emojis[(product.id - 1) % 6] }}</span>
+        <div>
+            <h2 class="icf-banner__name">{{ product.name }}</h2>
+            <span class="icf-banner__sub">Durée · {{ product.duration_days }} jours</span>
+        </div>
+    </div>
+    <div class="icf-body">
+        <div class="icf-price">{{ format_amount(product.min_amount, product.currency) }}</div>
+
+        <div class="icf-grid">
+            <div class="icf-cell"><span>Durée</span><strong>{{ product.duration_days }} jours</strong></div>
+            <div class="icf-cell"><span>Revenu / jour</span><strong>{{ format_sim(sim.daily, product.currency) }}</strong></div>
+            <div class="icf-cell"><span>Revenu {{ product.duration_days }} jours</span><strong class="gain">+{{ format_sim(sim.revenue, product.currency) }}</strong></div>
+            <div class="icf-cell"><span>Total (capital + revenu)</span><strong>{{ format_sim(sim.total, product.currency) }}</strong></div>
+        </div>
+
         {% if deposit_balance < product.min_amount %}
         <div class="alert alert-warning">
             Solde insuffisant : votre portefeuille dépôt contient {{ format_amount(deposit_balance, product.currency) }}.
             Il vous faut {{ format_amount(product.min_amount, product.currency) }} pour cet investissement.
         </div>
         {% endif %}
+
         <form method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-primary btn-block" {% if deposit_balance < product.min_amount %}disabled{% endif %}>Confirmer l'investissement</button>

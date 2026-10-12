@@ -45,12 +45,23 @@ def products():
     entries = []
     for p in catalog_products():
         entries.append({"product": p, "sim": simulation_for(p) if show_sim else None})
+
+    approved_entries = [e for e in entries if e["product"].status == "approved"]
+    approved_count = len(approved_entries)
+    starting_price = min((e["product"].min_amount for e in approved_entries), default=None)
+    standard_duration = entries[0]["product"].duration_days if entries else 90
+    catalog_currency = entries[0]["product"].currency if entries else "XOF"
+
     return render_template(
         "public/products.html",
         entries=entries,
         show_sim=show_sim,
         rate_percent=rate_percent,
         subs_enabled=subscriptions_enabled(),
+        approved_count=approved_count,
+        starting_price=starting_price,
+        standard_duration=standard_duration,
+        catalog_currency=catalog_currency,
     )
 
 

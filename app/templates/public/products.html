@@ -1,24 +1,48 @@
 {% extends "base.html" %}
 {% block title %}Produits{% endblock %}
 {% block body_class %}prd-body{% endblock %}
-{% block header %}{% endblock %}
 {% block content %}
-<section class="prd-hero">
-    <div class="prd-hero__inner">
-        <div class="prd-hero__copy">
-            <span class="prd-hero__badge">Nos produits</span>
-            <h1 class="prd-hero__title">Trouvez votre<br>prochain objectif</h1>
-            <p class="prd-hero__sub">Choisissez parmi nos solutions d'investissement et faites fructifier votre capital, en toute simplicité.</p>
+
+<section class="pcat-header">
+    <div class="pcat-header__inner">
+        <div class="pcat-header__copy">
+            <span class="pcat-header__label"><span class="pcat-header__dot"></span>Catalogue NAMARA</span>
+            <h1 class="pcat-header__title">Faites fructifier<br>votre <span class="accent">capital</span></h1>
+            <p class="pcat-header__sub">Choisissez un produit, suivez sa progression jour après jour et laissez votre capital travailler pour vous, en toute simplicité.</p>
         </div>
-        <div class="prd-hero__media">
-            <div class="prd-hero__frame">
-                <img class="prd-hero__img" src="{{ url_for('static', filename='images/login-bg.jpg') }}" alt="Produits d'investissement NAMARA">
+        <div class="pcat-stats">
+            <div class="pcat-stat">
+                <div class="pcat-stat__icon pcat-stat__icon--green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
+                </div>
+                <div class="pcat-stat__body">
+                    <span class="pcat-stat__label">Produits actifs</span>
+                    <strong class="pcat-stat__val">{{ approved_count }}</strong>
+                </div>
+            </div>
+            <div class="pcat-stat">
+                <div class="pcat-stat__icon pcat-stat__icon--blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="pcat-stat__body">
+                    <span class="pcat-stat__label">Durée</span>
+                    <strong class="pcat-stat__val">{{ standard_duration }} jours</strong>
+                </div>
+            </div>
+            <div class="pcat-stat">
+                <div class="pcat-stat__icon pcat-stat__icon--amber">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="pcat-stat__body">
+                    <span class="pcat-stat__label">À partir de</span>
+                    <strong class="pcat-stat__val">{{ format_amount(starting_price, catalog_currency) if starting_price is not none else '—' }}</strong>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<div class="container prd-page">
+<div class="container pcat-page">
 
     {% if not subs_enabled %}
     <div class="sim-warning">
@@ -28,62 +52,84 @@
     {% endif %}
 
     {% if entries %}
-    <div class="prd-grid">
-            {% for e in entries %}
-            {% set p = e.product %}
-            {% set disabled = (p.status != 'approved') %}
-            <article class="prd-card {{ 'prd-card--disabled' if disabled }}">
-                <div class="prd-card__top">
-                    <div class="prd-card__media">
-                        <img class="prd-card__img" src="{{ url_for('static', filename='images/login-bg.jpg') }}" alt="">
+    <div class="pcat-list">
+        {% for e in entries %}
+        {% set p = e.product %}
+        {% set disabled = (p.status != 'approved') %}
+        {% set gradients = [
+            ('#059669', '#047857'),
+            ('#2563eb', '#1d4ed8'),
+            ('#7c3aed', '#6d28d9'),
+            ('#d97706', '#b45309'),
+            ('#0891b2', '#0e7490'),
+            ('#e11d48', '#be123c'),
+        ] %}
+        {% set g = gradients[loop.index0 % 6] %}
+        {% set emojis = ['🏦','💎','🚀','🏆','🌟','👑'] %}
+        <article class="pcat-item {{ 'pcat-item--disabled' if disabled }}">
+            <div class="pcat-item__rail" style="background:linear-gradient(135deg, {{ g[0] }}, {{ g[1] }})">
+                <span class="pcat-item__emoji">{{ emojis[loop.index0 % 6] }}</span>
+            </div>
+            <div class="pcat-item__main">
+                <div class="pcat-item__head">
+                    <div class="pcat-item__head-left">
+                        <h3 class="pcat-item__name">{{ p.name }}</h3>
+                        <span class="pcat-item__ref">Durée · {{ p.duration_days }} jours</span>
                     </div>
-                    <div class="prd-card__identity">
-                        {% if disabled %}
-                            <span class="prd-badge prd-badge--soon">Bientôt disponible</span>
-                        {% else %}
-                            <span class="prd-badge prd-badge--ok">Disponible</span>
-                        {% endif %}
-                        <h3 class="prd-card__name">{{ p.name }}</h3>
-                    </div>
+                    {% if disabled %}
+                    <span class="pcat-item__badge pcat-item__badge--soon">Bientôt</span>
+                    {% else %}
+                    <span class="pcat-item__badge pcat-item__badge--ok">Disponible</span>
+                    {% endif %}
                 </div>
 
-                <div class="prd-card__price-row">
-                    <div class="prd-card__price">
-                        {% set _price = format_amount(p.min_amount, p.currency).rsplit(' ', 1) %}
-                        <span class="prd-card__amount">{{ _price[0] }}</span>
-                        <span class="prd-card__currency">{{ _price[1] }}</span>
-                    </div>
-                    <span class="prd-card__duration">{{ p.duration_days }} jours</span>
+                <div class="pcat-item__price">
+                    <span class="pcat-item__price-label">Mise de départ</span>
+                    <span class="pcat-item__price-val">{{ format_amount(p.min_amount, p.currency) }}</span>
                 </div>
 
                 {% if show_sim and e.sim %}
-                <div class="prd-card__stats">
-                    <div class="prd-card__stat">
-                        <span class="prd-card__stat-label">Revenu / jour</span>
-                        <span class="prd-card__stat-value">{{ format_sim(e.sim.daily, p.currency) }}</span>
+                <div class="pcat-item__stats">
+                    <div class="pcat-item__stat">
+                        <span class="pcat-item__stat-label">Revenu / jour</span>
+                        <span class="pcat-item__stat-val">{{ format_sim(e.sim.daily, p.currency) }}</span>
                     </div>
-                    <div class="prd-card__stat">
-                        <span class="prd-card__stat-label">Revenu {{ p.duration_days }} jours</span>
-                        <span class="prd-card__stat-value prd-card__stat-value--gain">+{{ format_sim(e.sim.revenue, p.currency) }}</span>
+                    <div class="pcat-item__stat">
+                        <span class="pcat-item__stat-label">Revenu {{ p.duration_days }} jours</span>
+                        <span class="pcat-item__stat-val pcat-item__stat-val--gain">+{{ format_sim(e.sim.revenue, p.currency) }}</span>
+                    </div>
+                    <div class="pcat-item__stat">
+                        <span class="pcat-item__stat-label">Total (capital + revenu)</span>
+                        <span class="pcat-item__stat-val">{{ format_sim(e.sim.total, p.currency) }}</span>
                     </div>
                 </div>
                 {% endif %}
 
-                <div class="prd-card__cta">
-                    {% if disabled %}
-                        <span class="prd-btn prd-btn--disabled" aria-disabled="true">Bientôt disponible</span>
-                    {% elif current_user.is_authenticated %}
-                        <a class="prd-btn prd-btn--primary" href="{{ url_for('investments.confirm', product_id=p.id) }}">Investir</a>
-                    {% else %}
-                        <a class="prd-btn prd-btn--primary" href="{{ url_for('auth.login', next=url_for('investments.confirm', product_id=p.id)) }}">Investir</a>
-                    {% endif %}
+                <div class="pcat-item__foot">
+                    <div class="pcat-item__meta">
+                        {% if show_sim %}Simulation indicative · sans capitalisation{% else %}Produit d'investissement NAMARA{% endif %}
+                    </div>
+                    <div class="pcat-item__cta">
+                        {% if disabled %}
+                            <span class="prd-btn prd-btn--disabled" aria-disabled="true">Bientôt disponible</span>
+                        {% elif current_user.is_authenticated %}
+                            <a class="prd-btn prd-btn--primary" href="{{ url_for('investments.confirm', product_id=p.id) }}">Investir</a>
+                        {% else %}
+                            <a class="prd-btn prd-btn--primary" href="{{ url_for('auth.login', next=url_for('investments.confirm', product_id=p.id)) }}">Investir</a>
+                        {% endif %}
+                    </div>
                 </div>
-            </article>
-            {% endfor %}
-        </div>
-        {% else %}
-        <p class="muted">Aucun produit n'est actuellement disponible.</p>
-        {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="inv-empty">
+        <div class="inv-empty-icon">🌱</div>
+        <h3>Aucun produit disponible</h3>
+        <p>Le catalogue sera bientôt mis à jour. Revenez dans quelques instants.</p>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 
