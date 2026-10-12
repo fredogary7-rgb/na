@@ -1,22 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Produits{% endblock %}
+{% block body_class %}prd-body{% endblock %}
 {% block header %}{% endblock %}
 {% block content %}
 <section class="prd-hero">
     <div class="prd-hero__inner">
         <div class="prd-hero__copy">
             <span class="prd-hero__badge">Nos produits</span>
-            <h1 class="prd-hero__title">Des produits pensés<br>pour votre avenir</h1>
-            <p class="prd-hero__sub">Investissez simplement dans des solutions conçues pour faire fructifier votre capital, avec transparence et sérénité.</p>
-            <a class="prd-hero__cta" href="#catalogue">
-                Explorer les produits
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </a>
+            <h1 class="prd-hero__title">Trouvez votre<br>prochain objectif</h1>
+            <p class="prd-hero__sub">Choisissez parmi nos solutions d'investissement et faites fructifier votre capital, en toute simplicité.</p>
         </div>
         <div class="prd-hero__media">
             <div class="prd-hero__frame">
-                <span class="prd-hero__shape prd-hero__shape--a" aria-hidden="true"></span>
-                <span class="prd-hero__shape prd-hero__shape--b" aria-hidden="true"></span>
                 <img class="prd-hero__img" src="{{ url_for('static', filename='images/login-bg.jpg') }}" alt="Produits d'investissement NAMARA">
             </div>
         </div>
@@ -25,61 +20,6 @@
 
 <div class="container prd-page">
 
-    {% if entries %}
-    {% set _amounts = entries | map(attribute='product') | map(attribute='min_amount') | list %}
-    {% set _durations = entries | map(attribute='product') | map(attribute='duration_days') | list %}
-    <div class="prd-stats">
-        <div class="prd-stat">
-            <span class="prd-stat__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>
-            </span>
-            <span class="prd-stat__body">
-                <span class="prd-stat__label">Produits</span>
-                <span class="prd-stat__value">{{ entries|length }}</span>
-            </span>
-        </div>
-        <div class="prd-stat">
-            <span class="prd-stat__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-            </span>
-            <span class="prd-stat__body">
-                <span class="prd-stat__label">À partir de</span>
-                <span class="prd-stat__value">{{ format_amount(_amounts|min, 'XOF') }}</span>
-            </span>
-        </div>
-        <div class="prd-stat">
-            <span class="prd-stat__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </span>
-            <span class="prd-stat__body">
-                <span class="prd-stat__label">Durées</span>
-                <span class="prd-stat__value">{{ _durations|min }}–{{ _durations|max }} jours</span>
-            </span>
-        </div>
-        {% if show_sim %}
-        <div class="prd-stat">
-            <span class="prd-stat__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-            </span>
-            <span class="prd-stat__body">
-                <span class="prd-stat__label">Revenu quotidien</span>
-                <span class="prd-stat__value">+{{ "%g"|format(rate_percent) }}%</span>
-            </span>
-        </div>
-        {% else %}
-        <div class="prd-stat">
-            <span class="prd-stat__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-            </span>
-            <span class="prd-stat__body">
-                <span class="prd-stat__label">Devise</span>
-                <span class="prd-stat__value">FCFA</span>
-            </span>
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
-
     {% if not subs_enabled %}
     <div class="sim-warning">
         <strong>Les souscriptions seront bientôt ouvertes.</strong>
@@ -87,14 +27,8 @@
     </div>
     {% endif %}
 
-    <section id="catalogue" class="prd-catalog">
-        <div class="prd-catalog__head">
-            <h2 class="prd-catalog__title">Découvrez nos produits</h2>
-            <p class="prd-catalog__sub">Choisissez le produit qui correspond à vos objectifs.</p>
-        </div>
-
-        {% if entries %}
-        <div class="prd-grid">
+    {% if entries %}
+    <div class="prd-grid">
             {% for e in entries %}
             {% set p = e.product %}
             {% set disabled = (p.status != 'approved') %}
@@ -112,32 +46,37 @@
                         <h3 class="prd-card__name">{{ p.name }}</h3>
                     </div>
                 </div>
-                <div class="prd-card__bottom">
-                    <div class="prd-card__facts">
-                        <div class="prd-fact">
-                            <span class="prd-fact__value">{{ p.duration_days }} jours</span>
-                            <span class="prd-fact__label">Durée</span>
-                        </div>
-                        <div class="prd-fact">
-                            <span class="prd-fact__value">{{ format_amount(p.min_amount, p.currency) }}</span>
-                            <span class="prd-fact__label">Prix du produit</span>
-                        </div>
-                        {% if show_sim and e.sim %}
-                        <div class="prd-fact">
-                            <span class="prd-fact__value">{{ format_sim(e.sim.daily, p.currency) }}</span>
-                            <span class="prd-fact__label">Revenu quotidien</span>
-                        </div>
-                        {% endif %}
+
+                <div class="prd-card__price-row">
+                    <div class="prd-card__price">
+                        {% set _price = format_amount(p.min_amount, p.currency).rsplit(' ', 1) %}
+                        <span class="prd-card__amount">{{ _price[0] }}</span>
+                        <span class="prd-card__currency">{{ _price[1] }}</span>
                     </div>
-                    <div class="prd-card__action">
-                        {% if disabled %}
-                            <span class="prd-btn prd-btn--disabled" aria-disabled="true">Bientôt disponible</span>
-                        {% elif current_user.is_authenticated %}
-                            <a class="prd-btn prd-btn--primary" href="{{ url_for('investments.confirm', product_id=p.id) }}">Investir</a>
-                        {% else %}
-                            <a class="prd-btn prd-btn--primary" href="{{ url_for('auth.login', next=url_for('investments.confirm', product_id=p.id)) }}">Investir</a>
-                        {% endif %}
+                    <span class="prd-card__duration">{{ p.duration_days }} jours</span>
+                </div>
+
+                {% if show_sim and e.sim %}
+                <div class="prd-card__stats">
+                    <div class="prd-card__stat">
+                        <span class="prd-card__stat-label">Revenu / jour</span>
+                        <span class="prd-card__stat-value">{{ format_sim(e.sim.daily, p.currency) }}</span>
                     </div>
+                    <div class="prd-card__stat">
+                        <span class="prd-card__stat-label">Revenu {{ p.duration_days }} jours</span>
+                        <span class="prd-card__stat-value prd-card__stat-value--gain">+{{ format_sim(e.sim.revenue, p.currency) }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="prd-card__cta">
+                    {% if disabled %}
+                        <span class="prd-btn prd-btn--disabled" aria-disabled="true">Bientôt disponible</span>
+                    {% elif current_user.is_authenticated %}
+                        <a class="prd-btn prd-btn--primary" href="{{ url_for('investments.confirm', product_id=p.id) }}">Investir</a>
+                    {% else %}
+                        <a class="prd-btn prd-btn--primary" href="{{ url_for('auth.login', next=url_for('investments.confirm', product_id=p.id)) }}">Investir</a>
+                    {% endif %}
                 </div>
             </article>
             {% endfor %}
@@ -145,7 +84,6 @@
         {% else %}
         <p class="muted">Aucun produit n'est actuellement disponible.</p>
         {% endif %}
-    </section>
 </div>
 {% endblock %}
 
