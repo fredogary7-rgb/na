@@ -4,21 +4,11 @@ from flask_wtf import FlaskForm
 from wtforms import BooleanField, PasswordField, SelectField, StringField
 from wtforms.validators import DataRequired, EqualTo, Length, ValidationError
 
-from app.constants import COUNTRIES, COUNTRY_FLAGS
+from app.constants import COUNTRIES
 
 
 def country_choices():
     return [(name, name) for name, info in COUNTRIES.items() if info["enabled"]]
-
-
-def login_country_choices():
-    """Choix de pays pour la connexion (drapeau + indicatif)."""
-    choices = [("", "🌍 Choisir un pays")]
-    for name, info in COUNTRIES.items():
-        if info["enabled"]:
-            flag = COUNTRY_FLAGS.get(name, "")
-            choices.append((name, f"{flag} {info['phone_code']}"))
-    return choices
 
 
 def normalize_phone(country: str, local_number: str) -> str:
@@ -54,7 +44,7 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    country = SelectField("Pays", choices=login_country_choices, default="")
+    country = SelectField("Pays", choices=country_choices, default="", validate_choice=False)
     phone_number = StringField("Numéro de téléphone", validators=[DataRequired()])
     password = PasswordField("Mot de passe", validators=[DataRequired()])
 
