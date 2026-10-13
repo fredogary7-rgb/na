@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}À propos{% endblock %}
+{% block content %}
+<div class="container narrow">
+    <div class="card">
+        <h2>À propos de {{ APP_NAME }}</h2>
+        <p class="muted">{{ APP_SLOGAN }}</p>
+        <p>{{ APP_NAME }} est une plateforme financière opérant en francs CFA (XOF / XAF). Elle permet de gérer ses fonds simplement et en toute sécurité : dépôts par Mobile Money, retraits, produits d'investissement et programme de parrainage.</p>
+
+        <h4>Notre mission</h4>
+        <p class="muted">Offrir à chacun un accès simple, transparent et sécurisé à des services financiers numériques adaptés aux réalités de l'Afrique de l'Ouest et centrale.</p>
+
+        <h4>Ce que nous proposons</h4>
+        <p><strong>Dépôts</strong> — rechargez votre compte via Mobile Money (MTN, Moov, Orange, Wave, Airtel…).</p>
+        <p><strong>Retraits</strong> — transférez vos fonds vers votre compte Mobile Money enregistré.</p>
+        <p><strong>Produits d'investissement</strong> — des placements à durée définie, suivis jour après jour.</p>
+        <p><strong>Parrainage</strong> — invitez vos proches et bénéficiez de commissions soumises à validation.</p>
+        <p><strong>Assistance</strong> — une équipe disponible sur le site et via Telegram.</p>
+
+        <h4>Sécurité &amp; conformité</h4>
+        <p class="muted">Vos portefeuilles sont séparés (dépôts, bonus, revenus, commissions, solde retirable) et votre téléphone est vérifié avant toute opération financière. Les produits et le parrainage ne sont activés qu'après validation réglementaire. {{ APP_NAME }} ne garantit aucun rendement.</p>
+    </div>
+</div>
+{% endblock %}

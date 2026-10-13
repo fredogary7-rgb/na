@@ -33,6 +33,12 @@ def index():
     return redirect(url_for("auth.login"))
 
 
+@public_bp.route("/about")
+def about():
+    """Page « À propos » présentant NAMARA."""
+    return render_template("public/about.html")
+
+
 @public_bp.route("/how-it-works")
 def how_it_works():
     return render_template("public/how_it_works.html")

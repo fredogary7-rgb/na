@@ -63,6 +63,12 @@
 </div>
 {% endif %}
 
+<div class="section-head"><h2>À propos</h2></div>
+<div class="card">
+    <p class="muted mb">Découvrez {{ APP_NAME }}, sa mission et ses valeurs.</p>
+    <a class="btn btn-outline btn-block" href="{{ url_for('public.about') }}">En savoir plus sur {{ APP_NAME }}</a>
+</div>
+
 <div class="section-head"><h2>Service client</h2></div>
 <div class="card">
     <p class="muted mb">Une question, un problème de mot de passe ou de compte ? Notre équipe est disponible :</p>
