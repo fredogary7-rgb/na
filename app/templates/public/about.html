@@ -1,24 +1,88 @@
 {% extends "base.html" %}
 {% block title %}À propos{% endblock %}
+{% block header %}
+<nav class="navbar">
+    <a class="brand" href="{{ url_for('public.index') }}">
+        <img src="{{ url_for('static', filename='images/namara.jpeg') }}" alt="Logo NAMARA">
+        <span>{{ APP_NAME }}<span class="dot">.</span></span>
+    </a>
+</nav>
+{% endblock %}
 {% block content %}
-<div class="container narrow">
-    <div class="card">
-        <h2>À propos de {{ APP_NAME }}</h2>
-        <p class="muted">{{ APP_SLOGAN }}</p>
-        <p>{{ APP_NAME }} est une plateforme financière opérant en francs CFA (XOF / XAF). Elle permet de gérer ses fonds simplement et en toute sécurité : dépôts par Mobile Money, retraits, produits d'investissement et programme de parrainage.</p>
 
-        <h4>Notre mission</h4>
-        <p class="muted">Offrir à chacun un accès simple, transparent et sécurisé à des services financiers numériques adaptés aux réalités de l'Afrique de l'Ouest et centrale.</p>
-
-        <h4>Ce que nous proposons</h4>
-        <p><strong>Dépôts</strong> — rechargez votre compte via Mobile Money (MTN, Moov, Orange, Wave, Airtel…).</p>
-        <p><strong>Retraits</strong> — transférez vos fonds vers votre compte Mobile Money enregistré.</p>
-        <p><strong>Produits d'investissement</strong> — des placements à durée définie, suivis jour après jour.</p>
-        <p><strong>Parrainage</strong> — invitez vos proches et bénéficiez de commissions soumises à validation.</p>
-        <p><strong>Assistance</strong> — une équipe disponible sur le site et via Telegram.</p>
-
-        <h4>Sécurité &amp; conformité</h4>
-        <p class="muted">Vos portefeuilles sont séparés (dépôts, bonus, revenus, commissions, solde retirable) et votre téléphone est vérifié avant toute opération financière. Les produits et le parrainage ne sont activés qu'après validation réglementaire. {{ APP_NAME }} ne garantit aucun rendement.</p>
+<section class="about-hero">
+    <div class="about-hero__inner">
+        <div class="about-hero__media">
+            <img src="{{ url_for('static', filename='images/namara.jpeg') }}" alt="Logo {{ APP_NAME }}">
+        </div>
+        <div class="about-hero__copy">
+            <span class="about-hero__badge">À propos de nous</span>
+            <h1 class="about-hero__title">{{ APP_NAME }}</h1>
+            <p class="about-hero__slogan">{{ APP_SLOGAN }}</p>
+            <p class="about-hero__desc">{{ APP_NAME }} est une plateforme financière opérant en francs CFA (XOF / XAF). Nous aidons chacun à gérer ses fonds simplement et en toute sécurité : dépôts, retraits, produits d'investissement et parrainage.</p>
+        </div>
     </div>
+</section>
+
+<div class="container about-page">
+
+    <section class="about-section">
+        <h2>Notre mission</h2>
+        <p>Offrir à chacun un accès simple, transparent et sécurisé à des services financiers numériques adaptés aux réalités de l'Afrique de l'Ouest et centrale.</p>
+    </section>
+
+    <section class="about-section">
+        <h2>Ce que nous proposons</h2>
+        <div class="about-grid">
+            <div class="about-card">
+                <div class="about-card__icon about-card__icon--green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </div>
+                <h3>Dépôts</h3>
+                <p>Rechargez votre compte via Mobile Money (MTN, Moov, Orange, Wave, Airtel…).</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card__icon about-card__icon--blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                </div>
+                <h3>Retraits</h3>
+                <p>Transférez vos fonds vers votre compte Mobile Money enregistré.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card__icon about-card__icon--amber">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                </div>
+                <h3>Produits d'investissement</h3>
+                <p>Des placements à durée définie, suivis jour après jour.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card__icon about-card__icon--violet">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <h3>Parrainage</h3>
+                <p>Invitez vos proches et bénéficiez de commissions soumises à validation.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card__icon about-card__icon--cyan">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <h3>Assistance</h3>
+                <p>Une équipe disponible sur le site et via Telegram.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card__icon about-card__icon--green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3>Sécurité</h3>
+                <p>Téléphone vérifié et portefeuilles séparés pour une gestion claire.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-security">
+        <h2>Sécurité &amp; conformité</h2>
+        <p>Vos portefeuilles sont séparés (dépôts, bonus, revenus, commissions, solde retirable) et votre téléphone est vérifié avant toute opération financière. Les produits d'investissement et le parrainage ne sont activés qu'après validation réglementaire. {{ APP_NAME }} ne garantit aucun rendement.</p>
+    </section>
+
 </div>
 {% endblock %}
