@@ -9,6 +9,7 @@ from app.extensions import csrf, db, limiter
 from app.models import SupportConversation
 from app.services import support
 from app.support import knowledge_base as kb
+from app.support import password_flow
 from app.support import telegram_handler
 
 support_bp = Blueprint("support", __name__)
@@ -72,31 +73,63 @@ def api_send_message():
     if conv is None:
         return jsonify({"error": "conversation introuvable"}), 404
 
+    buttons = []
+
+    # Option « modifier mon mot de passe » (flux de vérification d'identité).
+    if action == "password_change":
+        support.add_message(conv, "visitor", "Modifier mon mot de passe")
+        conv.category = "account"
+        reply = password_flow.start(conv)
+        bot_msg = support.add_message(conv, "bot", reply)
+        db.session.commit()
+        return jsonify({
+            "ok": True,
+            "reply": reply,
+            "buttons": [],
+            "reference": conv.public_reference,
+            "last_id": bot_msg.id,
+        })
+
     if action:
         result = kb.resolve_intent(action)
         if result is None:
             return jsonify({"error": "action inconnue"}), 400
         support.add_message(conv, "visitor", kb.BUTTON_LABELS.get(action, action))
+        reply = result["reply"]
+        if result["intent"] == "human":
+            reply += f"\n\nRéférence de votre demande : {conv.public_reference}"
+        conv.last_intent = result["intent"]
+        if result["category"]:
+            conv.category = result["category"]
+        buttons = result["buttons"]
     else:
         if len(text) > current_app.config.get("SUPPORT_MESSAGE_MAX_LENGTH", 2000):
             return jsonify({"error": "message trop long"}), 400
-        support.add_message(conv, "visitor", text)
-        result = kb.resolve(text, context=conv.last_intent)
-
-    reply = result["reply"]
-    if result["intent"] == "human":
-        reply += f"\n\nRéférence de votre demande : {conv.public_reference}"
+        if password_flow.is_active(conv):
+            # Les mots de passe saisis ne sont jamais journalisés.
+            support.add_message(
+                conv, "visitor",
+                password_flow.REDACTED if password_flow.is_sensitive_step(conv) else text,
+            )
+            reply = password_flow.handle(conv, text)
+        else:
+            support.add_message(conv, "visitor", text)
+            result = kb.resolve(text, context=conv.last_intent)
+            reply = result["reply"]
+            if result["intent"] == "human":
+                reply += f"\n\nRéférence de votre demande : {conv.public_reference}"
+            conv.last_intent = result["intent"]
+            if result["category"]:
+                conv.category = result["category"]
+            buttons = result["buttons"]
 
     bot_msg = support.add_message(conv, "bot", reply)
-    conv.last_intent = result["intent"]
-    if result["category"]:
-        conv.category = result["category"]
     db.session.commit()
 
     return jsonify({
         "ok": True,
         "reply": reply,
-        "buttons": kb.button_payload(result["buttons"]),
+        "buttons": kb.button_payload(buttons),
         "reference": conv.public_reference,
         "last_id": bot_msg.id,
     })

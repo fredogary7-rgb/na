@@ -6,19 +6,21 @@ from app.models import SupportConversation, SupportMessage
 from app.services import support
 from app.services.telegram import TelegramError, send_message
 from app.support import knowledge_base as kb
+from app.support import password_flow
 
 WELCOME = (
     "Bonjour et bienvenue chez NAMARA ! 🌿\n\n"
     "Comment pouvons-nous vous aider aujourd'hui ? Choisissez une catégorie "
     "ou écrivez directement votre question.\n\n"
-    "Commandes : /start /help /contact /status /cancel /privacy"
+    "Commandes : /start /help /contact /status /cancel /privacy /password"
 )
 
 HELP_TEXT = (
     "Catégories d'assistance :\n"
     "• Problème de compte\n• Dépôt\n• Retrait\n• Produits\n• Parrainage\n"
     "• Problème technique\n• Parler à un conseiller\n\n"
-    "Utilisez /contact pour parler à un conseiller, ou /status pour suivre une demande."
+    "Utilisez /contact pour parler à un conseiller, /status pour suivre une demande,\n"
+    "ou /password pour modifier votre mot de passe (avec vérification d'identité)."
 )
 
 PRIVACY_TEXT = (
@@ -35,6 +37,7 @@ CATEGORY_KEYBOARD = {
         [{"text": "Produits", "callback_data": "cat:products"},
          {"text": "Parrainage", "callback_data": "cat:referral"}],
         [{"text": "Problème technique", "callback_data": "cat:technical"}],
+        [{"text": "🔒 Modifier mon mot de passe", "callback_data": "pw:start"}],
         [{"text": "Parler à un conseiller", "callback_data": "cat:human"}],
     ]
 }
@@ -104,9 +107,13 @@ def _handle_command(chat_id, text):
             pass
     elif command == "/contact":
         _request_human(chat_id)
+    elif command == "/password":
+        _start_password_change(chat_id)
     elif command == "/status":
         _status(chat_id, arg)
     elif command == "/cancel":
+        conv = support.get_or_create_telegram_conversation(chat_id)
+        conv.last_intent = None
         try:
             send_message(chat_id, "Saisie annulée. Comment puis-je vous aider ?")
         except TelegramError:
@@ -162,8 +169,37 @@ def _request_human(chat_id):
         pass
 
 
+def _start_password_change(chat_id):
+    conv = support.get_or_create_telegram_conversation(
+        chat_id, category="account", subject="Modification du mot de passe"
+    )
+    support.add_message(conv, "visitor", "Modifier mon mot de passe")
+    reply = password_flow.start(conv)
+    support.add_message(conv, "bot", reply)
+    try:
+        send_message(chat_id, reply)
+    except TelegramError:
+        pass
+
+
 def _route_text(chat_id, text, update_id):
     conv = support.get_or_create_telegram_conversation(chat_id)
+
+    # Flux de modification du mot de passe (les mots de passe ne sont jamais journalisés).
+    if password_flow.is_active(conv):
+        support.add_message(
+            conv, "visitor",
+            password_flow.REDACTED if password_flow.is_sensitive_step(conv) else text,
+            telegram_update_id=update_id,
+        )
+        reply = password_flow.handle(conv, text)
+        support.add_message(conv, "bot", reply)
+        try:
+            send_message(chat_id, reply)
+        except TelegramError:
+            pass
+        return
+
     support.add_message(conv, "visitor", text, telegram_update_id=update_id)
 
     result = kb.resolve(text, context=conv.last_intent)
@@ -211,7 +247,9 @@ def _handle_callback(callback, update_id):
     data = callback.get("data", "")
     if not data:
         return
-    if data.startswith("intent:"):
+    if data in ("pw:start", "intent:password_change"):
+        _start_password_change(chat_id)
+    elif data.startswith("intent:"):
         _answer_intent(chat_id, data[7:], update_id)
     elif data.startswith("cat:"):
         category = data[4:]

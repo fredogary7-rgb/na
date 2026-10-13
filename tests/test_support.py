@@ -241,3 +241,77 @@ def test_web_chat_button_action(app, client, db):
     data = resp.get_json()
     assert "Retirer" in data["reply"]
     assert any(b["key"] == "withdrawal_pending" for b in data["buttons"])
+
+
+def test_password_change_flow_web(app, client, db):
+    user = make_user(db)
+    db.session.commit()
+    session_hash = "p" * 32
+    client.post("/support/api/conversation", json={"session_hash": session_hash})
+
+    # 1. Démarrage du flux.
+    r = client.post("/support/api/message", json={"session_hash": session_hash, "action": "password_change"})
+    assert "vérifier votre identité" in r.get_json()["reply"]
+
+    # 2. Numéro de téléphone (identification).
+    r = client.post("/support/api/message", json={"session_hash": session_hash, "text": "+22997000001"})
+    assert "mot de passe actuel" in r.get_json()["reply"]
+
+    # 3. Mauvais mot de passe.
+    r = client.post("/support/api/message", json={"session_hash": session_hash, "text": "mauvais"})
+    assert "incorrect" in r.get_json()["reply"]
+
+    # 4. Bon mot de passe (identité vérifiée).
+    r = client.post("/support/api/message", json={"session_hash": session_hash, "text": "password123"})
+    assert "nouveau mot de passe" in r.get_json()["reply"]
+
+    # 5. Nouveau mot de passe.
+    r = client.post("/support/api/message", json={"session_hash": session_hash, "text": "nouveaumdp123"})
+    assert "succès" in r.get_json()["reply"]
+
+    db.session.refresh(user)
+    assert user.check_password("nouveaumdp123")
+    assert not user.check_password("password123")
+
+    # Aucun mot de passe n'est stocké en clair dans l'historique.
+    conv = SupportConversation.query.filter_by(visitor_session_hash=session_hash).first()
+    all_text = " ".join(m.message_text or "" for m in conv.messages.all())
+    assert "password123" not in all_text
+    assert "nouveaumdp123" not in all_text
+
+
+def test_password_change_flow_telegram(app, client, db):
+    user = make_user(db)
+    db.session.commit()
+    app.config["TELEGRAM_WEBHOOK_SECRET"] = "bon-secret"
+    app.config["TELEGRAM_BOT_TOKEN"] = None
+
+    def send(text, update_id):
+        return client.post(
+            "/support/telegram/webhook",
+            json={"update_id": update_id, "message": {"chat": {"id": "888"}, "text": text}},
+            headers={"X-Telegram-Bot-Api-Secret-Token": "bon-secret"},
+        )
+
+    send("/password", 1)
+    send("+22997000001", 2)
+    send("mauvais", 3)
+    send("password123", 4)
+    send("nouveaumdp123", 5)
+
+    conv = SupportConversation.query.filter_by(channel="telegram", telegram_chat_id="888").first()
+    assert conv is not None
+    bot = [m.message_text or "" for m in conv.messages.filter_by(sender_type="bot").all()]
+    assert any("vérifier votre identité" in m for m in bot)
+    assert any("mot de passe actuel" in m for m in bot)
+    assert any("incorrect" in m for m in bot)
+    assert any("nouveau mot de passe" in m for m in bot)
+    assert any("succès" in m for m in bot)
+
+    db.session.refresh(user)
+    assert user.check_password("nouveaumdp123")
+    assert not user.check_password("password123")
+
+    all_text = " ".join(m.message_text or "" for m in conv.messages.all())
+    assert "password123" not in all_text
+    assert "nouveaumdp123" not in all_text
