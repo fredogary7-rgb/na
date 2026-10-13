@@ -13,7 +13,7 @@ def country_choices():
 
 def login_country_choices():
     """Choix de pays pour la connexion (drapeau + indicatif)."""
-    choices = [("", "🌍")]
+    choices = [("", "🌍 Choisir un pays")]
     for name, info in COUNTRIES.items():
         if info["enabled"]:
             flag = COUNTRY_FLAGS.get(name, "")
