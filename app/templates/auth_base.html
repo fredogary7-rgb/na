@@ -6,11 +6,10 @@
 
 {% block content %}
 <div class="auth-shell">
-    <div class="auth-brand">
-        <img src="{{ url_for('static', filename='images/namara.jpeg') }}" alt="Logo NAMARA">
-        <span class="auth-brand-name">{{ APP_NAME }}<span class="auth-brand-dot">.</span></span>
-    </div>
     <div class="auth-card">
+        <div class="auth-logo">
+            <img src="{{ url_for('static', filename='images/namara.jpeg') }}" alt="Logo NAMARA">
+        </div>
         {% block auth_content %}{% endblock %}
     </div>
 </div>
