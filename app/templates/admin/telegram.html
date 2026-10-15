@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Chaîne Telegram{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Chaîne Telegram</h2>
+    {% include "admin/_nav.html" %}
+
+    <div class="card mb">
+        <p class="muted mb">Chaîne configurée : <strong>{{ channel_id or 'non configurée' }}</strong></p>
+        <form method="post" action="{{ url_for('admin.telegram_info') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary">Envoyer le message « Fonctionnement »</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Envoyer une annonce</h3>
+        <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.message.label }}
+                {{ form.message(rows="4", placeholder="Votre message…") }}
+                {% for e in form.message.errors %}<span class="error">{{ e }}</span>{% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary">Envoyer à la chaîne</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

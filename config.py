@@ -84,6 +84,7 @@ class Config:
     TELEGRAM_WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET")
     TELEGRAM_WEBHOOK_URL = os.environ.get("TELEGRAM_WEBHOOK_URL")
     TELEGRAM_ADMIN_CHAT_ID = os.environ.get("TELEGRAM_ADMIN_CHAT_ID")
+    TELEGRAM_CHANNEL_ID = os.environ.get("TELEGRAM_CHANNEL_ID", "@namara_win")
     TELEGRAM_MODE = os.environ.get("TELEGRAM_MODE", "off")  # off / webhook / polling
     SUPPORT_ATTACHMENT_MAX_BYTES = int(os.environ.get("SUPPORT_ATTACHMENT_MAX_BYTES", "2000000"))
     SUPPORT_MESSAGE_MAX_LENGTH = int(os.environ.get("SUPPORT_MESSAGE_MAX_LENGTH", "2000"))

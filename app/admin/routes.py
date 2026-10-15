@@ -1,7 +1,7 @@
 """Espace administrateur : accès restreint au rôle admin, journalisé."""
 from functools import wraps
 
-from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, FloatField, IntegerField, SelectField, StringField, TextAreaField
@@ -21,7 +21,7 @@ from app.models import (
 from app.payments import service as payments
 from app.models.base import utcnow
 from app.services import support as support_service
-from app.services.telegram import TelegramError, send_message
+from app.services.telegram import TelegramError, send_channel_info, send_channel_message, send_message
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -242,6 +242,49 @@ def settings():
     form.simulation_show.data = settings_service.get_bool("SIMULATION_SHOW_AMOUNTS", True)
     form.simulation_daily_rate.data = settings_service.get_float("SIMULATION_DAILY_RATE", 0.08) * 100.0
     return render_template("admin/settings.html", form=form)
+
+
+# ---------------------------------------------------------------------------
+# Chaîne Telegram (diffusions / annonces)
+# ---------------------------------------------------------------------------
+class ChannelMessageForm(FlaskForm):
+    message = TextAreaField("Message", validators=[DataRequired()])
+
+
+@admin_bp.route("/telegram", methods=["GET", "POST"])
+@login_required
+@admin_required
+def telegram():
+    form = ChannelMessageForm()
+    if form.validate_on_submit():
+        text = (form.message.data or "").strip()
+        try:
+            send_channel_message(text)
+            _audit("telegram_channel_message", "telegram", None, details=text[:200])
+            db.session.commit()
+            flash("Message envoyé à la chaîne Telegram.", "success")
+        except TelegramError as exc:
+            flash(f"Erreur d'envoi : {exc}", "danger")
+        return redirect(url_for("admin.telegram"))
+    return render_template(
+        "admin/telegram.html",
+        form=form,
+        channel_id=current_app.config.get("TELEGRAM_CHANNEL_ID"),
+    )
+
+
+@admin_bp.route("/telegram/info", methods=["POST"])
+@login_required
+@admin_required
+def telegram_info():
+    try:
+        send_channel_info()
+        _audit("telegram_channel_info", "telegram", None)
+        db.session.commit()
+        flash("Message « Fonctionnement » (logo + infos) envoyé à la chaîne.", "success")
+    except TelegramError as exc:
+        flash(f"Erreur d'envoi : {exc}", "danger")
+    return redirect(url_for("admin.telegram"))
 
 
 # ---------------------------------------------------------------------------

@@ -205,6 +205,33 @@ def register_cli(app):
                     click.echo(f"Erreur réseau : {exc}")
                     time.sleep(5)
 
+    @app.cli.command("telegram-broadcast")
+    @click.argument("text")
+    def telegram_broadcast(text):
+        """Envoie un message vers la chaîne Telegram (TELEGRAM_CHANNEL_ID)."""
+        from app.services import telegram
+
+        with app.app_context():
+            try:
+                telegram.send_channel_message(text)
+                click.echo("Message envoyé à la chaîne Telegram.")
+            except Exception as exc:  # noqa: BLE001
+                click.echo(f"Erreur : {exc}")
+
+    @app.cli.command("telegram-info")
+    def telegram_info():
+        """Envoie un message « fonctionnement de la plateforme » à la chaîne Telegram."""
+        from app.services import telegram
+
+        with app.app_context():
+            app_name = app.jinja_env.globals.get("APP_NAME", "NAMARA")
+            app_slogan = app.jinja_env.globals.get("APP_SLOGAN", "Votre capital, une vision d'avenir.")
+            try:
+                telegram.send_channel_info(app_name, app_slogan)
+                click.echo("Message d'information (logo + infos) envoyé à la chaîne Telegram.")
+            except Exception as exc:  # noqa: BLE001
+                click.echo(f"Erreur : {exc}")
+
     @app.cli.command("seed-faq")
     def seed_faq():
         """Insère les FAQ de support par défaut (si la table est vide)."""

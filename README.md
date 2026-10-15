@@ -215,6 +215,7 @@ traitée depuis l'espace administrateur (`Admin → Service client`).
 | `TELEGRAM_WEBHOOK_SECRET` | Secret d'en-tête du webhook (chaîne aléatoire). |
 | `TELEGRAM_WEBHOOK_URL` | URL HTTPS publique du webhook (`https://namara.win/support/telegram/webhook`). |
 | `TELEGRAM_ADMIN_CHAT_ID` | (Optionnel) chat_id pour les alertes d'assistance. |
+| `TELEGRAM_CHANNEL_ID` | (Optionnel) chat_id de la chaîne pour les diffusions (annonces / infos). |
 | `TELEGRAM_MODE` | `off` (désactivé), `webhook` (production) ou `polling` (développement). |
 | `SUPPORT_ATTACHMENT_MAX_BYTES` | Taille max d'une pièce jointe (défaut 2 000 000). |
 | `SUPPORT_MESSAGE_MAX_LENGTH` | Longueur max d'un message (défaut 2 000). |
