@@ -29,6 +29,12 @@ class Config:
         "DATABASE_URL", "sqlite:///" + os.path.join(BASE_DIR, "namara_dev.db")
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Connexions PostgreSQL : pré-vérification + recyclage pour éviter les
+    # connexions coupées par Neon/proxy après une période d'inactivité.
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 280,
+    }
 
     # Sessions / cookies sécurisés
     SESSION_COOKIE_HTTPONLY = True
