@@ -17,7 +17,7 @@
     </form>
     <div class="card table-wrap">
         <table>
-            <thead><tr><th>ID</th><th>Nom</th><th>Téléphone</th><th>Pays</th><th>Devise</th><th>Rôle</th><th>Statut</th></tr></thead>
+            <thead><tr><th>ID</th><th>Nom</th><th>Téléphone</th><th>Pays</th><th>Devise</th><th>Solde</th><th>Rôle</th><th>Statut</th><th>Actions</th></tr></thead>
             <tbody>
             {% for u in users %}
                 <tr>
@@ -26,11 +26,32 @@
                     <td>{{ u.phone_number }}</td>
                     <td>{{ u.country }}</td>
                     <td>{{ u.currency }}</td>
+                    <td>{{ format_amount(balances.get(u.id, 0), u.currency) }}</td>
                     <td>{{ u.role }}</td>
                     <td>{{ u.status }}</td>
+                    <td>
+                        <div class="user-actions">
+                            <form method="post" action="{{ url_for('admin.user_credit', uid=u.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="number" name="amount" min="1" placeholder="Montant" required>
+                                <button type="submit" class="btn btn-sm btn-primary">Créditer</button>
+                            </form>
+                            <form method="post" action="{{ url_for('admin.user_debit', uid=u.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="number" name="amount" min="1" placeholder="Montant" required>
+                                <button type="submit" class="btn btn-sm btn-outline">Débiter</button>
+                            </form>
+                            {% if u.id != current_user.id and not u.is_admin %}
+                            <form method="post" action="{{ url_for('admin.user_delete', uid=u.id) }}" onsubmit="return confirm('Supprimer définitivement cet utilisateur ?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
                 </tr>
             {% else %}
-                <tr><td colspan="7" class="muted">Aucun utilisateur.</td></tr>
+                <tr><td colspan="9" class="muted">Aucun utilisateur.</td></tr>
             {% endfor %}
             </tbody>
         </table>

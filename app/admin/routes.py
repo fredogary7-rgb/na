@@ -7,20 +7,30 @@ from flask_wtf import FlaskForm
 from wtforms import BooleanField, FloatField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 
+from app.constants import WALLET_DEPOSIT
 from app.extensions import db
 from app.models import (
     AuditLog,
+    Card,
     Deposit,
+    Investment,
+    InvestmentAccrual,
     InvestmentProduct,
+    LedgerEntry,
+    Notification,
     PaymentEvent,
+    ReferralCommission,
+    ReferralRelationship,
     SupportConversation,
     SupportMessage,
     User,
+    Wallet,
     Withdrawal,
 )
 from app.payments import service as payments
 from app.models.base import utcnow
-from app.services import support as support_service
+from app.services import finance, support as support_service
+from app.utils import parse_amount
 from app.services.telegram import TelegramError, send_channel_info, send_channel_message, send_message
 
 admin_bp = Blueprint("admin", __name__)
@@ -80,7 +90,126 @@ def users():
     if country:
         query = query.filter_by(country=country)
     users_list = query.order_by(User.created_at.desc()).limit(200).all()
-    return render_template("admin/users.html", users=users_list, q=q, country=country)
+    balances = {u.id: finance.get_balance(u.id, u.currency, WALLET_DEPOSIT) for u in users_list}
+    return render_template("admin/users.html", users=users_list, q=q, country=country, balances=balances)
+
+
+def _hard_delete_user(user):
+    """Supprime un utilisateur et toutes ses données associées (cascade manuelle)."""
+    uid = user.id
+
+    # Liens auto-référentiels / nullable -> NULL
+    User.query.filter_by(referrer_id=uid).update({"referrer_id": None}, synchronize_session=False)
+    AuditLog.query.filter_by(admin_id=uid).update({"admin_id": None}, synchronize_session=False)
+    SupportConversation.query.filter_by(assigned_admin_id=uid).update(
+        {"assigned_admin_id": None}, synchronize_session=False
+    )
+
+    # Conversations de support (+ messages)
+    conv_ids = [c.id for c in SupportConversation.query.filter_by(user_id=uid).all()]
+    if conv_ids:
+        SupportMessage.query.filter(
+            SupportMessage.conversation_id.in_(conv_ids)
+        ).delete(synchronize_session=False)
+    SupportConversation.query.filter_by(user_id=uid).delete(synchronize_session=False)
+
+    # Investissements (+ régularisations)
+    inv_ids = [i.id for i in Investment.query.filter_by(user_id=uid).all()]
+    if inv_ids:
+        InvestmentAccrual.query.filter(
+            InvestmentAccrual.investment_id.in_(inv_ids)
+        ).delete(synchronize_session=False)
+    Investment.query.filter_by(user_id=uid).delete(synchronize_session=False)
+
+    # Données liées
+    Card.query.filter_by(user_id=uid).delete(synchronize_session=False)
+    Notification.query.filter_by(user_id=uid).delete(synchronize_session=False)
+    Deposit.query.filter_by(user_id=uid).delete(synchronize_session=False)
+    Withdrawal.query.filter_by(user_id=uid).delete(synchronize_session=False)
+    LedgerEntry.query.filter_by(user_id=uid).delete(synchronize_session=False)
+    ReferralRelationship.query.filter(
+        (ReferralRelationship.referrer_id == uid) | (ReferralRelationship.referred_id == uid)
+    ).delete(synchronize_session=False)
+    ReferralCommission.query.filter(
+        (ReferralCommission.referrer_id == uid) | (ReferralCommission.referred_id == uid)
+    ).delete(synchronize_session=False)
+    Wallet.query.filter_by(user_id=uid).delete(synchronize_session=False)
+
+    db.session.delete(user)
+
+
+@admin_bp.route("/users/<int:uid>/credit", methods=["POST"])
+@login_required
+@admin_required
+def user_credit(uid):
+    user = db.session.get(User, uid)
+    if user is None:
+        abort(404)
+    amount = parse_amount(request.form.get("amount"))
+    if amount <= 0:
+        flash("Montant invalide.", "danger")
+        return redirect(url_for("admin.users"))
+    try:
+        finance.credit(
+            user.id, user.currency, WALLET_DEPOSIT, amount,
+            "admin_credit", "admin", description="Crédit manuel administrateur",
+        )
+        _audit("user_credit", "user", uid, details=str(amount))
+        db.session.commit()
+        flash(f"Crédit de {amount} {user.currency} effectué.", "success")
+    except ValueError as exc:
+        db.session.rollback()
+        flash(f"Erreur : {exc}", "danger")
+    return redirect(url_for("admin.users"))
+
+
+@admin_bp.route("/users/<int:uid>/debit", methods=["POST"])
+@login_required
+@admin_required
+def user_debit(uid):
+    user = db.session.get(User, uid)
+    if user is None:
+        abort(404)
+    amount = parse_amount(request.form.get("amount"))
+    if amount <= 0:
+        flash("Montant invalide.", "danger")
+        return redirect(url_for("admin.users"))
+    try:
+        finance.debit(
+            user.id, user.currency, WALLET_DEPOSIT, amount,
+            "admin_debit", "admin", description="Débit manuel administrateur",
+        )
+        _audit("user_debit", "user", uid, details=str(amount))
+        db.session.commit()
+        flash(f"Débit de {amount} {user.currency} effectué.", "success")
+    except finance.FinancialError as exc:
+        db.session.rollback()
+        flash(f"Erreur : {exc}", "danger")
+    return redirect(url_for("admin.users"))
+
+
+@admin_bp.route("/users/<int:uid>/delete", methods=["POST"])
+@login_required
+@admin_required
+def user_delete(uid):
+    user = db.session.get(User, uid)
+    if user is None:
+        abort(404)
+    if user.id == current_user.id:
+        flash("Vous ne pouvez pas supprimer votre propre compte.", "danger")
+        return redirect(url_for("admin.users"))
+    if user.is_admin:
+        flash("Impossible de supprimer un administrateur.", "danger")
+        return redirect(url_for("admin.users"))
+    try:
+        _hard_delete_user(user)
+        _audit("user_delete", "user", uid, details=user.phone_number)
+        db.session.commit()
+        flash("Utilisateur supprimé.", "success")
+    except Exception:  # noqa: BLE001
+        db.session.rollback()
+        flash("Erreur lors de la suppression.", "danger")
+    return redirect(url_for("admin.users"))
 
 
 @admin_bp.route("/deposits")

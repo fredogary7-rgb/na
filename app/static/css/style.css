@@ -2379,6 +2379,14 @@ body.namara-modal-open { overflow: hidden; }
     .cfm-panel { animation: cfmFadeUp 0.4s ease 0.1s backwards; }
 }
 
+/* ============================================================
+   ADMIN — actions sur les utilisateurs (crédit / débit / suppression)
+   ============================================================ */
+.user-actions { display: flex; flex-direction: column; gap: 0.35rem; min-width: 230px; }
+.user-actions form { display: flex; gap: 0.35rem; align-items: center; margin: 0; }
+.user-actions input[type="number"] { width: 90px; padding: 0.4rem 0.55rem; font-size: 0.85rem; }
+.user-actions .btn { white-space: nowrap; }
+
 
 
 
