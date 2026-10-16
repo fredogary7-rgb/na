@@ -7,7 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import BooleanField, FloatField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 
-from app.constants import WALLET_DEPOSIT
+from app.constants import WALLET_DEPOSIT, WALLET_WITHDRAWABLE
 from app.extensions import db
 from app.models import (
     AuditLog,
@@ -90,8 +90,18 @@ def users():
     if country:
         query = query.filter_by(country=country)
     users_list = query.order_by(User.created_at.desc()).limit(200).all()
-    balances = {u.id: finance.get_balance(u.id, u.currency, WALLET_DEPOSIT) for u in users_list}
-    return render_template("admin/users.html", users=users_list, q=q, country=country, balances=balances)
+    deposit_balances = {u.id: finance.get_balance(u.id, u.currency, WALLET_DEPOSIT) for u in users_list}
+    withdrawable_balances = {
+        u.id: finance.get_balance(u.id, u.currency, WALLET_WITHDRAWABLE) for u in users_list
+    }
+    return render_template(
+        "admin/users.html",
+        users=users_list,
+        q=q,
+        country=country,
+        deposit_balances=deposit_balances,
+        withdrawable_balances=withdrawable_balances,
+    )
 
 
 def _hard_delete_user(user):
@@ -145,16 +155,20 @@ def user_credit(uid):
     user = db.session.get(User, uid)
     if user is None:
         abort(404)
+    wallet_type = request.form.get("wallet_type") or WALLET_DEPOSIT
+    if wallet_type not in (WALLET_DEPOSIT, WALLET_WITHDRAWABLE):
+        flash("Type de solde invalide.", "danger")
+        return redirect(url_for("admin.users"))
     amount = parse_amount(request.form.get("amount"))
     if amount <= 0:
         flash("Montant invalide.", "danger")
         return redirect(url_for("admin.users"))
     try:
         finance.credit(
-            user.id, user.currency, WALLET_DEPOSIT, amount,
-            "admin_credit", "admin", description="Crédit manuel administrateur",
+            user.id, user.currency, wallet_type, amount,
+            "admin_credit", "admin", description=f"Crédit manuel administrateur ({wallet_type})",
         )
-        _audit("user_credit", "user", uid, details=str(amount))
+        _audit("user_credit", "user", uid, details=f"{wallet_type}:{amount}")
         db.session.commit()
         flash(f"Crédit de {amount} {user.currency} effectué.", "success")
     except ValueError as exc:
@@ -170,16 +184,20 @@ def user_debit(uid):
     user = db.session.get(User, uid)
     if user is None:
         abort(404)
+    wallet_type = request.form.get("wallet_type") or WALLET_DEPOSIT
+    if wallet_type not in (WALLET_DEPOSIT, WALLET_WITHDRAWABLE):
+        flash("Type de solde invalide.", "danger")
+        return redirect(url_for("admin.users"))
     amount = parse_amount(request.form.get("amount"))
     if amount <= 0:
         flash("Montant invalide.", "danger")
         return redirect(url_for("admin.users"))
     try:
         finance.debit(
-            user.id, user.currency, WALLET_DEPOSIT, amount,
-            "admin_debit", "admin", description="Débit manuel administrateur",
+            user.id, user.currency, wallet_type, amount,
+            "admin_debit", "admin", description=f"Débit manuel administrateur ({wallet_type})",
         )
-        _audit("user_debit", "user", uid, details=str(amount))
+        _audit("user_debit", "user", uid, details=f"{wallet_type}:{amount}")
         db.session.commit()
         flash(f"Débit de {amount} {user.currency} effectué.", "success")
     except finance.FinancialError as exc:

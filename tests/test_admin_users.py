@@ -1,5 +1,5 @@
 """Tests des actions admin sur les utilisateurs (crédit / débit / suppression)."""
-from app.constants import WALLET_DEPOSIT
+from app.constants import WALLET_DEPOSIT, WALLET_WITHDRAWABLE
 from app.extensions import db
 from app.models import User
 from app.services import finance
@@ -64,4 +64,18 @@ def test_non_admin_cannot_credit(app, client, db):
 
     resp = client.post(f"/admin/users/{user.id}/credit", data={"amount": "5000"})
     assert resp.status_code == 403
+    assert finance.get_balance(user.id, "XOF", WALLET_DEPOSIT) == 0
+
+
+def test_admin_can_credit_withdrawable_wallet(app, client, db):
+    _admin_login(client, db)
+    user = make_user(db)
+    db.session.commit()
+
+    client.post(
+        f"/admin/users/{user.id}/credit",
+        data={"wallet_type": "withdrawable", "amount": "2000"},
+        follow_redirects=True,
+    )
+    assert finance.get_balance(user.id, "XOF", WALLET_WITHDRAWABLE) == 2000
     assert finance.get_balance(user.id, "XOF", WALLET_DEPOSIT) == 0
