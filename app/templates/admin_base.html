@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block header %}
+<nav class="navbar">
+    <a class="brand" href="{{ url_for('admin.index') }}">
+        <img src="{{ url_for('static', filename='images/namara.jpeg') }}" alt="Logo NAMARA">
+        <span>{{ APP_NAME }}<span class="dot">.</span></span>
+    </a>
+</nav>
+{% endblock %}
