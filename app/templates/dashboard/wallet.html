@@ -7,56 +7,51 @@
     <p class="muted">Chaque solde est séparé. Ils ne sont jamais additionnés en une somme retirable.</p>
 </div>
 
-<div class="list-card">
-    <div class="list-item">
-        <div class="ico">
+<section class="wallet-hero">
+    <div class="wallet-hero__inner">
+        <div class="wallet-hero__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
-        <div class="grow">
-            <div class="t">Solde retirable</div>
-            <div class="s">Fonds disponibles pour retrait</div>
+        <div class="wallet-hero__body">
+            <span class="wallet-hero__label">Solde retirable</span>
+            <span class="wallet-hero__amount">{{ format_amount(balances.withdrawable, current_user.currency) }}</span>
+            <span class="wallet-hero__sub">Fonds disponibles pour retrait</span>
         </div>
-        <div class="amt">{{ format_amount(balances.withdrawable, current_user.currency) }}</div>
     </div>
-    <div class="list-item">
-        <div class="ico">
+</section>
+
+<div class="wallet-grid">
+    <div class="wallet-card wallet-card--blue">
+        <div class="wallet-card__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
         </div>
-        <div class="grow">
-            <div class="t">Dépôts</div>
-            <div class="s">Capital déposé (non retirable directement)</div>
-        </div>
-        <div class="amt">{{ format_amount(balances.deposit, current_user.currency) }}</div>
+        <span class="wallet-card__label">Dépôts</span>
+        <span class="wallet-card__amount">{{ format_amount(balances.deposit, current_user.currency) }}</span>
+        <span class="wallet-card__sub">Capital déposé (non retirable directement)</span>
     </div>
-    <div class="list-item">
-        <div class="ico">
+    <div class="wallet-card wallet-card--amber">
+        <div class="wallet-card__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v8H4v-8"/><rect x="2" y="4" width="20" height="8" rx="2"/></svg>
         </div>
-        <div class="grow">
-            <div class="t">Bonus</div>
-            <div class="s">Bonus promotionnel (non retirable)</div>
-        </div>
-        <div class="amt">{{ format_amount(balances.bonus, current_user.currency) }}</div>
+        <span class="wallet-card__label">Bonus</span>
+        <span class="wallet-card__amount">{{ format_amount(balances.bonus, current_user.currency) }}</span>
+        <span class="wallet-card__sub">Bonus promotionnel (non retirable)</span>
     </div>
-    <div class="list-item">
-        <div class="ico">
+    <div class="wallet-card wallet-card--green">
+        <div class="wallet-card__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
         </div>
-        <div class="grow">
-            <div class="t">Revenus validés</div>
-            <div class="s">Revenus d'investissement réalisés</div>
-        </div>
-        <div class="amt">{{ format_amount(balances.earnings, current_user.currency) }}</div>
+        <span class="wallet-card__label">Revenus validés</span>
+        <span class="wallet-card__amount">{{ format_amount(balances.earnings, current_user.currency) }}</span>
+        <span class="wallet-card__sub">Revenus d'investissement réalisés</span>
     </div>
-    <div class="list-item">
-        <div class="ico">
+    <div class="wallet-card wallet-card--violet">
+        <div class="wallet-card__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-        <div class="grow">
-            <div class="t">Commissions parrainage</div>
-            <div class="s">Commissions confirmées</div>
-        </div>
-        <div class="amt">{{ format_amount(balances.referral, current_user.currency) }}</div>
+        <span class="wallet-card__label">Commissions parrainage</span>
+        <span class="wallet-card__amount">{{ format_amount(balances.referral, current_user.currency) }}</span>
+        <span class="wallet-card__sub">Commissions confirmées</span>
     </div>
 </div>
 
