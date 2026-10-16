@@ -23,6 +23,10 @@
         {{ form.password(placeholder="••••••••") }}
         {% for e in form.password.errors %}<span class="error">{{ e }}</span>{% endfor %}
     </div>
+    <div class="form-group checkbox">
+        {{ form.remember() }}
+        <label for="remember">Se souvenir de moi</label>
+    </div>
     <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
 </form>
 <div class="auth-footer-link">

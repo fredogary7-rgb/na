@@ -47,6 +47,7 @@ class LoginForm(FlaskForm):
     country = SelectField("Pays", choices=country_choices, default="", validate_choice=False)
     phone_number = StringField("Numéro de téléphone", validators=[DataRequired()])
     password = PasswordField("Mot de passe", validators=[DataRequired()])
+    remember = BooleanField("Se souvenir de moi")
 
 
 class ForgotPasswordForm(FlaskForm):

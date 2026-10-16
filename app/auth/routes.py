@@ -140,7 +140,7 @@ def login():
             flash("Compte suspendu. Contactez l'assistance.", "danger")
             return render_template("auth/login.html", form=form, next_page=next_page)
 
-        login_user(user)
+        login_user(user, remember=form.remember.data)
         return redirect(next_page or url_for("dashboard.index"))
 
     return render_template("auth/login.html", form=form, next_page=next_page)
