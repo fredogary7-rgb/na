@@ -1,6 +1,6 @@
 """Pages publiques de NAMARA."""
 from flask import Blueprint, jsonify, redirect, render_template, url_for
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from app.extensions import db
 from app.services.investment import (
@@ -97,6 +97,7 @@ def bonus_terms():
 
 
 @public_bp.route("/referral-terms")
+@login_required
 def referral_terms():
     return render_template("public/referral_terms.html")
 

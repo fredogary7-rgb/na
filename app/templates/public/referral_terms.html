@@ -1,16 +1,16 @@
-{% extends "base.html" %}
+{% extends "app_base.html" %}
 {% block title %}Conditions du parrainage{% endblock %}
-{% block content %}
-<div class="container narrow">
-    <div class="card">
-        <h2>Conditions du parrainage</h2>
-        <p class="muted">Le programme de parrainage est désactivé tant que sa conformité réglementaire n'est pas validée.</p>
-        <h4>Structure</h4>
-        <p class="muted">Trois niveaux sont prévus (12 %, 3 %, 2 %), configurables et soumis à validation.</p>
-        <h4>Base de calcul</h4>
-        <p class="muted">Les commissions ne sont jamais versées pour le simple recrutement. Elles se rattachent à une opération économique qualifiée (ex. dépôt confirmé).</p>
-        <h4>Interdictions</h4>
-        <p class="muted">Auto-parrainage, références circulaires et cumul de la même commission sont interdits.</p>
-    </div>
+{% block app_content %}
+<div class="page-head">
+    <h1>Conditions du parrainage</h1>
+</div>
+<div class="card">
+    <p class="muted">Le programme de parrainage est désactivé tant que sa conformité réglementaire n'est pas validée.</p>
+    <h4>Structure</h4>
+    <p class="muted">Trois niveaux sont prévus (12 %, 3 %, 2 %), configurables et soumis à validation.</p>
+    <h4>Base de calcul</h4>
+    <p class="muted">Les commissions ne sont jamais versées pour le simple recrutement. Elles se rattachent à une opération économique qualifiée (ex. dépôt confirmé).</p>
+    <h4>Interdictions</h4>
+    <p class="muted">Auto-parrainage, références circulaires et cumul de la même commission sont interdits.</p>
 </div>
 {% endblock %}
