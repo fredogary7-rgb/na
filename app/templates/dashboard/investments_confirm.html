@@ -43,7 +43,7 @@
             </li>
             <li class="cfm-detail">
                 <span class="cfm-detail__label">Revenu {{ product.duration_days }} jours</span>
-                <span class="cfm-detail__value cfm-detail__value--gain">+{{ format_sim(sim.revenue, product.currency) }}</span>
+                <span class="cfm-detail__value cfm-detail__value--gain">{{ format_sim(sim.revenue, product.currency) }}</span>
             </li>
             <li class="cfm-detail">
                 <span class="cfm-detail__label">Total (capital + revenu)</span>
