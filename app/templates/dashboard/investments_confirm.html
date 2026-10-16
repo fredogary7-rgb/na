@@ -2,39 +2,54 @@
 {% block title %}Confirmer l'investissement{% endblock %}
 {% block app_content %}
 
-<div class="inv-page-header">
-    <div class="inv-ph-left">
-        <span class="inv-ph-label">INVESTISSEMENT</span>
-        <h1 class="inv-ph-title">Confirmer l'investissement</h1>
-        <p class="inv-ph-sub">Vérifiez les détails du produit avant de valider votre souscription.</p>
-    </div>
-    <div class="inv-ph-right">
-        <a href="{{ url_for('investments.index') }}" class="inv-ph-cta">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-            Mes produits
-        </a>
-    </div>
-</div>
+<header class="cfm-head">
+    <a class="cfm-back" href="{{ url_for('investments.index') }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Retour
+    </a>
+    <h1 class="cfm-title">Confirmer mon investissement</h1>
+    <p class="cfm-sub">Vérifiez les informations de votre produit avant de continuer.</p>
+</header>
 
-<div class="icf-card">
-    <div class="icf-banner">
-        <span class="icf-banner__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
-        </span>
-        <div>
-            <h2 class="icf-banner__name">{{ product.name }}</h2>
-            <span class="icf-banner__sub">Durée · {{ product.duration_days }} jours</span>
-        </div>
-    </div>
-    <div class="icf-body">
-        <div class="icf-price">{{ format_amount(product.min_amount, product.currency) }}</div>
+<div class="cfm-layout">
 
-        <div class="icf-grid">
-            <div class="icf-cell"><span>Durée</span><strong>{{ product.duration_days }} jours</strong></div>
-            <div class="icf-cell"><span>Revenu / jour</span><strong>{{ format_sim(sim.daily, product.currency) }}</strong></div>
-            <div class="icf-cell"><span>Revenu {{ product.duration_days }} jours</span><strong class="gain">+{{ format_sim(sim.revenue, product.currency) }}</strong></div>
-            <div class="icf-cell"><span>Total (capital + revenu)</span><strong>{{ format_sim(sim.total, product.currency) }}</strong></div>
+    <section class="cfm-product">
+        <div class="cfm-product__media">
+            <img src="{{ url_for('static', filename='images/login-bg.jpg') }}" alt="{{ product.name }}">
         </div>
+        <div class="cfm-product__info">
+            <div class="cfm-product__head">
+                <h2 class="cfm-product__name">{{ product.name }}</h2>
+                <span class="cfm-badge">Disponible</span>
+            </div>
+            <span class="cfm-product__meta">Durée · {{ product.duration_days }} jours</span>
+        </div>
+    </section>
+
+    <section class="cfm-panel">
+        <div class="cfm-price-box">
+            <span class="cfm-price-box__label">Prix du produit</span>
+            <span class="cfm-price-box__value">{{ format_amount(product.min_amount, product.currency) }}</span>
+        </div>
+
+        <ul class="cfm-details">
+            <li class="cfm-detail">
+                <span class="cfm-detail__label">Durée</span>
+                <span class="cfm-detail__value">{{ product.duration_days }} jours</span>
+            </li>
+            <li class="cfm-detail">
+                <span class="cfm-detail__label">Revenu / jour</span>
+                <span class="cfm-detail__value">{{ format_sim(sim.daily, product.currency) }}</span>
+            </li>
+            <li class="cfm-detail">
+                <span class="cfm-detail__label">Revenu {{ product.duration_days }} jours</span>
+                <span class="cfm-detail__value cfm-detail__value--gain">+{{ format_sim(sim.revenue, product.currency) }}</span>
+            </li>
+            <li class="cfm-detail">
+                <span class="cfm-detail__label">Total (capital + revenu)</span>
+                <span class="cfm-detail__value">{{ format_sim(sim.total, product.currency) }}</span>
+            </li>
+        </ul>
 
         {% if deposit_balance < product.min_amount %}
         <div class="alert alert-warning">
@@ -43,11 +58,12 @@
         </div>
         {% endif %}
 
-        <form method="post">
+        <form method="post" class="cfm-actions">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn btn-primary btn-block" {% if deposit_balance < product.min_amount %}disabled{% endif %}>Confirmer l'investissement</button>
+            <button type="submit" class="cfm-btn cfm-btn--primary" {% if deposit_balance < product.min_amount %}disabled{% endif %}>Confirmer l'investissement</button>
         </form>
-        <a href="{{ url_for('investments.index') }}" class="btn btn-outline btn-block mt">Annuler</a>
-    </div>
+        <a href="{{ url_for('investments.index') }}" class="cfm-btn cfm-btn--ghost">Annuler</a>
+    </section>
+
 </div>
 {% endblock %}
