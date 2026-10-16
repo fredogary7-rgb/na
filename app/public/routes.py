@@ -45,6 +45,7 @@ def how_it_works():
 
 
 @public_bp.route("/products")
+@login_required
 def products():
     show_sim = simulation_enabled()
     rate_percent = simulation_daily_rate() * 100

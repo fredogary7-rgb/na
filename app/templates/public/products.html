@@ -1,21 +1,10 @@
-{% extends "base.html" %}
+{% extends "app_base.html" %}
 {% block title %}Produits{% endblock %}
-{% block body_class %}prd-body{% endblock %}
-{% block header %}
-<nav class="navbar">
-    <a class="brand" href="{{ url_for('public.index') }}">
-        <img src="{{ url_for('static', filename='images/namara.jpeg') }}" alt="Logo NAMARA">
-        <span>{{ APP_NAME }}<span class="dot">.</span></span>
-    </a>
-</nav>
-{% endblock %}
-{% block content %}
-
-<div class="container prd-page">
-    <div class="prd-head">
-        <h1 class="prd-head__title">Nos produits</h1>
-        <p class="prd-head__sub">Choisissez un produit et investissez en toute simplicité.</p>
-    </div>
+{% block app_content %}
+<div class="prd-head">
+    <h1 class="prd-head__title">Nos produits</h1>
+    <p class="prd-head__sub">Choisissez un produit et investissez en toute simplicité.</p>
+</div>
 
     {% if not subs_enabled %}
     <div class="sim-warning">
@@ -64,7 +53,6 @@
         <p>Le catalogue sera bientôt mis à jour. Revenez dans quelques instants.</p>
     </div>
     {% endif %}
-</div>
 {% endblock %}
 
 

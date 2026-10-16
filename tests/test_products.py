@@ -136,6 +136,9 @@ def test_no_simulated_income_credited(app, db):
 # ---------------------------------------------------------------------------
 def test_products_page_renders(app, client, db):
     _seed(app, db)
+    make_user(db)
+    db.session.commit()
+    login(client)
     resp = client.get("/products")
     assert resp.status_code == 200
     html = resp.get_data(as_text=True)
@@ -149,6 +152,9 @@ def test_products_page_renders(app, client, db):
 
 def test_products_page_no_footer(app, client, db):
     _seed(app, db)
+    make_user(db)
+    db.session.commit()
+    login(client)
     html = client.get("/products").get_data(as_text=True)
     assert "Informations légales" not in html
     assert "ne prétend pas être agréée" not in html
@@ -157,6 +163,9 @@ def test_products_page_no_footer(app, client, db):
 def test_simulation_display_can_be_disabled(app, client, db):
     app.config["SIMULATION_SHOW_AMOUNTS"] = False
     _seed(app, db)
+    make_user(db)
+    db.session.commit()
+    login(client)
     html = client.get("/products").get_data(as_text=True)
     assert "240 FCFA" not in html
 
