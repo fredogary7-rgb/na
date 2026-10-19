@@ -15,12 +15,14 @@ def _forward_webhook(req):
 
     Le corps brut et l'en-tête x-private-key sont renvoyés tels quels, afin
     que le second site puisse vérifier la signature SoleasPay lui-même.
+    Retourne un libellé de statut pour les logs.
     """
     target = current_app.config.get("TRANSFRIK_WEBHOOK_URL")
     if not target:
-        return
+        current_app.logger.info("WEBHOOK FORWARD skipped : TRANSFRIK_WEBHOOK_URL non défini")
+        return "skipped"
     try:
-        requests.post(
+        resp = requests.post(
             target,
             data=req.get_data(),
             headers={
@@ -29,8 +31,13 @@ def _forward_webhook(req):
             },
             timeout=10,
         )
+        current_app.logger.info(
+            "WEBHOOK FORWARDED | target=%s | http=%s", target, resp.status_code
+        )
+        return f"ok({resp.status_code})"
     except requests.RequestException:
-        current_app.logger.exception("Échec de la transmission du webhook vers le second site.")
+        current_app.logger.exception("WEBHOOK FORWARD FAILED | target=%s", target)
+        return "failed"
 
 
 @payments_bp.route("/webhook/<provider_name>", methods=["POST"])
@@ -38,15 +45,33 @@ def _forward_webhook(req):
 def webhook(provider_name):
     provider = service.get_provider()
     if provider.name != provider_name:
+        current_app.logger.warning("WEBHOOK PROVIDER INCONNU : %s", provider_name)
         return jsonify({"error": "provider_not_found"}), 404
+
+    raw = request.get_data()
+    current_app.logger.info(
+        "WEBHOOK RECEIVED | provider=%s | x-private-key=%s | body=%s",
+        provider_name,
+        request.headers.get("x-private-key", ""),
+        raw.decode("utf-8", errors="replace")[:2000],
+    )
+
     try:
         result = service.process_deposit_webhook(provider, request)
         db.session.commit()
-        _forward_webhook(request)
+        forward = _forward_webhook(request)
+        current_app.logger.info(
+            "WEBHOOK PROCESSED | provider=%s | result=%s | forward=%s",
+            provider_name,
+            result,
+            forward,
+        )
         return jsonify({"status": "ok", "result": result}), 200
     except ProviderError as exc:
         db.session.rollback()
+        current_app.logger.warning("WEBHOOK REJECTED | provider=%s | reason=%s", provider_name, exc)
         return jsonify({"error": str(exc)}), 400
     except Exception:
         db.session.rollback()
+        current_app.logger.exception("WEBHOOK ERROR | provider=%s", provider_name)
         raise
