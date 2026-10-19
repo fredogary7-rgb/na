@@ -94,18 +94,38 @@ class SoleasPayProvider(BaseProvider):
         }
 
     def verify_signature(self, request):
-        """Vérifie l'en-tête x-private-key = SHA-512(secret)."""
+        """Vérifie l'en-tête x-private-key = SHA-512(secret).
+
+        Accepte plusieurs secrets (principal + SOLEASPAY_EXTRA_SECRETS séparés
+        par des virgules) afin de tolérer une rotation de la clé webhook sans
+        rejeter les paiements en cours de transition.
+        """
         supplied = request.headers.get("x-private-key")
         if not supplied:
             return False
-        secret = (
+        secrets = self._webhook_secrets()
+        if not secrets:
+            return False
+        supplied = supplied.lower()
+        for secret in secrets:
+            expected = hashlib.sha512(secret.encode()).hexdigest()
+            if hmac.compare_digest(supplied, expected.lower()):
+                return True
+        return False
+
+    def _webhook_secrets(self):
+        """Liste des secrets webhook acceptés (principal + supplémentaires)."""
+        secrets = []
+        primary = (
             current_app.config.get("SOLEASPAY_WEBHOOK_SECRET")
             or current_app.config.get("SOLEASPAY_API_SECRET")
         )
-        if not secret:
-            return False
-        expected = hashlib.sha512(secret.encode()).hexdigest()
-        return hmac.compare_digest(supplied.lower(), expected.lower())
+        if primary:
+            secrets.append(primary)
+        extra = current_app.config.get("SOLEASPAY_EXTRA_SECRETS")
+        if extra:
+            secrets.extend(s.strip() for s in str(extra).split(",") if s.strip())
+        return secrets
 
     # --- helpers HTTP ---
     def _post(self, path, json=None, headers=None):

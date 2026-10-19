@@ -84,6 +84,9 @@ class Config:
     SOLEASPAY_API_SECRET = os.environ.get("SOLEASPAY_API_SECRET")
     SOLEASPAY_BASE_URL = os.environ.get("SOLEASPAY_BASE_URL", "https://soleaspay.com")
     SOLEASPAY_WEBHOOK_SECRET = os.environ.get("SOLEASPAY_WEBHOOK_SECRET")
+    # Secrets webhook supplémentaires acceptés (séparés par des virgules), pour
+    # assurer la transition lors d'une rotation de la clé sans casser les paiements.
+    SOLEASPAY_EXTRA_SECRETS = os.environ.get("SOLEASPAY_EXTRA_SECRETS", "")
     # Second site qui doit recevoir les mêmes webhooks SoleasPay (ex. transafrik.org).
     TRANSFRIK_WEBHOOK_URL = os.environ.get("TRANSFRIK_WEBHOOK_URL", "https://transafrik.org/webhook/soleaspay")
 

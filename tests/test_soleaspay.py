@@ -51,6 +51,29 @@ def test_soleaspay_verify_signature(app):
         assert p.verify_signature(ReqBad()) is False
 
 
+def test_soleaspay_verify_signature_extra_secrets(app):
+    p = SoleasPayProvider()
+    with app.app_context():
+        app.config["SOLEASPAY_WEBHOOK_SECRET"] = "secret-nouveau"
+        app.config["SOLEASPAY_EXTRA_SECRETS"] = "secret-ancien, autre-secret"
+
+        new_expected = hashlib.sha512(b"secret-nouveau").hexdigest()
+        old_expected = hashlib.sha512(b"secret-ancien").hexdigest()
+
+        class ReqNew:
+            headers = {"x-private-key": new_expected}
+
+        class ReqOld:
+            headers = {"x-private-key": old_expected}
+
+        class ReqBad:
+            headers = {"x-private-key": "mauvais"}
+
+        assert p.verify_signature(ReqNew()) is True
+        assert p.verify_signature(ReqOld()) is True
+        assert p.verify_signature(ReqBad()) is False
+
+
 def test_soleaspay_initiate_deposit(app, db, monkeypatch):
     import requests
 
