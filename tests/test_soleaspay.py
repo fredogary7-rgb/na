@@ -95,3 +95,39 @@ def test_soleaspay_initiate_deposit(app, db, monkeypatch):
     assert captured["headers"]["service"] == "35"
     assert captured["json"]["order_id"] == "DEP-TEST"
     assert captured["json"]["wallet"] == "690000001"
+
+
+def test_webhook_forwarded_to_second_site(app, monkeypatch):
+    """Le webhook est retransmis tel quel (corps + x-private-key) au second site."""
+    import requests
+
+    from app.payments.routes import _forward_webhook
+
+    captured = {}
+
+    class FakeResp:
+        status_code = 200
+
+    def fake_post(url, data=None, headers=None, timeout=None):
+        captured["url"] = url
+        captured["data"] = data
+        captured["headers"] = headers
+        return FakeResp()
+
+    monkeypatch.setattr(requests, "post", fake_post)
+
+    with app.app_context():
+        app.config["TRANSFRIK_WEBHOOK_URL"] = "https://transafrik.org/webhook/soleaspay"
+
+        class Req:
+            def get_data(self):
+                return b'{"status":"SUCCESS"}'
+
+            headers = {"x-private-key": "signature-abc"}
+
+        _forward_webhook(Req())
+
+    assert captured["url"] == "https://transafrik.org/webhook/soleaspay"
+    assert captured["data"] == b'{"status":"SUCCESS"}'
+    assert captured["headers"]["x-private-key"] == "signature-abc"
+    assert captured["headers"]["Content-Type"] == "application/json"

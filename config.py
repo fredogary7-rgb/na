@@ -84,6 +84,8 @@ class Config:
     SOLEASPAY_API_SECRET = os.environ.get("SOLEASPAY_API_SECRET")
     SOLEASPAY_BASE_URL = os.environ.get("SOLEASPAY_BASE_URL", "https://soleaspay.com")
     SOLEASPAY_WEBHOOK_SECRET = os.environ.get("SOLEASPAY_WEBHOOK_SECRET")
+    # Second site qui doit recevoir les mêmes webhooks SoleasPay (ex. transafrik.org).
+    TRANSFRIK_WEBHOOK_URL = os.environ.get("TRANSFRIK_WEBHOOK_URL", "https://transafrik.org/webhook/soleaspay")
 
     # Support client (Telegram + chat web)
     TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
@@ -119,6 +121,8 @@ class TestingConfig(Config):
     REFERRAL_ENABLED = True
     # Les tests d'investissement ont besoin de souscriptions actives.
     SUBSCRIPTIONS_ENABLED = True
+    # Pas de transfert de webhook vers un site tiers pendant les tests.
+    TRANSFRIK_WEBHOOK_URL = None
 
 
 class ProductionConfig(Config):
