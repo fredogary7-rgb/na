@@ -63,7 +63,14 @@ class SoleasPayProvider(BaseProvider):
             "description": "Dépôt NAMARA",
             "payer": "Client NAMARA",
         }
+        current_app.logger.info(
+            "SOLEASPAY PAY IN | url=%s | headers=%s | body=%s",
+            self.base_url + "/api/agent/bills/v3",
+            headers,
+            payload,
+        )
         data = self._post("/api/agent/bills/v3", json=payload, headers=headers)
+        current_app.logger.info("SOLEASPAY PAY IN RESPONSE | %s", data)
         info = data.get("data") or {}
         deposit.external_ref = info.get("reference")  # payId SoleasPay
         deposit.status = "processing"
