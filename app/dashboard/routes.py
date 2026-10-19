@@ -19,6 +19,7 @@ from app.models import (
     Withdrawal,
 )
 from app.payments import service as payments
+from app.payments.providers.base import ProviderError
 from app.notifications.service import notify
 from app.services import finance, referral as referral_service, settings
 from app.utils import currency_for_country, operators_for_country, parse_amount
@@ -156,7 +157,7 @@ def deposits():
             db.session.commit()
             flash("Demande de dépôt enregistrée. En attente de confirmation du prestataire.", "info")
             return redirect(url_for("dashboard.deposits"))
-        except ValueError as exc:
+        except (ValueError, ProviderError) as exc:
             db.session.rollback()
             flash(str(exc), "danger")
 
