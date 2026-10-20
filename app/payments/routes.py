@@ -59,7 +59,8 @@ def webhook(provider_name):
     try:
         result = service.process_deposit_webhook(provider, request)
         db.session.commit()
-        forward = _forward_webhook(request)
+        # Le transfert vers un second site ne concerne que l'ancien provider SoleasPay.
+        forward = _forward_webhook(request) if provider.name == "soleaspay" else "skipped"
         current_app.logger.info(
             "WEBHOOK PROCESSED | provider=%s | result=%s | forward=%s",
             provider_name,
