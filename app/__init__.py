@@ -264,6 +264,8 @@ def register_cli(app):
 
 
 def configure_logging(app):
+    if app.logger.handlers:
+        return  # déjà configuré — évite les logs en double
     handler = logging.StreamHandler()
     handler.setFormatter(
         logging.Formatter("[%(asctime)s] %(levelname)s in %(module)s: %(message)s")
