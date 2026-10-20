@@ -107,6 +107,7 @@ def test_drimpay_initiate_deposit(app, monkeypatch):
     assert result["external_ref"] == "TG-ABC123"
     assert deposit.status == "processing"
     assert captured["headers"]["Authorization"] == "Bearer dp_live_sk_test"
+    assert captured["url"] == "https://drimpay.com/api/v2/payin/initiate"
     assert captured["json"]["order_id"] == "DEP-TEST"
     assert captured["json"]["country_code"] == "TG"
     assert captured["json"]["operator"] == "tmoney"

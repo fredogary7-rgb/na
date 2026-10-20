@@ -269,4 +269,5 @@ def configure_logging(app):
         logging.Formatter("[%(asctime)s] %(levelname)s in %(module)s: %(message)s")
     )
     app.logger.addHandler(handler)
+    app.logger.propagate = False
     app.logger.setLevel(logging.INFO)

@@ -1,9 +1,10 @@
 """Fournisseur DrimPay v2 (intégration réelle Mobile Money).
 
 Documentation : https://drimpay.com/fr/docs/payin
-- Collecte (Pay-In) : POST /v2/payin/initiate
+Base URL live : https://drimpay.com/api/v2 (le préfixe /v2 est déjà inclus).
+- Collecte (Pay-In) : POST /payin/initiate
   Headers : Authorization: Bearer <dp_live_sk_...>
-- Vérification : GET /v2/payin/{reference}
+- Vérification : GET /payin/{reference}
 - Webhook : header X-DrimPay-Signature = t=<ts>,v1=<HMAC-SHA256>
   HMAC_SHA256(key=DRIMPAY_WEBHOOK_SECRET, data="{timestamp}.{raw_body}")
 """
@@ -85,10 +86,10 @@ class DrimPayProvider(BaseProvider):
         }
         current_app.logger.info(
             "DRIMPAY PAY IN | url=%s | body=%s",
-            self.base_url + "/v2/payin/initiate",
+            self.base_url + "/payin/initiate",
             payload,
         )
-        data = self._post("/v2/payin/initiate", json=payload, headers=headers)
+        data = self._post("/payin/initiate", json=payload, headers=headers)
         current_app.logger.info("DRIMPAY PAY IN RESPONSE | %s", data)
 
         deposit.external_ref = data.get("reference")
@@ -97,7 +98,7 @@ class DrimPayProvider(BaseProvider):
 
     def verify_status(self, external_ref, order_id=None):
         headers = {"Authorization": f"Bearer {self.api_key}"}
-        data = self._get(f"/v2/payin/{external_ref}", headers=headers)
+        data = self._get(f"/payin/{external_ref}", headers=headers)
         return self.normalize_status(data.get("status"))
 
     def process_webhook(self, payload):
