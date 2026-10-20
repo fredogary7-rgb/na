@@ -17,6 +17,10 @@ def get_provider():
         from app.payments.providers.soleaspay import SoleasPayProvider
 
         return SoleasPayProvider()
+    if mode == "drimpay":
+        from app.payments.providers.drimpay import DrimPayProvider
+
+        return DrimPayProvider()
     from app.payments.providers.mock import MockProvider
 
     return MockProvider()

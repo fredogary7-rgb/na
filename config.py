@@ -90,6 +90,14 @@ class Config:
     # Second site qui doit recevoir les mêmes webhooks SoleasPay (ex. transafrik.org).
     TRANSFRIK_WEBHOOK_URL = os.environ.get("TRANSFRIK_WEBHOOK_URL", "https://transafrik.org/webhook/soleaspay")
 
+    # DrimPay v2 — https://drimpay.com/fr/docs/payin
+    DRIMPAY_API_KEY = os.environ.get("DRIMPAY_API_KEY")
+    DRIMPAY_WEBHOOK_SECRET = os.environ.get("DRIMPAY_WEBHOOK_SECRET")
+    DRIMPAY_BASE_URL = os.environ.get("DRIMPAY_BASE_URL", "https://drimpay.com/api/v2")
+    DRIMPAY_SANDBOX_BASE_URL = os.environ.get("DRIMPAY_SANDBOX_BASE_URL", "https://drimpay.com/sandbox-api/v2")
+    # URL de notification DrimPay (renseignée à l'initiation du pay-in).
+    DRIMPAY_WEBHOOK_URL = os.environ.get("DRIMPAY_WEBHOOK_URL", "https://namara.win/payments/webhook/drimpay")
+
     # Support client (Telegram + chat web)
     TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
     TELEGRAM_WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET")
