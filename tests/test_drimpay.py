@@ -111,5 +111,5 @@ def test_drimpay_initiate_deposit(app, monkeypatch):
     assert captured["json"]["order_id"] == "DEP-TEST"
     assert captured["json"]["country_code"] == "TG"
     assert captured["json"]["operator"] == "tmoney"
-    assert captured["json"]["phone"] == "+22890000000"
+    assert captured["json"]["phone"] == "90000000"
     assert captured["json"]["webhook_url"] == "https://namara.win/payments/webhook/drimpay"

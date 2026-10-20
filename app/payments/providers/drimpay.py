@@ -70,7 +70,7 @@ class DrimPayProvider(BaseProvider):
             "currency": deposit.currency,
             "country_code": self._country_code(deposit.country),
             "operator": self._operator_slug(deposit.operator),
-            "phone": self._e164(deposit.country, deposit.phone_number),
+            "phone": self._phone(deposit.phone_number),
             "order_id": deposit.reference,
             "description": "Dépôt NAMARA",
         }
@@ -154,24 +154,20 @@ class DrimPayProvider(BaseProvider):
         return cls.OPERATOR_SLUG.get(str(operator), str(operator).lower())
 
     @staticmethod
-    def _e164(country, phone):
-        phone = str(phone or "").strip()
-        if phone.startswith("+"):
-            return phone
-        digits = "".join(ch for ch in phone if ch.isdigit())
-        code = COUNTRIES.get(country, {}).get("phone_code", "")
-        return f"{code}{digits}"
+    def _phone(phone):
+        # DrimPay attend le numéro local sans indicatif (ex. 71339325 au Togo).
+        return str(phone or "").strip()
 
     def _post(self, path, json=None, headers=None):
         try:
-            resp = requests.post(self.base_url + path, json=json, headers=headers, timeout=15)
+            resp = requests.post(self.base_url + path, json=json, headers=headers, timeout=30)
         except requests.RequestException as exc:
             raise ProviderError(f"Erreur réseau DrimPay : {exc}")
         return self._parse(resp)
 
     def _get(self, path, headers=None):
         try:
-            resp = requests.get(self.base_url + path, headers=headers, timeout=15)
+            resp = requests.get(self.base_url + path, headers=headers, timeout=30)
         except requests.RequestException as exc:
             raise ProviderError(f"Erreur réseau DrimPay : {exc}")
         return self._parse(resp)
@@ -182,6 +178,7 @@ class DrimPayProvider(BaseProvider):
         except ValueError:
             raise ProviderError(f"Réponse DrimPay invalide (HTTP {resp.status_code}).")
         if not (200 <= resp.status_code < 300):
+            current_app.logger.warning("DRIMPAY ERROR | http=%s | body=%s", resp.status_code, data)
             raise ProviderError(f"DrimPay : {data.get('message') or data.get('error') or 'opération refusée'}")
         return data
 

@@ -159,6 +159,7 @@ def deposits():
             return redirect(url_for("dashboard.deposits"))
         except (ValueError, ProviderError) as exc:
             db.session.rollback()
+            current_app.logger.warning("DÉPÔT ÉCHOUÉ | reason=%s", exc)
             flash(str(exc), "danger")
 
     history = (
