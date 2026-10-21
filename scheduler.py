@@ -52,6 +52,17 @@ def run_channel_message():
             app.logger.exception("Erreur lors de l'envoi du message à la chaîne.")
 
 
+def run_announcement():
+    from app.services import telegram
+
+    with app.app_context():
+        try:
+            telegram.send_announcement()
+            app.logger.info("telegram-announcement : annonce envoyée à la chaîne.")
+        except Exception:
+            app.logger.exception("Erreur lors de l'envoi de l'annonce.")
+
+
 if __name__ == "__main__":
     # Rattrape un éventuel jour manqué au démarrage (idempotent).
     run_payout()
@@ -67,5 +78,8 @@ if __name__ == "__main__":
             id=f"channel_message_{hour}",
         )
         app.logger.info("Message chaîne programmé à %02d:00 (%s).", hour, CHANNEL_TZ)
+
+    scheduler.add_job(run_announcement, CronTrigger(minute=0), id="announcement")
+    app.logger.info("Annonce programmée à chaque heure (minute 0).")
 
     scheduler.start()

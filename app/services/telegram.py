@@ -120,6 +120,43 @@ def platform_info_text(app_name="NAMARA", app_slogan="Votre capital, une vision 
     return "\n".join(lines)
 
 
+def announcement_text():
+    """Message d'annonce officielle du lancement NAMARA INVESTMENTS."""
+    return """🚀✨ OFFICIEL : NAMARA INVESTMENTS ARRIVE ! ✨🚀
+
+🌿 Votre capital, une vision d'avenir. 💚💛
+
+Une nouvelle aventure se prépare… et vous êtes invités à en faire partie ! 🎉
+
+📅 Rendez-vous ce mercredi 21 octobre 2026
+⏰ À partir de 7h00
+
+🔥 NAMARA INVESTMENTS vous ouvre ses portes ! Préparez-vous à découvrir notre plateforme, nos offres et une nouvelle vision de l'investissement.
+
+🌍 Pays éligibles : 🇳🇪 Niger • 🇧🇯 Bénin • 🇹🇬 Togo • 🇨🇮 Côte d'Ivoire • 🇨🇲 Cameroun • 🇬🇦 Gabon • 🇨🇬 Congo • 🇸🇳 Sénégal • 🇲🇱 Mali • 🇧🇫 Burkina Faso.
+
+💎 Le compte à rebours est lancé ! Partagez cette annonce avec vos amis, vos proches et tous ceux qui souhaitent découvrir NAMARA.
+
+📢 Soyez au rendez-vous dès 7h00 et restez connectés pour ne rien manquer du lancement !
+
+NAMARA INVESTMENTS 🌱
+Ensemble vers votre liberté financière.
+
+#NAMARA #NamaraInvestments #GrandLancement #Afrique #Investissement
+https://namara.win/register
+https://t.me/namara_win"""
+
+
+def announcement_photo_path():
+    """Chemin de l'image d'annonce (pro.png)."""
+    return os.path.join(current_app.static_folder, "images", "pro.png")
+
+
+def send_announcement():
+    """Envoie l'annonce officielle (image + texte) à la chaîne Telegram."""
+    return send_channel_photo(announcement_photo_path(), caption=announcement_text())
+
+
 def set_webhook(url, secret_token=None):
     payload = {"url": url}
     if secret_token:

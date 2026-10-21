@@ -232,6 +232,18 @@ def register_cli(app):
             except Exception as exc:  # noqa: BLE001
                 click.echo(f"Erreur : {exc}")
 
+    @app.cli.command("telegram-announcement")
+    def telegram_announcement():
+        """Envoie l'annonce officielle (image + texte) à la chaîne Telegram."""
+        from app.services import telegram
+
+        with app.app_context():
+            try:
+                telegram.send_announcement()
+                click.echo("Annonce envoyée à la chaîne Telegram.")
+            except Exception as exc:  # noqa: BLE001
+                click.echo(f"Erreur : {exc}")
+
     @app.cli.command("seed-faq")
     def seed_faq():
         """Insère les FAQ de support par défaut (si la table est vide)."""
