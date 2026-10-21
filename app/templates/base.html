@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{% block title %}{{ APP_NAME }}{% endblock %} — {{ APP_SLOGAN }}</title>
+    <meta name="description" content="NAMARA — Votre capital, une vision d'avenir. Investissez et faites fructifier votre argent en ligne, depuis votre mobile.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ APP_NAME }}">
+    <meta property="og:title" content="{{ APP_NAME }} — {{ APP_SLOGAN }}">
+    <meta property="og:description" content="NAMARA — Votre capital, une vision d'avenir. Investissez et faites fructifier votre argent en ligne, depuis votre mobile.">
+    <meta property="og:image" content="{{ url_for('static', filename='images/namara.jpeg', _external=True) }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ APP_NAME }} — {{ APP_SLOGAN }}">
+    <meta name="twitter:description" content="NAMARA — Votre capital, une vision d'avenir. Investissez et faites fructifier votre argent en ligne, depuis votre mobile.">
+    <meta name="twitter:image" content="{{ url_for('static', filename='images/namara.jpeg', _external=True) }}">
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
