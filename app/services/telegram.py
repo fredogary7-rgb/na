@@ -143,7 +143,7 @@ NAMARA INVESTMENTS 🌱
 Ensemble vers votre liberté financière.
 
 #NAMARA #NamaraInvestments #GrandLancement #Afrique #Investissement
-https://namara.win/register
+https://namara.win/auth/register
 https://t.me/namara_win"""
 
 
