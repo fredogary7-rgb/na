@@ -9,11 +9,11 @@ from app.payments.providers.robotpay import RobotPayProvider
 def test_robotpay_checkout_url(app):
     p = RobotPayProvider()
     with app.app_context():
-        app.config["ROBOTPAY_MERCHANT_SLUG"] = "ecomat"
+        app.config["ROBOTPAY_MERCHANT_SLUG"] = "nectarpro"
         app.config["ROBOTPAY_RETURN_URL"] = "https://namara.win/payments/robotpay/return"
         url = p.checkout_url(3000, "Niger", "DEP-TEST")
         assert "checkout1.westpay.cfd/pay" in url
-        assert "merchant=ecomat" in url
+        assert "merchant=nectarpro" in url
         assert "amount=3000" in url
         assert "country=Niger" in url
         assert "DEP-TEST" in url  # la référence est dans l'URL de retour (encodée)
