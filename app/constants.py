@@ -40,7 +40,7 @@ OPERATORS = {
     "Mali": ["Orange", "Moov"],
     "Senegal": ["Orange", "Wave"],
     "Burkina Faso": ["Orange", "Moov"],
-    "Niger": ["Airtel", "Moov"],
+    "Niger": ["Airtel", "Moov", "Zamani", "Amana", "Mynita"],
     "Togo": ["Moov", "MTN"],
     "Cameroun": ["MTN", "Orange"],
     "Gabon": ["Airtel", "Moov"],
