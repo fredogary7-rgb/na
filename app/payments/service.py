@@ -135,6 +135,34 @@ def _confirm_deposit(deposit: Deposit, external_ref) -> None:
         referral.confirm_commission(commission)
 
 
+def sync_drimpay_deposits():
+    """Synchronise les dépôts DrimPay restés « processing » (fallback polling).
+
+    Utile si un webhook a été manqué/rejeté : interroge DrimPay et met à jour
+    le statut du dépôt (successful -> confirmation, failed/cancelled -> échec).
+    Retourne le nombre de dépôts mis à jour.
+    """
+    from app.payments.providers.drimpay import DrimPayProvider
+
+    provider = DrimPayProvider()
+    deposits = Deposit.query.filter_by(provider="drimpay", status="processing").all()
+    updated = 0
+    for deposit in deposits:
+        if not deposit.external_ref:
+            continue
+        try:
+            status = provider.verify_status(deposit.external_ref)
+        except ProviderError:
+            continue
+        if status == "successful":
+            _confirm_deposit(deposit, deposit.external_ref)
+            updated += 1
+        elif status in ("failed", "cancelled"):
+            deposit.status = "failed"
+            updated += 1
+    return updated
+
+
 def create_withdrawal(user, amount, currency, country, operator, wallet_number) -> Withdrawal:
     min_amount = settings.get_int("MIN_WITHDRAWAL", current_app.config["MIN_WITHDRAWAL"])
     if amount < min_amount:

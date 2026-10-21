@@ -113,3 +113,36 @@ def test_drimpay_initiate_deposit(app, monkeypatch):
     assert captured["json"]["operator"] == "tmoney"
     assert captured["json"]["phone"] == "90000000"
     assert captured["json"]["webhook_url"] == "https://namara.win/payments/webhook/drimpay"
+
+
+def test_sync_drimpay_deposits(app, db, monkeypatch):
+    """Le fallback polling met à jour les dépôts DrimPay restés en attente."""
+    from tests.helpers import make_user
+
+    from app.models import Deposit
+    from app.payments.providers.drimpay import DrimPayProvider
+    from app.payments.service import sync_drimpay_deposits
+
+    user = make_user(db)
+    db.session.commit()
+
+    deposit = Deposit(
+        user_id=user.id, amount=3000, currency="XOF", country="Togo",
+        operator="Mix", phone_number="71339325", provider="drimpay",
+        reference="DEP-SYNC", status="processing", service_id=37,
+        external_ref="TG-SYNC",
+    )
+    db.session.add(deposit)
+    db.session.commit()
+
+    monkeypatch.setattr(
+        DrimPayProvider, "verify_status", lambda self, ref, order_id=None: "failed"
+    )
+
+    with app.app_context():
+        app.config["DRIMPAY_API_KEY"] = "dp_live_sk_test"
+        updated = sync_drimpay_deposits()
+        db.session.commit()
+
+    assert updated == 1
+    assert deposit.status == "failed"

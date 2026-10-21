@@ -274,6 +274,16 @@ def register_cli(app):
             db.session.commit()
             click.echo(f"{paid} revenu(s) quotidien(s) versé(s).")
 
+    @app.cli.command("sync-drimpay")
+    def sync_drimpay():
+        """Synchronise les dépôts DrimPay restés en attente (polling)."""
+        from app.payments.service import sync_drimpay_deposits
+
+        with app.app_context():
+            updated = sync_drimpay_deposits()
+            db.session.commit()
+            click.echo(f"{updated} dépôt(s) DrimPay synchronisé(s).")
+
 
 def configure_logging(app):
     if app.logger.handlers:

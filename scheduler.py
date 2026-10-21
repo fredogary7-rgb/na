@@ -68,6 +68,19 @@ def run_announcement():
             app.logger.exception("Erreur lors de l'envoi de l'annonce.")
 
 
+def run_sync_drimpay():
+    from app.payments.service import sync_drimpay_deposits
+
+    with app.app_context():
+        try:
+            updated = sync_drimpay_deposits()
+            db.session.commit()
+            app.logger.info("sync-drimpay : %s dépôt(s) synchronisé(s).", updated)
+        except Exception:
+            db.session.rollback()
+            app.logger.exception("Erreur lors de la synchronisation DrimPay.")
+
+
 if __name__ == "__main__":
     # Rattrape un éventuel jour manqué au démarrage (idempotent).
     run_payout()
@@ -91,5 +104,8 @@ if __name__ == "__main__":
             id=f"announcement_{hour}",
         )
         app.logger.info("Annonce programmée à %02d:00 (%s).", hour, CHANNEL_TZ)
+
+    scheduler.add_job(run_sync_drimpay, CronTrigger(minute="*/5"), id="sync_drimpay")
+    app.logger.info("Synchronisation DrimPay programmée toutes les 5 minutes.")
 
     scheduler.start()
