@@ -11,6 +11,10 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn-primary">Envoyer le message « Fonctionnement »</button>
         </form>
+        <form method="post" action="{{ url_for('admin.telegram_announcement') }}" style="margin-top:0.75rem">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary">Envoyer l'annonce NAMARA INVESTMENTS (image + texte)</button>
+        </form>
     </div>
 
     <div class="card">

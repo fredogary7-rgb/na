@@ -31,7 +31,13 @@ from app.payments import service as payments
 from app.models.base import utcnow
 from app.services import finance, support as support_service
 from app.utils import parse_amount
-from app.services.telegram import TelegramError, send_channel_info, send_channel_message, send_message
+from app.services.telegram import (
+    TelegramError,
+    send_announcement,
+    send_channel_info,
+    send_channel_message,
+    send_message,
+)
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -429,6 +435,20 @@ def telegram_info():
         _audit("telegram_channel_info", "telegram", None)
         db.session.commit()
         flash("Message « Fonctionnement » (logo + infos) envoyé à la chaîne.", "success")
+    except TelegramError as exc:
+        flash(f"Erreur d'envoi : {exc}", "danger")
+    return redirect(url_for("admin.telegram"))
+
+
+@admin_bp.route("/telegram/announcement", methods=["POST"])
+@login_required
+@admin_required
+def telegram_announcement():
+    try:
+        send_announcement()
+        _audit("telegram_announcement", "telegram", None)
+        db.session.commit()
+        flash("Annonce NAMARA INVESTMENTS (image + texte) envoyée à la chaîne.", "success")
     except TelegramError as exc:
         flash(f"Erreur d'envoi : {exc}", "danger")
     return redirect(url_for("admin.telegram"))
