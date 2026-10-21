@@ -11,16 +11,47 @@ from app.services import finance, referral, settings
 from app.utils import new_reference
 
 
-def get_provider():
+def get_provider(name=None, country=None):
+    """Résout le fournisseur de paiement.
+
+    - name : nom explicite (ex. "drimpay", "robotpay") — utilisé par la route webhook.
+    - country : pays du dépôt — utilisé pour le routage (Niger → robotpay).
+    """
+    if name:
+        if name == "drimpay":
+            from app.payments.providers.drimpay import DrimPayProvider
+
+            return DrimPayProvider()
+        if name == "robotpay":
+            from app.payments.providers.robotpay import RobotPayProvider
+
+            return RobotPayProvider()
+        if name == "soleaspay":
+            from app.payments.providers.soleaspay import SoleasPayProvider
+
+            return SoleasPayProvider()
+        from app.payments.providers.mock import MockProvider
+
+        return MockProvider()
+
     mode = current_app.config.get("PAYMENT_MODE", "mock")
+    if mode == "drimpay":
+        # Routage par pays : le Niger passe par RobotPay (page hébergée).
+        if country == "Niger":
+            from app.payments.providers.robotpay import RobotPayProvider
+
+            return RobotPayProvider()
+        from app.payments.providers.drimpay import DrimPayProvider
+
+        return DrimPayProvider()
     if mode == "soleaspay":
         from app.payments.providers.soleaspay import SoleasPayProvider
 
         return SoleasPayProvider()
-    if mode == "drimpay":
-        from app.payments.providers.drimpay import DrimPayProvider
+    if mode == "robotpay":
+        from app.payments.providers.robotpay import RobotPayProvider
 
-        return DrimPayProvider()
+        return RobotPayProvider()
     from app.payments.providers.mock import MockProvider
 
     return MockProvider()
@@ -32,7 +63,7 @@ def initiate_deposit(user, amount, currency, country, operator, phone, service_i
     if currency != user.currency:
         raise ValueError("Devise incompatible avec le compte.")
 
-    provider = get_provider()
+    provider = get_provider(country=country)
     deposit = Deposit(
         user_id=user.id,
         amount=amount,
@@ -47,7 +78,10 @@ def initiate_deposit(user, amount, currency, country, operator, phone, service_i
     )
     db.session.add(deposit)
     db.session.flush()
-    provider.initiate_deposit(deposit, otp=otp)
+    result = provider.initiate_deposit(deposit, otp=otp)
+    if result and result.get("checkout_url"):
+        # Attribut transitoire (non persisté) : URL de redirection RobotPay.
+        deposit.checkout_url = result["checkout_url"]
     return deposit
 
 
@@ -66,6 +100,17 @@ def process_deposit_webhook(provider, req):
     reference = event["reference"]
 
     deposit = Deposit.query.filter_by(reference=reference).first()
+    if deposit is None and provider.name == "robotpay":
+        # RobotPay : le webhook porte txId (pas la référence NAMARA).
+        # Rapprochement via external_ref (stocké au retour) puis montant+pays.
+        deposit = Deposit.query.filter_by(external_ref=reference).first()
+        if deposit is None:
+            amount = int(event.get("amount") or 0)
+            deposit = (
+                Deposit.query.filter_by(provider="robotpay", amount=amount, status="pending")
+                .order_by(Deposit.created_at.desc())
+                .first()
+            )
     if deposit is None:
         raise ProviderError("Référence de dépôt inconnue.")
 

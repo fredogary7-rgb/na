@@ -144,7 +144,7 @@ def deposits():
             service = service_by_name(current_user.country, form.operator.data)
             operator = service["operator"] if service else form.operator.data
             service_id = service["id"] if service else None
-            payments.initiate_deposit(
+            deposit = payments.initiate_deposit(
                 current_user,
                 amount,
                 current_user.currency,
@@ -155,6 +155,9 @@ def deposits():
                 otp=(form.otp.data or "").strip() or None,
             )
             db.session.commit()
+            checkout_url = getattr(deposit, "checkout_url", None)
+            if checkout_url:
+                return redirect(checkout_url)
             flash("Demande de dépôt enregistrée. En attente de confirmation du prestataire.", "info")
             return redirect(url_for("dashboard.deposits"))
         except (ValueError, ProviderError) as exc:

@@ -98,6 +98,14 @@ class Config:
     # URL de notification DrimPay (renseignée à l'initiation du pay-in).
     DRIMPAY_WEBHOOK_URL = os.environ.get("DRIMPAY_WEBHOOK_URL", "https://namara.win/payments/webhook/drimpay")
 
+    # RobotPay / WestPay (Niger) — https://westpay.cfd
+    ROBOTPAY_API_KEY = os.environ.get("ROBOTPAY_API_KEY")
+    ROBOTPAY_WEBHOOK_SECRET = os.environ.get("ROBOTPAY_WEBHOOK_SECRET")
+    ROBOTPAY_MERCHANT_SLUG = os.environ.get("ROBOTPAY_MERCHANT_SLUG")
+    ROBOTPAY_BASE_URL = os.environ.get("ROBOTPAY_BASE_URL", "https://westpay.cfd")
+    ROBOTPAY_CHECKOUT_URL = os.environ.get("ROBOTPAY_CHECKOUT_URL", "https://checkout1.westpay.cfd/pay")
+    ROBOTPAY_RETURN_URL = os.environ.get("ROBOTPAY_RETURN_URL", "https://namara.win/payments/robotpay/return")
+
     # Support client (Telegram + chat web)
     TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
     TELEGRAM_WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET")

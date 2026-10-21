@@ -1,9 +1,10 @@
 """Routes de paiement (webhooks)."""
 import requests
 
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, current_app, jsonify, redirect, request, url_for
 
 from app.extensions import csrf, db
+from app.models import Deposit
 from app.payments import service
 from app.payments.providers.base import ProviderError
 
@@ -40,10 +41,26 @@ def _forward_webhook(req):
         return "failed"
 
 
+@payments_bp.route("/robotpay/return/<deposit_ref>")
+def robotpay_return(deposit_ref):
+    """URL de retour après paiement RobotPay (page hébergée).
+
+    Stocke le txId WestPay (paramètre `ref`) comme external_ref du dépôt afin
+    de pouvoir le rapprocher au webhook payment.confirmed.
+    """
+    tx_ref = request.args.get("ref", "")
+    if deposit_ref and tx_ref:
+        deposit = Deposit.query.filter_by(reference=deposit_ref).first()
+        if deposit and not deposit.external_ref:
+            deposit.external_ref = tx_ref
+            db.session.commit()
+    return redirect(url_for("dashboard.deposits"))
+
+
 @payments_bp.route("/webhook/<provider_name>", methods=["POST"])
 @csrf.exempt
 def webhook(provider_name):
-    provider = service.get_provider()
+    provider = service.get_provider(name=provider_name)
     if provider.name != provider_name:
         current_app.logger.warning("WEBHOOK PROVIDER INCONNU : %s", provider_name)
         return jsonify({"error": "provider_not_found"}), 404
