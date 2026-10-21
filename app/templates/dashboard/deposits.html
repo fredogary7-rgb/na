@@ -15,6 +15,7 @@
             {{ form.amount(placeholder="3000") }}
             <span class="help-text">Montant minimum : 3 000 FCFA.</span>
         </div>
+        {% if not is_redirect_flow %}
         <div class="form-group">
             <label>Opérateur Mobile Money</label>
             <div class="service-grid">
@@ -47,6 +48,11 @@
             {{ form.otp(placeholder="Optionnel") }}
             <span class="help-text">Uniquement pour Orange Money (si demandé par SoleasPay).</span>
         </div>
+        {% else %}
+        <div class="form-group">
+            <p class="help-text">Vous serez redirigé vers une page de paiement sécurisée (WestPay) pour saisir votre numéro et valider le paiement.</p>
+        </div>
+        {% endif %}
         <button type="submit" class="btn btn-primary btn-block">Confirmer le dépôt</button>
     </form>
     <p class="help-text mt">Le dépôt est crédité uniquement après confirmation authentifiée du prestataire.</p>

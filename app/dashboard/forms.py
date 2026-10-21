@@ -8,8 +8,8 @@ from app.utils import parse_amount
 
 class DepositForm(FlaskForm):
     amount = StringField("Montant (FCFA)", validators=[DataRequired()])
-    operator = SelectField("Opérateur Mobile Money", validators=[DataRequired()])
-    phone_number = StringField("Numéro de téléphone", validators=[DataRequired()])
+    operator = SelectField("Opérateur Mobile Money", validators=[Optional()])
+    phone_number = StringField("Numéro de téléphone", validators=[Optional()])
     otp = StringField("Code OTP (Orange Money)", validators=[Optional()])
 
     def clean_amount(self) -> int:

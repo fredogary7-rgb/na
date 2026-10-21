@@ -136,21 +136,33 @@ def deposits():
     from app.payments.services import service_by_name, services_for_country
 
     services = services_for_country(current_user.country)
+    is_redirect_flow = current_user.country == "Niger"  # RobotPay (page hébergée)
     form = DepositForm()
     form.operator.choices = [(s["name"], s["name"]) for s in services]
     if form.validate_on_submit():
         try:
             amount = form.clean_amount()
-            service = service_by_name(current_user.country, form.operator.data)
-            operator = service["operator"] if service else form.operator.data
-            service_id = service["id"] if service else None
+            if is_redirect_flow:
+                # RobotPay : seul le montant est utilisé (numéro/opérateur saisis sur WestPay).
+                operator = ""
+                phone = ""
+                service_id = None
+            else:
+                if not form.operator.data:
+                    raise ValueError("Veuillez sélectionner un opérateur Mobile Money.")
+                if not (form.phone_number.data or "").strip():
+                    raise ValueError("Veuillez saisir votre numéro de téléphone.")
+                service = service_by_name(current_user.country, form.operator.data)
+                operator = service["operator"] if service else form.operator.data
+                service_id = service["id"] if service else None
+                phone = form.phone_number.data.strip()
             deposit = payments.initiate_deposit(
                 current_user,
                 amount,
                 current_user.currency,
                 current_user.country,
                 operator,
-                form.phone_number.data.strip(),
+                phone,
                 service_id=service_id,
                 otp=(form.otp.data or "").strip() or None,
             )
@@ -171,7 +183,13 @@ def deposits():
         .limit(50)
         .all()
     )
-    return render_template("dashboard/deposits.html", form=form, history=history, services=services)
+    return render_template(
+        "dashboard/deposits.html",
+        form=form,
+        history=history,
+        services=services,
+        is_redirect_flow=is_redirect_flow,
+    )
 
 
 @dashboard_bp.route("/withdrawals", methods=["GET", "POST"])
