@@ -75,7 +75,18 @@ def country_code(country_name):
 
 def services_for_country(country_name):
     code = COUNTRY_CODE.get(country_name)
-    return SERVICES.get(code, [])
+    services = SERVICES.get(code, [])
+    if services:
+        return services
+    # Pays sans catalogue de services (ex. Niger via RobotPay) :
+    # expose les opérateurs génériques pour alimenter le formulaire.
+    from app.constants import OPERATORS
+
+    operators = OPERATORS.get(country_name, [])
+    return [
+        {"id": None, "name": op, "description": op, "operator": op, "logo": None}
+        for op in operators
+    ]
 
 
 def service_by_name(country_name, name):

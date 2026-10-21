@@ -138,6 +138,9 @@ class TestingConfig(Config):
     BONUS_ENABLED = False
     BONUS_INSCRIPTION = 0
     REFERRAL_ENABLED = True
+    # Les tests utilisent toujours le fournisseur simulé (mock), quel que soit
+    # le PAYMENT_MODE défini dans le .env local.
+    PAYMENT_MODE = "mock"
     # Les tests d'investissement ont besoin de souscriptions actives.
     SUBSCRIPTIONS_ENABLED = True
     # Pas de transfert de webhook vers un site tiers pendant les tests.
