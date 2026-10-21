@@ -8,6 +8,7 @@ Variables configurables :
   DAILY_PAYOUT_HOUR      (défaut 0)  — heure UTC du versement
   DAILY_PAYOUT_MINUTE    (défaut 5)  — minute UTC du versement
   CHANNEL_MESSAGE_HOURS  (défaut "8,12,18") — heures d'envoi du message chaîne
+  ANNOUNCEMENT_HOURS     (défaut "6,12,18") — heures d'envoi de l'annonce
   CHANNEL_TZ             (défaut "Africa/Porto-Novo") — fuseau des heures chaîne
 """
 import os
@@ -28,6 +29,10 @@ CHANNEL_HOURS = [
     int(h) for h in os.environ.get("CHANNEL_MESSAGE_HOURS", "8,12,18").split(",") if h.strip()
 ]
 CHANNEL_TZ = os.environ.get("CHANNEL_TZ", "Africa/Porto-Novo")
+
+ANNOUNCEMENT_HOURS = [
+    int(h) for h in os.environ.get("ANNOUNCEMENT_HOURS", "6,12,18").split(",") if h.strip()
+]
 
 
 def run_payout():
@@ -79,7 +84,12 @@ if __name__ == "__main__":
         )
         app.logger.info("Message chaîne programmé à %02d:00 (%s).", hour, CHANNEL_TZ)
 
-    scheduler.add_job(run_announcement, CronTrigger(minute=0), id="announcement")
-    app.logger.info("Annonce programmée à chaque heure (minute 0).")
+    for hour in ANNOUNCEMENT_HOURS:
+        scheduler.add_job(
+            run_announcement,
+            CronTrigger(hour=hour, minute=0, timezone=CHANNEL_TZ),
+            id=f"announcement_{hour}",
+        )
+        app.logger.info("Annonce programmée à %02d:00 (%s).", hour, CHANNEL_TZ)
 
     scheduler.start()
