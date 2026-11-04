@@ -67,14 +67,14 @@ class Config:
     REFERRAL_MAX_LEVEL = 3
 
     # Investissements : désactivés tant qu'aucun produit n'est approuvé.
-    INVESTMENTS_ENABLED = _as_bool(os.environ.get("INVESTMENTS_ENABLED", "false"))
+    INVESTMENTS_ENABLED = _as_bool(os.environ.get("INVESTMENTS_ENABLED", "true"))
 
     # Catalogue produits — simulation hypothétique (NON validée).
     # Le taux quotidien est purement indicatif et ne constitue pas un rendement.
     SIMULATION_DAILY_RATE = float(os.environ.get("SIMULATION_DAILY_RATE", "0.08"))
     SIMULATION_SHOW_AMOUNTS = _as_bool(os.environ.get("SIMULATION_SHOW_AMOUNTS", "true"))
     # Souscriptions réelles : bloquées tant que le modèle économique n'est pas validé.
-    SUBSCRIPTIONS_ENABLED = _as_bool(os.environ.get("SUBSCRIPTIONS_ENABLED", "false"))
+    SUBSCRIPTIONS_ENABLED = _as_bool(os.environ.get("SUBSCRIPTIONS_ENABLED", "true"))
 
     # Paiements : "mock" (simulation explicite) ou "soleaspay".
     PAYMENT_MODE = os.environ.get("PAYMENT_MODE", "mock")
