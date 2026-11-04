@@ -1,20 +1,87 @@
 {% extends "admin_base.html" %}
 {% block title %}Paramètres{% endblock %}
+
 {% block content %}
+
 <div class="container">
     <h2>Paramètres</h2>
-    {% include "admin/_nav.html" %}
-    <div class="card narrow">
-        <form method="post" novalidate>
-            {{ form.hidden_tag() }}
-            <div class="form-group checkbox">{{ form.bonus_enabled() }} <label for="bonus_enabled">Bonus de bienvenue activé</label></div>
-            <div class="form-group">{{ form.bonus_amount.label }} {{ form.bonus_amount() }}</div>
-            <div class="form-group">{{ form.min_deposit.label }} {{ form.min_deposit() }}</div>
-            <div class="form-group">{{ form.min_withdrawal.label }} {{ form.min_withdrawal() }}</div>
-            <div class="form-group checkbox">{{ form.referral_enabled() }} <label for="referral_enabled">Parrainage activé</label></div>
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
-        </form>
-        <p class="help-text mt">Tout changement financier est enregistré dans le journal d'audit.</p>
-    </div>
+
+```
+{% include "admin/_nav.html" %}
+
+<div class="card narrow">
+    <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+
+        <h3>Paramètres financiers</h3>
+
+        <div class="form-group checkbox">
+            {{ form.bonus_enabled() }}
+            {{ form.bonus_enabled.label }}
+        </div>
+
+        <div class="form-group">
+            {{ form.bonus_amount.label }}
+            {{ form.bonus_amount() }}
+        </div>
+
+        <div class="form-group">
+            {{ form.min_deposit.label }}
+            {{ form.min_deposit() }}
+        </div>
+
+        <div class="form-group">
+            {{ form.min_withdrawal.label }}
+            {{ form.min_withdrawal() }}
+        </div>
+
+        <hr>
+
+        <h3>Parrainage</h3>
+
+        <div class="form-group checkbox">
+            {{ form.referral_enabled() }}
+            {{ form.referral_enabled.label }}
+        </div>
+
+        <hr>
+
+        <h3>Gestion des investissements</h3>
+
+        <div class="form-group checkbox">
+            {{ form.subscriptions_enabled() }}
+            {{ form.subscriptions_enabled.label }}
+        </div>
+
+        <p class="help-text">
+            Active cette option pour autoriser les utilisateurs à souscrire
+            aux produits approuvés.
+        </p>
+
+        <hr>
+
+        <h3>Simulation</h3>
+
+        <div class="form-group checkbox">
+            {{ form.simulation_show() }}
+            {{ form.simulation_show.label }}
+        </div>
+
+        <div class="form-group">
+            {{ form.simulation_daily_rate.label }}
+            {{ form.simulation_daily_rate() }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Enregistrer les paramètres
+        </button>
+    </form>
+
+    <p class="help-text mt">
+        Tout changement financier est enregistré dans le journal d'audit.
+    </p>
+</div>
+```
+
 </div>
 {% endblock %}
